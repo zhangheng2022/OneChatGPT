@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:one_chatgpt_flutter/ui/person/person.dart';
 import 'package:one_chatgpt_flutter/ui/components/navbar.dart';
 
-class Home extends StatefulWidget {
-  const Home({super.key});
+class Person extends StatefulWidget {
+  const Person({super.key});
   @override
-  State<Home> createState() => _HomeState();
+  State<Person> createState() => _PersonState();
 }
 
-class _HomeState extends State<Home> {
+class _PersonState extends State<Person> {
   int _counter = 0;
   void _incrementCounter() {
     setState(() {
@@ -16,13 +15,12 @@ class _HomeState extends State<Home> {
     });
   }
 
-  int currentPageIndex = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: const Text("首页"),
+          title: const Text("个人中心"),
           actions: <Widget>[
             IconButton(
                 onPressed: () => {},
@@ -42,22 +40,11 @@ class _HomeState extends State<Home> {
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
               FilledButton(
-                onPressed: () => {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Person()),
-                  )
-                },
+                onPressed: _incrementCounter,
                 child: const Text('登录'),
               ),
             ],
           ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: _incrementCounter,
-          tooltip: '新增会话',
-          mini: true,
-          child: const Icon(Icons.add),
         ),
         bottomNavigationBar: const Navbar());
   }

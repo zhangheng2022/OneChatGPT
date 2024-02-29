@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="one_chatgpt_flutter"
+        android:label="OneChatGPT"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
