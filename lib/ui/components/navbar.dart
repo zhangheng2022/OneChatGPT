@@ -17,6 +17,7 @@ class _NavbarState extends State<Navbar> {
           currentPageIndex = index;
         });
       },
+      labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
       selectedIndex: currentPageIndex,
       destinations: const <Widget>[
         NavigationDestination(
