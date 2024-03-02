@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:one_chatgpt_flutter/ui/person/person.dart';
-import 'package:one_chatgpt_flutter/ui/components/navbar.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -17,18 +15,33 @@ class _HomeState extends State<Home> {
   }
 
   int currentPageIndex = 0;
+  void updatePageIndex(int index) {
+    setState(() {
+      currentPageIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: const Text("首页"),
-          actions: <Widget>[
-            IconButton(
-                onPressed: () => {},
-                tooltip: "调整",
-                icon: const Icon(Icons.density_medium))
-          ],
+        appBar: appBar(),
+        drawer: Drawer(
+          child: ListView(
+            children: [
+              const DrawerHeader(
+                child: Text('Drawer Header'),
+              ),
+              ListTile(
+                title: const Text('Item 1'),
+                onTap: () {},
+              ),
+              ListTile(
+                title: const Text('Item 2'),
+                subtitle: const Text("data"),
+                onTap: () {},
+              ),
+            ],
+          ),
         ),
         body: Center(
           child: Column(
@@ -42,12 +55,7 @@ class _HomeState extends State<Home> {
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
               FilledButton(
-                onPressed: () => {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Person()),
-                  )
-                },
+                onPressed: () => {Navigator.pushNamed(context, '/person')},
                 child: const Text('登录'),
               ),
             ],
@@ -55,10 +63,39 @@ class _HomeState extends State<Home> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: _incrementCounter,
-          tooltip: '新增会话',
+          tooltip: '新增对话',
           mini: true,
-          child: const Icon(Icons.add),
+          child: const Icon(Icons.add_card),
         ),
-        bottomNavigationBar: const Navbar());
+        bottomNavigationBar: navigationBar(currentPageIndex));
   }
+}
+
+AppBar appBar() {
+  return AppBar(actions: <Widget>[
+    IconButton(
+        onPressed: () => {},
+        tooltip: "设置",
+        icon: const Icon(Icons.density_medium))
+  ]);
+}
+
+NavigationBar navigationBar(index) {
+  return NavigationBar(
+    onDestinationSelected: (int index) {},
+    labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+    selectedIndex: index,
+    destinations: const <Widget>[
+      NavigationDestination(
+        selectedIcon: Icon(Icons.ballot),
+        icon: Icon(Icons.ballot_outlined),
+        label: '对话',
+      ),
+      NavigationDestination(
+        selectedIcon: Icon(Icons.person),
+        icon: Icon(Icons.person_outlined),
+        label: '我的',
+      ),
+    ],
+  );
 }

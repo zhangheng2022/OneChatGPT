@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:one_chatgpt_flutter/ui/home/home.dart';
+import 'package:one_chatgpt_flutter/ui/person/person.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,8 +17,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
       ),
-      home: const Home(),
       debugShowCheckedModeBanner: false,
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const Home(),
+        '/person': (context) => const Person(),
+      },
     );
   }
 }
