@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const Index(),
         '/login': (context) => Login(),
-        '/chat': (context) => Chat()
+        '/chat': (context) => const ChatPage()
       },
     );
   }
