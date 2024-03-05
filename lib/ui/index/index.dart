@@ -30,8 +30,7 @@ class _IndexState extends State<Index> {
         floatingActionButton: FloatingActionButton(
           onPressed: () => {},
           tooltip: '新增对话',
-          mini: true,
-          child: const Icon(Icons.add_card),
+          child: const Icon(Icons.add),
         ),
         bottomNavigationBar: NavigationBar(
           onDestinationSelected: (int index) {
