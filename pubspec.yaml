@@ -37,7 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   provider: ^6.1.2
   flutter_chat_ui: ^1.6.12
-  file_picker: ^6.1.1
+  file_picker: ^6.2.0
   flutter_chat_types: ^3.6.2
   image_picker: ^1.0.7
   uuid: ^4.3.3
@@ -45,8 +45,8 @@ dependencies:
   open_filex: ^4.4.0
   mime: ^1.0.5
   intl: ^0.19.0
-  firebase_core: ^2.24.2
-  firebase_auth: ^4.17.6
+  firebase_core: ^2.26.0
+  firebase_auth: ^4.17.7
 
 dev_dependencies:
   flutter_test:
