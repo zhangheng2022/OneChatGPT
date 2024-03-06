@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:one_chatgpt_flutter/ui/index/components/home.dart';
 import 'package:one_chatgpt_flutter/ui/index/components/person.dart';
@@ -9,6 +11,12 @@ class Index extends StatefulWidget {
 }
 
 class _IndexState extends State<Index> {
+  @override
+  void initState() {
+    super.initState();
+    log('message');
+  }
+
   int currentPageIndex = 0;
   void updatePageIndex(int index) {
     setState(() {

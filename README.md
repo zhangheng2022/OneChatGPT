@@ -1,16 +1,5 @@
-# one_chatgpt_flutter
+# OneChatGPT
 
-A new Flutter project.
+一个基于Flutter的chatGPT开源项目，免费使用GPT-3.5和Google genmini等
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 正在开发中...

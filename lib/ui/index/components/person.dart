@@ -9,9 +9,7 @@ class Person extends StatefulWidget {
 class _PersonState extends State<Person> {
   int _counter = 0;
   void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+    Navigator.of(context).pushReplacementNamed('/login');
   }
 
   @override

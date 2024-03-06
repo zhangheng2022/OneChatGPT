@@ -45,6 +45,8 @@ dependencies:
   open_filex: ^4.4.0
   mime: ^1.0.5
   intl: ^0.19.0
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.17.6
 
 dev_dependencies:
   flutter_test:
