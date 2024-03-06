@@ -8,30 +8,59 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginForm extends State<LoginForm> {
+  bool _showObscureText = false;
   @override
   Widget build(BuildContext context) {
     return Form(
       child: (Column(
-        children: [
+        children: <Widget>[
           TextFormField(
-              autofocus: true,
-              decoration: const InputDecoration(
-                  labelText: '邮箱',
-                  prefixIcon: Icon(Icons.mail),
-                  enabledBorder: InputBorder.none),
-              validator: (value) {
-                return '请输入正确的邮箱地址';
-              },
-              onSaved: (val) {}),
+            autofocus: true,
+            keyboardType: TextInputType.emailAddress,
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.mail_outlined),
+              labelText: '邮箱',
+              border: OutlineInputBorder(),
+            ),
+            validator: (value) {
+              return '请输入正确的邮箱地址';
+            },
+            onSaved: (val) {},
+          ),
+          const SizedBox(height: 20),
           TextFormField(
-              decoration: const InputDecoration(labelText: '密码'),
-              validator: (value) {
-                return '请输入正确的邮箱地址';
+            obscureText: _showObscureText,
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.lock_outlined),
+              labelText: '密码',
+              border: const OutlineInputBorder(),
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.remove_red_eye),
+                onPressed: () {
+                  setState(() {
+                    _showObscureText = !_showObscureText;
+                  });
+                },
+              ),
+            ),
+            validator: (value) {
+              return '请输入正确的邮箱地址';
+            },
+            onSaved: (val) {},
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            height: 50,
+            child: FilledButton.icon(
+              style: const ButtonStyle(),
+              icon: const Icon(Icons.login),
+              label: const Text("登录"),
+              onPressed: () {
+                Navigator.pushNamed(context, '/');
               },
-              onSaved: (val) {}),
-          const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [Text("立即注册"), Text("忘记密码？")])
+            ),
+          )
         ],
       )),
     );
