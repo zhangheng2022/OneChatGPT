@@ -9,7 +9,8 @@ class LoginForm extends StatefulWidget {
 
 class _LoginForm extends State<LoginForm> {
   bool _showObscureText = false;
-  @override
+  // Object _form = {String mail: "", password: ""};
+
   Widget build(BuildContext context) {
     return Form(
       child: (Column(
@@ -30,6 +31,7 @@ class _LoginForm extends State<LoginForm> {
           const SizedBox(height: 20),
           TextFormField(
             obscureText: _showObscureText,
+            keyboardType: TextInputType.visiblePassword,
             decoration: InputDecoration(
               prefixIcon: const Icon(Icons.lock_outlined),
               labelText: '密码',
@@ -47,6 +49,7 @@ class _LoginForm extends State<LoginForm> {
               return '请输入正确的邮箱地址';
             },
             onSaved: (val) {},
+            onChanged: (value) {},
           ),
           const SizedBox(height: 20),
           SizedBox(
