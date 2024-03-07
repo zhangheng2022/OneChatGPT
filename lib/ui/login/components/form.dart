@@ -9,8 +9,8 @@ class LoginForm extends StatefulWidget {
 
 class _LoginForm extends State<LoginForm> {
   bool _showObscureText = false;
-  // Object _form = {String mail: "", password: ""};
-
+  final _form = {'mail': '', 'password': ''};
+  @override
   Widget build(BuildContext context) {
     return Form(
       child: (Column(
@@ -27,6 +27,9 @@ class _LoginForm extends State<LoginForm> {
               return '请输入正确的邮箱地址';
             },
             onSaved: (val) {},
+            onChanged: (val) {
+              _form['mail'] = val;
+            },
           ),
           const SizedBox(height: 20),
           TextFormField(
@@ -49,7 +52,9 @@ class _LoginForm extends State<LoginForm> {
               return '请输入正确的邮箱地址';
             },
             onSaved: (val) {},
-            onChanged: (value) {},
+            onChanged: (val) {
+              _form['password'] = val;
+            },
           ),
           const SizedBox(height: 20),
           SizedBox(
@@ -60,7 +65,8 @@ class _LoginForm extends State<LoginForm> {
               icon: const Icon(Icons.login),
               label: const Text("登录"),
               onPressed: () {
-                Navigator.pushNamed(context, '/');
+                print(_form);
+                // Navigator.pushNamed(context, '/');
               },
             ),
           )
