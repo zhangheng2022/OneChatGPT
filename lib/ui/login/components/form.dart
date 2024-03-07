@@ -39,14 +39,16 @@ class _LoginForm extends State<LoginForm> {
               prefixIcon: const Icon(Icons.lock_outlined),
               labelText: '密码',
               border: const OutlineInputBorder(),
-              suffixIcon: IconButton(
-                icon: const Icon(Icons.remove_red_eye),
-                onPressed: () {
-                  setState(() {
-                    _showObscureText = !_showObscureText;
-                  });
-                },
-              ),
+              suffixIcon: _form['password']!.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.remove_red_eye),
+                      onPressed: () {
+                        setState(() {
+                          _showObscureText = !_showObscureText;
+                        });
+                      },
+                    )
+                  : null,
             ),
             validator: (value) {
               return '请输入正确的邮箱地址';
