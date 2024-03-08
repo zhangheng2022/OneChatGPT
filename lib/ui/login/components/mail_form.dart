@@ -9,6 +9,7 @@ class LoginForm extends StatefulWidget {
 
 class _LoginForm extends State<LoginForm> {
   bool _showObscureText = false;
+  final _form = {'mail': '', 'password': ''};
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -27,27 +28,36 @@ class _LoginForm extends State<LoginForm> {
               return '请输入正确的邮箱地址';
             },
             onSaved: (val) {},
+            onChanged: (val) {
+              _form['mail'] = val;
+            },
           ),
           const SizedBox(height: 20),
           TextFormField(
             obscureText: _showObscureText,
+            keyboardType: TextInputType.visiblePassword,
             decoration: InputDecoration(
               prefixIcon: const Icon(Icons.lock_outlined),
               labelText: '密码',
               border: const OutlineInputBorder(),
-              suffixIcon: IconButton(
-                icon: const Icon(Icons.remove_red_eye),
-                onPressed: () {
-                  setState(() {
-                    _showObscureText = !_showObscureText;
-                  });
-                },
-              ),
+              suffixIcon: _form['password']!.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.remove_red_eye),
+                      onPressed: () {
+                        setState(() {
+                          _showObscureText = !_showObscureText;
+                        });
+                      },
+                    )
+                  : null,
             ),
             validator: (value) {
               return '请输入正确的邮箱地址';
             },
             onSaved: (val) {},
+            onChanged: (val) {
+              _form['password'] = val;
+            },
           ),
           const SizedBox(height: 20),
           SizedBox(
@@ -57,7 +67,8 @@ class _LoginForm extends State<LoginForm> {
               icon: const Icon(Icons.login),
               label: const Text("登录"),
               onPressed: () {
-                Navigator.of(context).pushReplacementNamed('/');
+                print(_form);
+                // Navigator.pushNamed(context, '/');
               },
             ),
           )
