@@ -1,19 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:one_chatgpt_flutter/utils/validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginEmail extends StatefulWidget {
   const LoginEmail({super.key});
 
   @override
-  State<LoginEmail> createState() => _LoginEmail();
+  State<LoginEmail> createState() => _LoginEmailState();
 }
 
-class _LoginEmail extends State<LoginEmail> {
-  bool _showObscureText = false;
-  final _form = {'mail': '', 'password': ''};
+class _LoginEmailState extends State<LoginEmail> {
+  bool _hideObscureText = true;
+  final _form = Map.from({'emali': '', 'password': ''});
+  final GlobalKey _formKey = GlobalKey<FormState>();
+  var _isLoading = false;
+
+  Future<void> _onSubmit(context) async {
+    if (!(_formKey.currentState as FormState).validate()) return;
+    try {
+      setState(() => _isLoading = true);
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _form['email'],
+        password: _form['password'],
+      );
+    } on FirebaseAuthException {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            showCloseIcon: true,
+            behavior: SnackBarBehavior.floating,
+            content: Text('账号或密码不正确')),
+      );
+    } catch (err) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          showCloseIcon: true,
+          behavior: SnackBarBehavior.floating,
+          content: Text('系统错误，请稍后再试'),
+        ),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
-      autovalidateMode: AutovalidateMode.always,
+      key: _formKey,
       child: (Column(
         children: <Widget>[
           TextFormField(
@@ -25,16 +58,18 @@ class _LoginEmail extends State<LoginEmail> {
               border: OutlineInputBorder(),
             ),
             validator: (value) {
-              return '请输入正确的邮箱地址';
+              if (value!.isEmpty) return "请输入邮箱";
+              if (!Validator.validatorEmail(value)) return "请输入正确的邮箱";
             },
-            onSaved: (val) {},
             onChanged: (val) {
-              _form['mail'] = val;
+              setState(() {
+                _form['email'] = val;
+              });
             },
           ),
           const SizedBox(height: 20),
           TextFormField(
-            obscureText: _showObscureText,
+            obscureText: _hideObscureText,
             keyboardType: TextInputType.visiblePassword,
             decoration: InputDecoration(
               prefixIcon: const Icon(Icons.lock_outlined),
@@ -45,18 +80,20 @@ class _LoginEmail extends State<LoginEmail> {
                       icon: const Icon(Icons.remove_red_eye),
                       onPressed: () {
                         setState(() {
-                          _showObscureText = !_showObscureText;
+                          _hideObscureText = !_hideObscureText;
                         });
                       },
                     )
                   : null,
             ),
             validator: (value) {
-              return '请输入正确的邮箱地址';
+              if (value!.isEmpty) return "请输入密码";
+              if (!Validator.validatorPassword(value)) return "请输入正确的密码";
             },
-            onSaved: (val) {},
             onChanged: (val) {
-              _form['password'] = val;
+              setState(() {
+                _form['password'] = val;
+              });
             },
           ),
           const SizedBox(height: 20),
@@ -64,11 +101,10 @@ class _LoginEmail extends State<LoginEmail> {
             width: double.infinity,
             height: 50,
             child: FilledButton.icon(
-              icon: const Icon(Icons.login),
+              icon: _isLoading ? loading(context) : const Icon(Icons.login),
               label: const Text("登录"),
               onPressed: () {
-                print(_form);
-                // Navigator.pushNamed(context, '/');
+                if (!_isLoading) _onSubmit(context);
               },
             ),
           )
@@ -76,4 +112,12 @@ class _LoginEmail extends State<LoginEmail> {
       )),
     );
   }
+}
+
+Widget loading(BuildContext context) {
+  return const SizedBox(
+    width: 24,
+    height: 24,
+    child: CircularProgressIndicator(color: Colors.white),
+  );
 }

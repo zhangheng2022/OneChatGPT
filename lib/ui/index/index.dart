@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:one_chatgpt_flutter/ui/index/components/home.dart';
 import 'package:one_chatgpt_flutter/ui/index/components/person.dart';
 
-class Index extends StatefulWidget {
-  const Index({super.key});
+class IndexPage extends StatefulWidget {
+  const IndexPage({super.key});
   @override
-  State<Index> createState() => _IndexState();
+  State<IndexPage> createState() => _IndexPageState();
 }
 
-class _IndexState extends State<Index> {
+class _IndexPageState extends State<IndexPage> {
   @override
   void initState() {
     super.initState();

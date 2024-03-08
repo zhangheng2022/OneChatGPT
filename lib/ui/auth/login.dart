@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:one_chatgpt_flutter/ui/auth/components/login_email.dart';
 import 'package:one_chatgpt_flutter/ui/auth/components/logo.dart';
 import 'package:one_chatgpt_flutter/ui/auth/components/footer.dart';
 
-class Login extends StatefulWidget {
-  const Login({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  State<Login> createState() => _Login();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _Login extends State<Login> {
+class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(

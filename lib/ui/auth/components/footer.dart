@@ -25,14 +25,15 @@ class LoginFooter extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).pushNamed('/register');
+            },
             child: Text(
               "立即注册",
               style: TextStyle(
                 color: isDarkMode(context)
                     ? Theme.of(context).primaryColorLight
                     : Theme.of(context).primaryColor,
-                decoration: TextDecoration.underline,
               ),
             ),
           ),
