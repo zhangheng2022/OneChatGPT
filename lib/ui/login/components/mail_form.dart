@@ -12,6 +12,7 @@ class _LoginForm extends State<LoginForm> {
   @override
   Widget build(BuildContext context) {
     return Form(
+      autovalidateMode: AutovalidateMode.always,
       child: (Column(
         children: <Widget>[
           TextFormField(
@@ -53,11 +54,10 @@ class _LoginForm extends State<LoginForm> {
             width: double.infinity,
             height: 50,
             child: FilledButton.icon(
-              style: const ButtonStyle(),
               icon: const Icon(Icons.login),
               label: const Text("登录"),
               onPressed: () {
-                Navigator.pushNamed(context, '/');
+                Navigator.of(context).pushReplacementNamed('/');
               },
             ),
           )

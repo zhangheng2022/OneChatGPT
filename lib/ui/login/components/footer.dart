@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 class LoginFooter extends StatelessWidget {
   const LoginFooter({super.key});
 
+  bool isDarkMode(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(children: [
@@ -25,7 +29,9 @@ class LoginFooter extends StatelessWidget {
             child: Text(
               "立即注册",
               style: TextStyle(
-                color: Theme.of(context).primaryColorLight,
+                color: isDarkMode(context)
+                    ? Theme.of(context).primaryColorLight
+                    : Theme.of(context).primaryColor,
                 decoration: TextDecoration.underline,
               ),
             ),
