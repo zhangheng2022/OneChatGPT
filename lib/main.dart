@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:one_chatgpt_flutter/ui/index/index.dart';
-import 'package:one_chatgpt_flutter/ui/login/login.dart';
+import 'package:one_chatgpt_flutter/ui/auth/login.dart';
 import 'package:one_chatgpt_flutter/ui/chat/chat.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:one_chatgpt_flutter/config/firebase.dart';

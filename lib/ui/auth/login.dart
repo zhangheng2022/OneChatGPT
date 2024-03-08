@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:one_chatgpt_flutter/ui/login/components/mail_form.dart';
-import 'package:one_chatgpt_flutter/ui/login/components/header.dart';
-import 'package:one_chatgpt_flutter/ui/login/components/footer.dart';
+import 'package:one_chatgpt_flutter/ui/auth/components/login_email.dart';
+import 'package:one_chatgpt_flutter/ui/auth/components/logo.dart';
+import 'package:one_chatgpt_flutter/ui/auth/components/footer.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -21,8 +21,8 @@ class _Login extends State<Login> {
           child: Column(
             children: [
               SizedBox(height: kToolbarHeight),
-              LoginHeader(),
-              LoginForm(),
+              Logo(),
+              LoginEmail(),
               LoginFooter(),
             ],
           ),

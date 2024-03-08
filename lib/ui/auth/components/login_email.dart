@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class LoginForm extends StatefulWidget {
-  const LoginForm({super.key});
+class LoginEmail extends StatefulWidget {
+  const LoginEmail({super.key});
 
   @override
-  State<LoginForm> createState() => _LoginForm();
+  State<LoginEmail> createState() => _LoginEmail();
 }
 
-class _LoginForm extends State<LoginForm> {
+class _LoginEmail extends State<LoginEmail> {
   bool _showObscureText = false;
   final _form = {'mail': '', 'password': ''};
   @override
