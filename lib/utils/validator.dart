@@ -10,8 +10,7 @@ class Validator {
   }
 
   /// 密码正则
-  static String regexPassword =
-      r"^\S*(?=\S{6,})(?=\S*\d)(?=\S*[A-Z])(?=\S*[a-z])(?=\S*[!@#$%^&*? ])\S*$";
+  static String regexPassword = r"^(?=.*[a-zA-Z])(?=.*\d).{6,}$";
 
   /// 判断密码是否正确
   static bool validatorPassword(String value) {

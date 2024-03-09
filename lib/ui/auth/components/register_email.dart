@@ -4,15 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:one_chatgpt_flutter/utils/validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class LoginEmail extends StatefulWidget {
-  const LoginEmail({super.key});
+class RegisterEmail extends StatefulWidget {
+  const RegisterEmail({super.key});
 
   @override
-  State<LoginEmail> createState() => _LoginEmailState();
+  State<RegisterEmail> createState() => _RegisterEmailState();
 }
 
-class _LoginEmailState extends State<LoginEmail> {
+class _RegisterEmailState extends State<RegisterEmail> {
   bool _hideObscureText = true;
+  bool _hideRepeatObscureText = true;
   final _form = Map.from({'emali': '', 'password': ''});
   final GlobalKey _formKey = GlobalKey<FormState>();
   var _isLoading = false;
@@ -21,17 +22,23 @@ class _LoginEmailState extends State<LoginEmail> {
     if (!(_formKey.currentState as FormState).validate()) return;
     try {
       setState(() => _isLoading = true);
-      final user = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _form['email'],
         password: _form['password'],
       );
-      print(user);
-    } on FirebaseAuthException {
+    } on FirebaseAuthException catch (err) {
+      log(err.code, level: 1);
+      String errMessage = "";
+      if (err.code == 'email-already-in-use') {
+        errMessage = "该邮箱的帐户已存在";
+      } else if (err.code == 'weak-password') {
+        errMessage = "您的密码太简单了，请重新输入";
+      }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
             showCloseIcon: true,
             behavior: SnackBarBehavior.floating,
-            content: Text('账号或密码不正确')),
+            content: Text(errMessage)),
       );
     } catch (err) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -50,7 +57,6 @@ class _LoginEmailState extends State<LoginEmail> {
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
       child: (Column(
         children: <Widget>[
           TextFormField(
@@ -60,10 +66,12 @@ class _LoginEmailState extends State<LoginEmail> {
               prefixIcon: Icon(Icons.mail_outlined),
               labelText: '邮箱',
               border: OutlineInputBorder(),
+              hintText: "请输入邮箱",
             ),
             validator: (value) {
               if (value!.isEmpty) return "请输入邮箱";
               if (!Validator.validatorEmail(value)) return "请输入正确的邮箱";
+              return null;
             },
             onChanged: (val) {
               setState(() {
@@ -79,6 +87,8 @@ class _LoginEmailState extends State<LoginEmail> {
               prefixIcon: const Icon(Icons.lock_outlined),
               labelText: '密码',
               border: const OutlineInputBorder(),
+              hintText: "请输入密码",
+              helperText: "最少6位，包括至少1个字母，1个数字",
               suffixIcon: _form['password']!.isNotEmpty
                   ? IconButton(
                       icon: const Icon(Icons.remove_red_eye),
@@ -93,6 +103,7 @@ class _LoginEmailState extends State<LoginEmail> {
             validator: (value) {
               if (value!.isEmpty) return "请输入密码";
               if (!Validator.validatorPassword(value)) return "请输入正确的密码";
+              return null;
             },
             onChanged: (val) {
               setState(() {
@@ -101,12 +112,39 @@ class _LoginEmailState extends State<LoginEmail> {
             },
           ),
           const SizedBox(height: 20),
+          TextFormField(
+            obscureText: _hideRepeatObscureText,
+            keyboardType: TextInputType.visiblePassword,
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.lock_outlined),
+              labelText: '密码',
+              border: const OutlineInputBorder(),
+              hintText: "请再次输入密码",
+              helperText: "请再次输入密码",
+              suffixIcon: _form['password']!.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.remove_red_eye),
+                      onPressed: () {
+                        setState(() {
+                          _hideRepeatObscureText = !_hideRepeatObscureText;
+                        });
+                      },
+                    )
+                  : null,
+            ),
+            validator: (value) {
+              if (value!.isEmpty) return "请输入密码";
+              if (value != _form['password']) return "两次输入密码不一致";
+              return null;
+            },
+          ),
+          const SizedBox(height: 20),
           SizedBox(
             width: double.infinity,
             height: 50,
             child: FilledButton.icon(
-              icon: _isLoading ? loading(context) : const Icon(Icons.login),
-              label: const Text("登录"),
+              icon: _isLoading ? loading(context) : const Icon(Icons.add),
+              label: const Text("注册"),
               onPressed: () {
                 if (!_isLoading) _onSubmit(context);
               },

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:one_chatgpt_flutter/ui/auth/components/logo.dart';
+import 'package:one_chatgpt_flutter/ui/auth/components/register_email.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -19,7 +20,10 @@ class _RegisterPageState extends State<RegisterPage> {
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20),
           child: Column(
-            children: [SizedBox(height: kToolbarHeight), Logo()],
+            children: [
+              Logo(),
+              RegisterEmail(),
+            ],
           ),
         ),
       ),
