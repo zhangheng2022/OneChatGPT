@@ -1,8 +1,10 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:one_chatgpt_flutter/state/userinfo.dart';
 import 'package:one_chatgpt_flutter/ui/index/components/home.dart';
 import 'package:one_chatgpt_flutter/ui/index/components/person.dart';
+import 'package:provider/provider.dart';
 
 class IndexPage extends StatefulWidget {
   const IndexPage({super.key});
@@ -14,7 +16,6 @@ class _IndexPageState extends State<IndexPage> {
   @override
   void initState() {
     super.initState();
-    log('message');
   }
 
   int currentPageIndex = 0;
@@ -29,6 +30,8 @@ class _IndexPageState extends State<IndexPage> {
   final pageController = PageController();
   @override
   Widget build(BuildContext context) {
+    UserinfoModel userinfoModel = Provider.of<UserinfoModel>(context);
+    log('userinfoModel.isLogin：${userinfoModel.isLogin}');
     return Scaffold(
         body: PageView(
           controller: pageController,

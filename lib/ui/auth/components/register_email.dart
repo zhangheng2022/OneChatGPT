@@ -26,6 +26,7 @@ class _RegisterEmailState extends State<RegisterEmail> {
         email: _form['email'],
         password: _form['password'],
       );
+      _showDialog(context);
     } on FirebaseAuthException catch (err) {
       log(err.code, level: 1);
       String errMessage = "";
@@ -161,5 +162,38 @@ Widget loading(BuildContext context) {
     width: 24,
     height: 24,
     child: CircularProgressIndicator(color: Colors.white),
+  );
+}
+
+Future<void> _showDialog(context) async {
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false, // user must tap button!
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text(
+          '恭喜您，注册成功',
+          textAlign: TextAlign.center,
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        content: SingleChildScrollView(
+          child: Icon(
+            Icons.check_circle,
+            size: 120,
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
+        actions: <Widget>[
+          FilledButton.tonal(
+            child: const Text('返回'),
+            onPressed: () {
+              Navigator.of(context)
+                ..pop()
+                ..pop();
+            },
+          ),
+        ],
+      );
+    },
   );
 }
