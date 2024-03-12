@@ -1,13 +1,13 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'userinfo.dart';
+import 'user.dart';
 part 'profile.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class Profile {
-  Profile(this.userinfo, this.theme);
+  Profile(this.user, this.theme);
 
   final int? theme;
-  final Userinfo? userinfo;
+  final User? user;
 
   // 从JSON创建User实例的工厂方法
   factory Profile.fromJson(Map<String, dynamic> json) =>

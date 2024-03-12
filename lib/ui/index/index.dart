@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:one_chatgpt_flutter/state/userinfo.dart';
+import 'package:one_chatgpt_flutter/state/user.dart';
 import 'package:one_chatgpt_flutter/ui/index/components/home.dart';
 import 'package:one_chatgpt_flutter/ui/index/components/person.dart';
 import 'package:provider/provider.dart';
@@ -30,8 +30,8 @@ class _IndexPageState extends State<IndexPage> {
   final pageController = PageController();
   @override
   Widget build(BuildContext context) {
-    UserinfoModel userinfoModel = Provider.of<UserinfoModel>(context);
-    log('userinfoModel.isLogin：${userinfoModel.isLogin}');
+    final userProvider = Provider.of<UserProvider>(context);
+    log('userinfoModel.isLogin：${userProvider.isLogin}');
     return Scaffold(
         body: PageView(
           controller: pageController,

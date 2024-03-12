@@ -4,7 +4,7 @@ import 'package:one_chatgpt_flutter/ui/index/index.dart';
 import 'package:one_chatgpt_flutter/ui/auth/login.dart';
 import 'package:one_chatgpt_flutter/ui/chat/chat.dart';
 import 'package:one_chatgpt_flutter/ui/auth/Register.dart';
-import 'package:one_chatgpt_flutter/state/userinfo.dart';
+import 'package:one_chatgpt_flutter/state/user.dart';
 import 'package:one_chatgpt_flutter/state/global.dart';
 
 Future<void> main() async {
@@ -19,7 +19,7 @@ class InitApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => UserinfoModel()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
       ],
       child: MaterialApp(
         title: 'OneChatGPT',

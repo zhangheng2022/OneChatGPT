@@ -7,13 +7,13 @@ part of 'profile.dart';
 // **************************************************************************
 
 Profile _$ProfileFromJson(Map<String, dynamic> json) => Profile(
-      json['userinfo'] == null
+      json['user'] == null
           ? null
-          : Userinfo.fromJson(json['userinfo'] as Map<String, dynamic>),
+          : User.fromJson(json['user'] as Map<String, dynamic>),
       json['theme'] as int?,
     );
 
 Map<String, dynamic> _$ProfileToJson(Profile instance) => <String, dynamic>{
       'theme': instance.theme,
-      'userinfo': instance.userinfo?.toJson(),
+      'user': instance.user?.toJson(),
     };
