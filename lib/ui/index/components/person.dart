@@ -7,7 +7,6 @@ class Person extends StatefulWidget {
 }
 
 class _PersonState extends State<Person> {
-  int _counter = 0;
   void _incrementCounter() {
     Navigator.of(context).pushReplacementNamed('/login');
   }
@@ -27,7 +26,7 @@ class _PersonState extends State<Person> {
               'You have pushed the button this many times:',
             ),
             Text(
-              '$_counter',
+              '1',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             FilledButton(

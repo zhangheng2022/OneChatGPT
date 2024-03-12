@@ -5,9 +5,8 @@ part 'userinfo.g.dart';
 class Userinfo {
   String? uid;
   String? email;
-  int? age;
 
-  Userinfo({this.uid, this.email, this.age});
+  Userinfo({this.uid, this.email});
 
   // 从JSON创建User实例的工厂方法
   factory Userinfo.fromJson(Map<String, dynamic> json) =>

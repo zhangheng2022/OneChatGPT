@@ -19,11 +19,10 @@ class _LoginEmailState extends State<LoginEmail> {
     if (!(_formKey.currentState as FormState).validate()) return;
     try {
       setState(() => _isLoading = true);
-      final user = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _form['email'],
         password: _form['password'],
       );
-      print(user);
     } on FirebaseAuthException {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -62,6 +61,7 @@ class _LoginEmailState extends State<LoginEmail> {
             validator: (value) {
               if (value!.isEmpty) return "请输入邮箱";
               if (!Validator.validatorEmail(value)) return "请输入正确的邮箱";
+              return null;
             },
             onChanged: (val) {
               setState(() {
@@ -91,6 +91,7 @@ class _LoginEmailState extends State<LoginEmail> {
             validator: (value) {
               if (value!.isEmpty) return "请输入密码";
               if (!Validator.validatorPassword(value)) return "请输入正确的密码";
+              return null;
             },
             onChanged: (val) {
               setState(() {
