@@ -45,12 +45,11 @@ dependencies:
   open_filex: ^4.4.0
   mime: ^1.0.5
   intl: ^0.19.0
-  firebase_core: ^2.26.0
-  firebase_auth: ^4.17.7
   transparent_image: ^2.0.1
   dio: ^5.4.1
   shared_preferences: ^2.2.2
   json_annotation: ^4.8.1
+  supabase_flutter: ^2.3.4
 
 dev_dependencies:
   flutter_test:

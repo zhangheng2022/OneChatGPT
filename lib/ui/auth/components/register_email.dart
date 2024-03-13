@@ -1,8 +1,6 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:one_chatgpt_flutter/utils/validator.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterEmail extends StatefulWidget {
   const RegisterEmail({super.key});
@@ -20,38 +18,38 @@ class _RegisterEmailState extends State<RegisterEmail> {
 
   Future<void> _onSubmit(context) async {
     if (!(_formKey.currentState as FormState).validate()) return;
-    try {
-      setState(() => _isLoading = true);
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _form['email'],
-        password: _form['password'],
-      );
-      _showDialog(context);
-    } on FirebaseAuthException catch (err) {
-      log(err.code, level: 1);
-      String errMessage = "";
-      if (err.code == 'email-already-in-use') {
-        errMessage = "该邮箱的帐户已存在";
-      } else if (err.code == 'weak-password') {
-        errMessage = "您的密码太简单了，请重新输入";
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            showCloseIcon: true,
-            behavior: SnackBarBehavior.floating,
-            content: Text(errMessage)),
-      );
-    } catch (err) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          showCloseIcon: true,
-          behavior: SnackBarBehavior.floating,
-          content: Text('系统错误，请稍后再试'),
-        ),
-      );
-    } finally {
-      setState(() => _isLoading = false);
-    }
+    // try {
+    //   setState(() => _isLoading = true);
+    //   await FirebaseAuth.instance.createUserWithEmailAndPassword(
+    //     email: _form['email'],
+    //     password: _form['password'],
+    //   );
+    //   _showDialog(context);
+    // } on FirebaseAuthException catch (err) {
+    //   log(err.code, level: 1);
+    //   String errMessage = "";
+    //   if (err.code == 'email-already-in-use') {
+    //     errMessage = "该邮箱的帐户已存在";
+    //   } else if (err.code == 'weak-password') {
+    //     errMessage = "您的密码太简单了，请重新输入";
+    //   }
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(
+    //         showCloseIcon: true,
+    //         behavior: SnackBarBehavior.floating,
+    //         content: Text(errMessage)),
+    //   );
+    // } catch (err) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(
+    //       showCloseIcon: true,
+    //       behavior: SnackBarBehavior.floating,
+    //       content: Text('系统错误，请稍后再试'),
+    //     ),
+    //   );
+    // } finally {
+    //   setState(() => _isLoading = false);
+    // }
   }
 
   @override

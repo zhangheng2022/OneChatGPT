@@ -1,8 +1,6 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:one_chatgpt_flutter/models/user.dart';
-import 'package:firebase_auth/firebase_auth.dart' as firebase;
 
 class UserProvider extends ChangeNotifier {
   User _user = User(email: '', uid: '');
@@ -22,11 +20,11 @@ class UserProvider extends ChangeNotifier {
   }
 
   UserProvider() {
-    firebase.FirebaseAuth.instance.authStateChanges().listen((user) {
-      log('firebase.user===>$user');
-      User data = User(email: user?.email, uid: user?.uid);
-      _user = data;
-      updateUser(_user);
-    });
+    // firebase.FirebaseAuth.instance.authStateChanges().listen((user) {
+    //   log('firebase.user===>$user');
+    //   User data = User(email: user?.email, uid: user?.uid);
+    //   _user = data;
+    //   updateUser(_user);
+    // });
   }
 }

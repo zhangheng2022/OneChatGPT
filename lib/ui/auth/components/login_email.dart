@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:one_chatgpt_flutter/utils/validator.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginEmail extends StatefulWidget {
   const LoginEmail({super.key});
@@ -17,30 +16,30 @@ class _LoginEmailState extends State<LoginEmail> {
 
   Future<void> _onSubmit(context) async {
     if (!(_formKey.currentState as FormState).validate()) return;
-    try {
-      setState(() => _isLoading = true);
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _form['email'],
-        password: _form['password'],
-      );
-    } on FirebaseAuthException {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            showCloseIcon: true,
-            behavior: SnackBarBehavior.floating,
-            content: Text('账号或密码不正确')),
-      );
-    } catch (err) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          showCloseIcon: true,
-          behavior: SnackBarBehavior.floating,
-          content: Text('系统错误，请稍后再试'),
-        ),
-      );
-    } finally {
-      setState(() => _isLoading = false);
-    }
+    // try {
+    //   setState(() => _isLoading = true);
+    //   await FirebaseAuth.instance.signInWithEmailAndPassword(
+    //     email: _form['email'],
+    //     password: _form['password'],
+    //   );
+    // } on FirebaseAuthException {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(
+    //         showCloseIcon: true,
+    //         behavior: SnackBarBehavior.floating,
+    //         content: Text('账号或密码不正确')),
+    //   );
+    // } catch (err) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(
+    //       showCloseIcon: true,
+    //       behavior: SnackBarBehavior.floating,
+    //       content: Text('系统错误，请稍后再试'),
+    //     ),
+    //   );
+    // } finally {
+    //   setState(() => _isLoading = false);
+    // }
   }
 
   @override
