@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:one_chatgpt_flutter/utils/validator.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginEmail extends StatefulWidget {
   const LoginEmail({super.key});
@@ -13,33 +16,30 @@ class _LoginEmailState extends State<LoginEmail> {
   final _form = Map.from({'emali': '', 'password': ''});
   final GlobalKey _formKey = GlobalKey<FormState>();
   var _isLoading = false;
-
+  final supabase = Supabase.instance.client;
   Future<void> _onSubmit(context) async {
     if (!(_formKey.currentState as FormState).validate()) return;
-    // try {
-    //   setState(() => _isLoading = true);
-    //   await FirebaseAuth.instance.signInWithEmailAndPassword(
-    //     email: _form['email'],
-    //     password: _form['password'],
-    //   );
-    // } on FirebaseAuthException {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     const SnackBar(
-    //         showCloseIcon: true,
-    //         behavior: SnackBarBehavior.floating,
-    //         content: Text('账号或密码不正确')),
-    //   );
-    // } catch (err) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     const SnackBar(
-    //       showCloseIcon: true,
-    //       behavior: SnackBarBehavior.floating,
-    //       content: Text('系统错误，请稍后再试'),
-    //     ),
-    //   );
-    // } finally {
-    //   setState(() => _isLoading = false);
-    // }
+    try {
+      setState(() => _isLoading = true);
+      final AuthResponse res = await supabase.auth.signInWithPassword(
+        email: _form['email'],
+        password: _form['password'],
+      );
+      final Session? session = res.session;
+      final User? user = res.user;
+      log('$session');
+      log('$user');
+    } catch (err) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          showCloseIcon: true,
+          behavior: SnackBarBehavior.floating,
+          content: Text('系统错误，请稍后再试'),
+        ),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
