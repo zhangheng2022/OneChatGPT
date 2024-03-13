@@ -5,6 +5,7 @@ import 'package:one_chatgpt_flutter/state/user.dart';
 import 'package:one_chatgpt_flutter/ui/index/components/home.dart';
 import 'package:one_chatgpt_flutter/ui/index/components/person.dart';
 import 'package:provider/provider.dart';
+import 'package:one_chatgpt_flutter/ui/auth/login.dart';
 
 class IndexPage extends StatefulWidget {
   const IndexPage({super.key});
@@ -32,16 +33,14 @@ class _IndexPageState extends State<IndexPage> {
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
     log('userinfoModel.isLogin：${userProvider.isLogin}');
+    if (!userProvider.isLogin) {
+      return const LoginPage();
+    }
     return Scaffold(
         body: PageView(
           controller: pageController,
           physics: const NeverScrollableScrollPhysics(),
           children: bodyList,
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => {},
-          tooltip: '新增对话',
-          child: const Icon(Icons.add),
         ),
         bottomNavigationBar: NavigationBar(
           onDestinationSelected: (int index) {

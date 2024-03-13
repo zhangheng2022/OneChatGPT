@@ -7,7 +7,7 @@ class Person extends StatefulWidget {
 }
 
 class _PersonState extends State<Person> {
-  void _incrementCounter() {
+  void _loginOut() {
     Navigator.of(context).pushReplacementNamed('/login');
   }
 
@@ -15,23 +15,16 @@ class _PersonState extends State<Person> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("个人中心"),
+        title: const Text("我的"),
         centerTitle: true,
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '1',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
             FilledButton(
-              onPressed: _incrementCounter,
-              child: const Text('登录'),
+              onPressed: _loginOut,
+              child: const Text('退出登录'),
             ),
           ],
         ),

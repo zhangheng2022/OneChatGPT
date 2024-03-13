@@ -39,6 +39,11 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
           title: const Text("对话"),
           centerTitle: true,
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => {},
+          tooltip: '新增对话',
+          child: const Icon(Icons.add),
+        ),
         drawer: Drawer(
           child: ListView(
             children: [
