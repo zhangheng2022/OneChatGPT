@@ -11,24 +11,24 @@ class RegisterEmail extends StatefulWidget {
 }
 
 class _RegisterEmailState extends State<RegisterEmail> {
+  final supabase = Supabase.instance.client;
+  final GlobalKey _formKey = GlobalKey<FormState>();
+
   bool _hideObscureText = true;
   bool _hideRepeatObscureText = true;
-  final _form = Map.from({'emali': '', 'password': ''});
-  final GlobalKey _formKey = GlobalKey<FormState>();
-  var _isLoading = false;
 
-  final supabase = Supabase.instance.client;
+  String _userEmail = "";
+  String _userPassword = "";
+
+  bool _isLoading = false;
+
   Future<void> _onSubmit(context) async {
     if (!(_formKey.currentState as FormState).validate()) return;
     try {
       setState(() => _isLoading = true);
-      // await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      //   email: _form['email'],
-      //   password: _form['password'],
-      // );
       final AuthResponse res = await supabase.auth.signUp(
-        email: _form['email'],
-        password: _form['password'],
+        email: _userEmail,
+        password: _userPassword,
       );
       final Session? session = res.session;
       final User? user = res.user;
@@ -41,7 +41,7 @@ class _RegisterEmailState extends State<RegisterEmail> {
         const SnackBar(
           showCloseIcon: true,
           behavior: SnackBarBehavior.floating,
-          content: Text('系统错误，请稍后再试'),
+          content: Text('注册失败，请检查邮箱'),
         ),
       );
     } finally {
@@ -71,11 +71,11 @@ class _RegisterEmailState extends State<RegisterEmail> {
             },
             onChanged: (val) {
               setState(() {
-                _form['email'] = val;
+                _userEmail = val;
               });
             },
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 30),
           TextFormField(
             obscureText: _hideObscureText,
             keyboardType: TextInputType.visiblePassword,
@@ -85,7 +85,7 @@ class _RegisterEmailState extends State<RegisterEmail> {
               border: const OutlineInputBorder(),
               hintText: "请输入密码",
               helperText: "最少6位，包括至少1个字母，1个数字",
-              suffixIcon: _form['password']!.isNotEmpty
+              suffixIcon: _userPassword.isNotEmpty
                   ? IconButton(
                       icon: const Icon(Icons.remove_red_eye),
                       onPressed: () {
@@ -103,11 +103,11 @@ class _RegisterEmailState extends State<RegisterEmail> {
             },
             onChanged: (val) {
               setState(() {
-                _form['password'] = val;
+                _userPassword = val;
               });
             },
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 10),
           TextFormField(
             obscureText: _hideRepeatObscureText,
             keyboardType: TextInputType.visiblePassword,
@@ -117,7 +117,7 @@ class _RegisterEmailState extends State<RegisterEmail> {
               border: const OutlineInputBorder(),
               hintText: "请再次输入密码",
               helperText: "请再次输入密码",
-              suffixIcon: _form['password']!.isNotEmpty
+              suffixIcon: _userPassword.isNotEmpty
                   ? IconButton(
                       icon: const Icon(Icons.remove_red_eye),
                       onPressed: () {
@@ -130,7 +130,7 @@ class _RegisterEmailState extends State<RegisterEmail> {
             ),
             validator: (value) {
               if (value!.isEmpty) return "请输入密码";
-              if (value != _form['password']) return "两次输入密码不一致";
+              if (value != _userPassword) return "两次输入密码不一致";
               return null;
             },
           ),
@@ -167,20 +167,24 @@ Future<void> _showDialog(context) async {
     builder: (BuildContext context) {
       return AlertDialog(
         title: const Text(
-          '恭喜您，注册成功',
+          '注册成功',
           textAlign: TextAlign.center,
         ),
+        icon: Icon(
+          Icons.check_circle,
+          size: 80,
+          color: Theme.of(context).primaryColor,
+        ),
         actionsAlignment: MainAxisAlignment.center,
-        content: SingleChildScrollView(
-          child: Icon(
-            Icons.check_circle,
-            size: 120,
-            color: Theme.of(context).primaryColor,
+        content: const SizedBox(
+          child: Text(
+            '下一步，请前往邮箱激活',
+            textAlign: TextAlign.center,
           ),
         ),
         actions: <Widget>[
-          FilledButton.tonal(
-            child: const Text('返回'),
+          FilledButton(
+            child: const Text('返回登录'),
             onPressed: () {
               Navigator.of(context)
                 ..pop()

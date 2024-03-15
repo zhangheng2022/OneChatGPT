@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:one_chatgpt_flutter/ui/auth/components/logo.dart';
-import 'package:one_chatgpt_flutter/ui/auth/components/register_email.dart';
+import 'package:one_chatgpt_flutter/ui/auth/widgets/logo.dart';
+import 'package:one_chatgpt_flutter/ui/auth/widgets/email_register.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});

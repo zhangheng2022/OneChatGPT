@@ -12,29 +12,31 @@ class LoginEmail extends StatefulWidget {
 }
 
 class _LoginEmailState extends State<LoginEmail> {
-  bool _hideObscureText = true;
-  final _form = Map.from({'emali': '', 'password': ''});
-  final GlobalKey _formKey = GlobalKey<FormState>();
-  var _isLoading = false;
   final supabase = Supabase.instance.client;
+  final GlobalKey _formKey = GlobalKey<FormState>();
+
+  bool _hideObscureText = true;
+
+  String _userEmail = "";
+  String _userPassword = "";
+
+  bool _isLoading = false;
+
   Future<void> _onSubmit(context) async {
     if (!(_formKey.currentState as FormState).validate()) return;
     try {
       setState(() => _isLoading = true);
-      final AuthResponse res = await supabase.auth.signInWithPassword(
-        email: _form['email'],
-        password: _form['password'],
+      await supabase.auth.signInWithPassword(
+        email: _userEmail,
+        password: _userPassword,
       );
-      final Session? session = res.session;
-      final User? user = res.user;
-      log('$session');
-      log('$user');
+      Navigator.of(context).pushReplacementNamed('/');
     } catch (err) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           showCloseIcon: true,
           behavior: SnackBarBehavior.floating,
-          content: Text('系统错误，请稍后再试'),
+          content: Text('邮箱或密码不正确，请检查'),
         ),
       );
     } finally {
@@ -64,7 +66,7 @@ class _LoginEmailState extends State<LoginEmail> {
             },
             onChanged: (val) {
               setState(() {
-                _form['email'] = val;
+                _userEmail = val;
               });
             },
           ),
@@ -76,7 +78,7 @@ class _LoginEmailState extends State<LoginEmail> {
               prefixIcon: const Icon(Icons.lock_outlined),
               labelText: '密码',
               border: const OutlineInputBorder(),
-              suffixIcon: _form['password']!.isNotEmpty
+              suffixIcon: _userPassword.isNotEmpty
                   ? IconButton(
                       icon: const Icon(Icons.remove_red_eye),
                       onPressed: () {
@@ -94,7 +96,7 @@ class _LoginEmailState extends State<LoginEmail> {
             },
             onChanged: (val) {
               setState(() {
-                _form['password'] = val;
+                _userPassword = val;
               });
             },
           ),
@@ -109,7 +111,7 @@ class _LoginEmailState extends State<LoginEmail> {
                 if (!_isLoading) _onSubmit(context);
               },
             ),
-          )
+          ),
         ],
       )),
     );

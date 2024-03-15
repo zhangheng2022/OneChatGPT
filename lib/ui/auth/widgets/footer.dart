@@ -10,6 +10,9 @@ class LoginFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
+      const SizedBox(
+        height: 10,
+      ),
       Row(mainAxisAlignment: MainAxisAlignment.end, children: [
         TextButton(
           onPressed: () {},
@@ -40,7 +43,7 @@ class LoginFooter extends StatelessWidget {
         ],
       ),
       const SizedBox(
-        height: 10,
+        height: 20,
       ),
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -68,7 +71,7 @@ class LoginFooter extends StatelessWidget {
             child: Image.asset('assets/logos/github.png'),
           )
         ],
-      )
+      ),
     ]);
   }
 }

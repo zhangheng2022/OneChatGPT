@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:one_chatgpt_flutter/ui/auth/components/login_email.dart';
-import 'package:one_chatgpt_flutter/ui/auth/components/logo.dart';
-import 'package:one_chatgpt_flutter/ui/auth/components/footer.dart';
+import 'package:one_chatgpt_flutter/ui/auth/widgets/email_login.dart';
+import 'package:one_chatgpt_flutter/ui/auth/widgets/logo.dart';
+import 'package:one_chatgpt_flutter/ui/auth/widgets/footer.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
