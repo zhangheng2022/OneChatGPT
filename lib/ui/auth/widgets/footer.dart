@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginFooter extends StatelessWidget {
   const LoginFooter({super.key});
@@ -29,7 +30,7 @@ class LoginFooter extends StatelessWidget {
         children: [
           TextButton(
             onPressed: () {
-              Navigator.of(context).pushNamed('/register');
+              context.goNamed('register');
             },
             child: Text(
               "立即注册",

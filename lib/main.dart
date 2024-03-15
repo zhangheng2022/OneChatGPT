@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:one_chatgpt_flutter/ui/index/index.dart';
-import 'package:one_chatgpt_flutter/ui/auth/login.dart';
-import 'package:one_chatgpt_flutter/ui/chat/chat.dart';
-import 'package:one_chatgpt_flutter/ui/auth/Register.dart';
+import 'package:one_chatgpt_flutter/router.dart';
+// import 'package:go_router/go_router.dart';
+// import 'package:one_chatgpt_flutter/ui/index/index.dart';
+// import 'package:one_chatgpt_flutter/ui/auth/login.dart';
+// import 'package:one_chatgpt_flutter/ui/chat/chat.dart';
+// import 'package:one_chatgpt_flutter/ui/auth/Register.dart';
 import 'package:one_chatgpt_flutter/state/user.dart';
 import 'package:one_chatgpt_flutter/state/global.dart';
 
@@ -21,40 +23,23 @@ class InitApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
       ],
-      child: MaterialApp(
+      child: MaterialApp.router(
         title: 'OneChatGPT',
         theme: ThemeData(
           useMaterial3: true,
         ),
         // darkTheme: ThemeData.dark(),
         debugShowCheckedModeBanner: false,
-        initialRoute: '/',
-        // onGenerateRoute: onGenerateRoute,
-        routes: {
-          '/': (context) => const IndexPage(),
-          '/login': (context) => const LoginPage(),
-          '/register': (context) => const RegisterPage(),
-          '/chat': (context) => const ChatPage()
-        },
+        routerConfig: AppRoutes.router,
+        // initialRoute: '/',
+        // // onGenerateRoute: onGenerateRoute,
+        // routes: {
+        //   '/': (context) => const IndexPage(),
+        //   '/login': (context) => const LoginPage(),
+        //   '/register': (context) => const RegisterPage(),
+        //   '/chat': (context) => const ChatPage()
+        // },
       ),
     );
   }
-
-  // Route<dynamic> onGenerateRoute(RouteSettings settings) {
-  //   String routeName;
-  //   routeName = routeBeforeHook(settings);
-  // }
-
-  // String routeBeforeHook(RouteSettings settings) {
-  //   /// Global.prefs 是全局的 SharedPreferences 实例
-  //   /// SharedPreferences 是常用的本地存储的插件
-  //   final token = Global.prefs.getString('token') ?? '';
-  //   if (token != '') {
-  //     if (settings.name == 'login') {
-  //       return 'index';
-  //     }
-  //     return settings.name;
-  //   }
-  //   return 'login';
-  // }
 }

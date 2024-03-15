@@ -1,5 +1,5 @@
 import 'dart:developer';
-
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:one_chatgpt_flutter/utils/validator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -22,7 +22,7 @@ class _LoginEmailState extends State<LoginEmail> {
 
   bool _isLoading = false;
 
-  Future<void> _onSubmit(context) async {
+  Future<void> _onSubmit() async {
     if (!(_formKey.currentState as FormState).validate()) return;
     try {
       setState(() => _isLoading = true);
@@ -30,7 +30,8 @@ class _LoginEmailState extends State<LoginEmail> {
         email: _userEmail,
         password: _userPassword,
       );
-      Navigator.of(context).pushReplacementNamed('/');
+      if (!mounted) return;
+      context.goNamed('index');
     } catch (err) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -108,7 +109,7 @@ class _LoginEmailState extends State<LoginEmail> {
               icon: _isLoading ? loading(context) : const Icon(Icons.login),
               label: const Text("登录"),
               onPressed: () {
-                if (!_isLoading) _onSubmit(context);
+                if (!_isLoading) _onSubmit();
               },
             ),
           ),

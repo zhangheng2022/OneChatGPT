@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class Person extends StatefulWidget {
   const Person({super.key});
@@ -8,7 +9,7 @@ class Person extends StatefulWidget {
 
 class _PersonState extends State<Person> {
   void _loginOut() {
-    Navigator.of(context).pushReplacementNamed('/login');
+    context.pushReplacement('/login');
   }
 
   @override

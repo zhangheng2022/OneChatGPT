@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:one_chatgpt_flutter/utils/validator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -75,7 +76,7 @@ class _RegisterEmailState extends State<RegisterEmail> {
               });
             },
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 10),
           TextFormField(
             obscureText: _hideObscureText,
             keyboardType: TextInputType.visiblePassword,
@@ -186,7 +187,7 @@ Future<void> _showDialog(context) async {
           FilledButton(
             child: const Text('返回登录'),
             onPressed: () {
-              Navigator.of(context)
+              context
                 ..pop()
                 ..pop();
             },
