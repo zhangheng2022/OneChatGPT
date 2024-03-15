@@ -40,21 +40,21 @@ class InitApp extends StatelessWidget {
     );
   }
 
-//   Route<dynamic> onGenerateRoute(RouteSettings settings) {
-//     String routeName;
-//     routeName = routeBeforeHook(settings);
-//   }
+  // Route<dynamic> onGenerateRoute(RouteSettings settings) {
+  //   String routeName;
+  //   routeName = routeBeforeHook(settings);
+  // }
 
-//   String routeBeforeHook(RouteSettings settings) {
-//     /// Global.prefs 是全局的 SharedPreferences 实例
-//     /// SharedPreferences 是常用的本地存储的插件
-//     final token = Global.prefs.getString('token') ?? '';
-//     if (token != '') {
-//       if (settings.name == 'login') {
-//         return 'index';
-//       }
-//       return settings.name;
-//     }
-//     return 'login';
-//   }
-// }
+  // String routeBeforeHook(RouteSettings settings) {
+  //   /// Global.prefs 是全局的 SharedPreferences 实例
+  //   /// SharedPreferences 是常用的本地存储的插件
+  //   final token = Global.prefs.getString('token') ?? '';
+  //   if (token != '') {
+  //     if (settings.name == 'login') {
+  //       return 'index';
+  //     }
+  //     return settings.name;
+  //   }
+  //   return 'login';
+  // }
+}
