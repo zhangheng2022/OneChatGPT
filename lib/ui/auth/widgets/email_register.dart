@@ -26,7 +26,7 @@ class _RegisterEmailState extends State<RegisterEmail> {
     if (!(_formKey.currentState as FormState).validate()) return;
     try {
       setState(() => _isLoading = true);
-      final AuthResponse res = await supabase.auth.signUp(
+      await supabase.auth.signUp(
         email: _userEmail,
         password: _userPassword,
       );
