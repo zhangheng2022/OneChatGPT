@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:one_chatgpt_flutter/utils/validator.dart';
@@ -31,13 +30,8 @@ class _RegisterEmailState extends State<RegisterEmail> {
         email: _userEmail,
         password: _userPassword,
       );
-      final Session? session = res.session;
-      final User? user = res.user;
-      log('$session');
-      log('$user');
       _showDialog(context);
     } catch (err) {
-      log('$err');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           showCloseIcon: true,
