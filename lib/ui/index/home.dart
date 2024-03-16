@@ -7,7 +7,7 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
+class _HomeState extends State<Home> {
   var listData = <Widget>[];
 
   @override
@@ -30,11 +30,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
   }
 
   @override
-  bool get wantKeepAlive => true;
-
-  @override
   Widget build(BuildContext context) {
-    super.build(context);
     return Scaffold(
         appBar: AppBar(
           title: const Text("对话"),
@@ -79,30 +75,6 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
                   }),
             );
           },
-
-          // children: [
-
-          //   Card.outlined(
-          //     margin: const EdgeInsets.only(bottom: 12),
-          //     child: ListTile(
-          //         leading: const Icon(Icons.smart_toy),
-          //         title: const Text('关于母猪和牛的故事'),
-          //         subtitle: const Text("关于母猪和牛的故事"),
-          //         trailing: const Icon(Icons.more_vert),
-          //         onTap: () {
-          //           Navigator.pushNamed(context, '/chat');
-          //         }),
-          //   ),
-          //   Card.outlined(
-          //     margin: const EdgeInsets.only(bottom: 12),
-          //     child: ListTile(
-          //         leading: const Icon(Icons.smart_toy),
-          //         title: const Text('关于母猪和牛的故事'),
-          //         subtitle: const Text("关于母猪和牛的故事"),
-          //         trailing: const Icon(Icons.more_vert),
-          //         onTap: () {}),
-          //   ),
-          // ],
         ));
   }
 }
