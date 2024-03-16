@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Person extends StatefulWidget {
   const Person({super.key});
@@ -8,8 +9,11 @@ class Person extends StatefulWidget {
 }
 
 class _PersonState extends State<Person> {
+  final supabase = Supabase.instance.client;
   void _loginOut() {
-    context.pushReplacement('/login');
+    supabase.auth
+        .signOut()
+        .then((value) => {context.pushReplacement('/login')});
   }
 
   @override

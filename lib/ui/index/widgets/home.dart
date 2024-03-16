@@ -75,7 +75,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
                   subtitle: const Text("关于母猪和牛的故事"),
                   trailing: const Icon(Icons.more_vert),
                   onTap: () {
-                    Navigator.pushNamed(context, '/chat');
+                    context.pushNamed('chat');
                   }),
             );
           },

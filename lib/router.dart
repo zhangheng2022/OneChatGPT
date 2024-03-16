@@ -18,7 +18,7 @@ class AppRoutes {
           session?.accessToken == null) {
         return '/login';
       } else {
-        return null; // return "null" to display the intended route without redirecting
+        return null;
       }
     },
     initialLocation: '/',
@@ -27,21 +27,25 @@ class AppRoutes {
         name: 'index',
         path: '/',
         builder: (context, state) => const IndexPage(),
+        routes: <RouteBase>[
+          GoRoute(
+            name: 'chat',
+            path: 'chat',
+            builder: (context, state) => const ChatPage(),
+          ),
+        ],
       ),
       GoRoute(
         name: 'login',
         path: '/login',
         builder: (context, state) => const LoginPage(),
-      ),
-      GoRoute(
-        name: 'register',
-        path: '/register',
-        builder: (context, state) => const RegisterPage(),
-      ),
-      GoRoute(
-        name: 'chat',
-        path: '/chat',
-        builder: (context, state) => const ChatPage(),
+        routes: <RouteBase>[
+          GoRoute(
+            name: 'register',
+            path: 'register',
+            builder: (context, state) => const RegisterPage(),
+          ),
+        ],
       ),
     ],
   );
