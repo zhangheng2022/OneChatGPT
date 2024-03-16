@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:one_chatgpt_flutter/router.dart';
+import 'package:one_chatgpt_flutter/router/router.dart';
 import 'package:one_chatgpt_flutter/state/user.dart';
 import 'package:one_chatgpt_flutter/state/global.dart';
 

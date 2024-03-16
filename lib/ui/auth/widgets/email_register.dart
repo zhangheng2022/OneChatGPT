@@ -64,6 +64,7 @@ class _RegisterEmailState extends State<RegisterEmail> {
               labelText: '邮箱',
               border: OutlineInputBorder(),
               hintText: "请输入邮箱",
+              helperText: "请输入邮箱",
             ),
             validator: (value) {
               if (value!.isEmpty) return "请输入邮箱";
