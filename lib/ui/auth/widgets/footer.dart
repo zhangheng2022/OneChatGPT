@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginFooter extends StatelessWidget {
-  const LoginFooter({super.key});
-
-  bool isDarkMode(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark;
-  }
+  LoginFooter({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -49,30 +46,55 @@ class LoginFooter extends StatelessWidget {
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Container(
-            width: 50,
-            height: 50,
-            padding: const EdgeInsets.all(2),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey, width: 1),
-              borderRadius: const BorderRadius.all(Radius.circular(10)),
-              color: Colors.white,
+          InkWell(
+            borderRadius: const BorderRadius.all(Radius.circular(10)),
+            child: Container(
+              width: 50,
+              height: 50,
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey, width: 1),
+                borderRadius: const BorderRadius.all(Radius.circular(10)),
+              ),
+              child: Image.asset('assets/logos/google.png'),
             ),
-            child: Image.asset('assets/logos/google.png'),
+            onTap: () => _githubLogin(),
           ),
-          Container(
-            width: 50,
-            height: 50,
-            padding: const EdgeInsets.all(2),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey, width: 1),
-              borderRadius: const BorderRadius.all(Radius.circular(10)),
-              color: Colors.white,
+          InkWell(
+            borderRadius: const BorderRadius.all(Radius.circular(10)),
+            child: Container(
+              width: 50,
+              height: 50,
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey, width: 1),
+                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                color: Colors.white,
+              ),
+              child: Image.asset('assets/logos/github.png'),
             ),
-            child: Image.asset('assets/logos/github.png'),
+            onTap: () => _googleLogin(),
           )
         ],
       ),
     ]);
+  }
+
+  bool isDarkMode(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark;
+  }
+
+  final supabase = Supabase.instance.client;
+
+  Future<void> _googleLogin() async {
+    await supabase.auth.signInWithOAuth(
+      OAuthProvider.google,
+    );
+  }
+
+  Future<void> _githubLogin() async {
+    await supabase.auth.signInWithOAuth(
+      OAuthProvider.github,
+    );
   }
 }

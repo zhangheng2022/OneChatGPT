@@ -42,15 +42,15 @@ class _LoginPageState extends State<LoginPage> {
             });
           }
         },
-        child: const Scaffold(
+        child: Scaffold(
           body: SingleChildScrollView(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 children: [
-                  SizedBox(height: kToolbarHeight),
-                  Logo(),
-                  LoginEmail(),
+                  const SizedBox(height: kToolbarHeight),
+                  const Logo(),
+                  const LoginEmail(),
                   LoginFooter(),
                 ],
               ),
