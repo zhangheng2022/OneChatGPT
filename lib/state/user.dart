@@ -1,10 +1,10 @@
-import 'dart:developer';
+// import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:one_chatgpt_flutter/models/user.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' as supabasePack;
+// import 'package:supabase_flutter/supabase_flutter.dart' as supabasePack;
 
 class UserProvider extends ChangeNotifier {
-  final supabase = supabasePack.Supabase.instance.client;
+  // final supabase = supabasePack.Supabase.instance.client;
   User _user = User(email: '', uid: '');
 
   User get user => _user;
@@ -22,13 +22,9 @@ class UserProvider extends ChangeNotifier {
   }
 
   UserProvider() {
-    supabase.auth.onAuthStateChange.listen((data) {
-      final supabasePack.AuthChangeEvent event = data.event;
-      final supabasePack.Session? session = data.session;
-    });
-    // final authSubscription = supabasePack.ausupabase.auth.onAuthStateChange.listen((data) {
-    //   final AuthChangeEvent event = data.event;
-    //   final Session? session = data.session;
+    // supabase.auth.onAuthStateChange.listen((data) {
+    //   final supabasePack.AuthChangeEvent event = data.event;
+    //   final supabasePack.Session? session = data.session;
     // });
     // firebase.FirebaseAuth.instance.authStateChanges().listen((user) {
     //   log('firebase.user===>$user');
