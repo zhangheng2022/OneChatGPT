@@ -5,12 +5,8 @@ import 'package:one_chatgpt_flutter/ui/index/index.dart';
 import 'package:one_chatgpt_flutter/ui/auth/login.dart';
 import 'package:one_chatgpt_flutter/ui/chat/chat.dart';
 import 'package:one_chatgpt_flutter/ui/auth/Register.dart';
-import 'package:one_chatgpt_flutter/router/scaffold_with_navbar.dart';
 
-class AppRoutes extends StatelessWidget {
-  final _rootNavigatorKey = GlobalKey<NavigatorState>();
-  final _sectionNavigatorKey = GlobalKey<NavigatorState>();
-
+class AppRoutes {
   static GoRouter router = GoRouter(
     redirect: (BuildContext context, GoRouterState state) {
       final supabase = Supabase.instance.client;
@@ -24,7 +20,6 @@ class AppRoutes extends StatelessWidget {
         return null;
       }
     },
-    navigatorKey: _rootNavigatorKey,
     initialLocation: '/',
     routes: <RouteBase>[
       GoRoute(
