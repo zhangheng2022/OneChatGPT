@@ -1,11 +1,22 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:one_chatgpt_flutter/router.dart';
 import 'package:one_chatgpt_flutter/state/user.dart';
 import 'package:one_chatgpt_flutter/state/global.dart';
 
 Future<void> main() async {
-  Global.init().then((e) => runApp(const InitApp()));
+  await Global.init();
+  runApp(const InitApp());
+  if (Platform.isAndroid) {
+    SystemUiOverlayStyle systemUiOverlayStyle = const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.blueGrey,
+    );
+    SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
+  }
 }
 
 class InitApp extends StatelessWidget {
@@ -22,6 +33,10 @@ class InitApp extends StatelessWidget {
         title: 'OneChatGPT',
         theme: ThemeData(
           useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.blueGrey, // 设置紫色
+            brightness: Brightness.light,
+          ),
         ),
         // darkTheme: ThemeData.dark(),
         debugShowCheckedModeBanner: false,
