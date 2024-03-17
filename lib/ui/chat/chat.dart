@@ -33,13 +33,49 @@ class _ChatPageState extends State<ChatPage> {
   );
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        body: Chat(
-          messages: _messages,
-          onSendPressed: _handleSendPressed,
-          user: _user,
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text("新的对话"),
+          centerTitle: true,
         ),
+        body: SafeArea(
+          bottom: false,
+          child: Chat(
+            messages: _messages,
+            onSendPressed: _handleSendPressed,
+            onAttachmentPressed: _handleImageSelection,
+            l10n: const ChatL10nZhCN(),
+            user: _user,
+          ),
+        ));
+  }
+
+  Future<void> _handleImageSelection() async {
+    final result = await ImagePicker().pickImage(
+      imageQuality: 70,
+      maxWidth: 1440,
+      source: ImageSource.gallery,
+    );
+
+    if (result != null) {
+      final bytes = await result.readAsBytes();
+      final image = await decodeImageFromList(bytes);
+
+      final message = types.ImageMessage(
+        author: _user,
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+        height: image.height.toDouble(),
+        id: randomString(),
+        name: result.name,
+        size: bytes.length,
+        uri: result.path,
+        width: image.width.toDouble(),
       );
+
+      _addMessage(message);
+    }
+  }
 
   void _addMessage(types.Message message) {
     setState(() {

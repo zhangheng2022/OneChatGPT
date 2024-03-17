@@ -17,6 +17,7 @@ class ScaffoldNavBar extends StatelessWidget {
           onDestinationSelected: (int index) => _toPageIndex(index, context),
           labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
           selectedIndex: _currentPageIndex(context),
+          backgroundColor: Colors.transparent,
           destinations: const <Widget>[
             NavigationDestination(
               selectedIcon: Icon(Icons.ballot),
