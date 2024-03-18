@@ -58,7 +58,7 @@ class LoginFooter extends StatelessWidget {
               ),
               child: Image.asset('assets/logos/google.png'),
             ),
-            onTap: () => _githubLogin(),
+            onTap: () => _googleLogin(),
           ),
           InkWell(
             borderRadius: const BorderRadius.all(Radius.circular(10)),
@@ -73,7 +73,7 @@ class LoginFooter extends StatelessWidget {
               ),
               child: Image.asset('assets/logos/github.png'),
             ),
-            onTap: () => _googleLogin(),
+            onTap: () => _githubLogin(),
           )
         ],
       ),
@@ -87,14 +87,18 @@ class LoginFooter extends StatelessWidget {
   final supabase = Supabase.instance.client;
 
   Future<void> _googleLogin() async {
-    await supabase.auth.signInWithOAuth(
-      OAuthProvider.google,
-    );
+    // const ohresult = await supabase.auth.signInWithOAuth(OAuthProvider.google);
+    // print(ohresult);
   }
 
   Future<void> _githubLogin() async {
-    await supabase.auth.signInWithOAuth(
-      OAuthProvider.github,
-    );
+    try {
+      final result = await supabase.auth.signInWithOAuth(
+        OAuthProvider.github,
+      );
+      print(result);
+    } catch (e) {
+      print(e);
+    }
   }
 }
