@@ -95,6 +95,7 @@ class LoginFooter extends StatelessWidget {
     try {
       final result = await supabase.auth.signInWithOAuth(
         OAuthProvider.github,
+        redirectTo: 'http://one.zhangheng.eu.org/home',
       );
       print(result);
     } catch (e) {

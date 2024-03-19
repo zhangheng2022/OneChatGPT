@@ -30,7 +30,7 @@ class _LoginEmailState extends State<LoginEmail> {
         password: _userPassword,
       );
       if (!mounted) return;
-      context.goNamed('index');
+      context.goNamed('home');
     } catch (err) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
