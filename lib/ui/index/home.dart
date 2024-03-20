@@ -12,7 +12,7 @@ class _HomeState extends State<Home> {
 
   void _addCardListData() {
     setState(() {
-      _cardListData.add({"title": "新的对话"});
+      _cardListData.add({"title": "新的对话", "dateTime": ""});
     });
   }
 
