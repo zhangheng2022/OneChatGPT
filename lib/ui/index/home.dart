@@ -8,24 +8,19 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  var listData = <Widget>[];
+  final _cardListData = <Map>[];
+
+  void _addCardListData() {
+    setState(() {
+      _cardListData.add({"title": "新的对话"});
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    for (int i = 0; i < 2000; ++i) {
-      String index = i.toString();
-      listData.add(Card.outlined(
-        margin: const EdgeInsets.only(bottom: 12),
-        child: ListTile(
-            leading: const Icon(Icons.smart_toy),
-            title: Text('关于母猪和牛的故事$index'),
-            subtitle: const Text("关于母猪和牛的故事"),
-            trailing: const Icon(Icons.more_vert),
-            onTap: () {
-              context.goNamed('chat');
-            }),
-      ));
+    if (_cardListData.isEmpty) {
+      _addCardListData();
     }
   }
 
@@ -37,7 +32,7 @@ class _HomeState extends State<Home> {
           centerTitle: true,
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () => {},
+          onPressed: () => _addCardListData(),
           tooltip: '新增对话',
           child: const Icon(Icons.add),
         ),
@@ -60,16 +55,16 @@ class _HomeState extends State<Home> {
           ),
         ),
         body: ListView.builder(
-          itemCount: 2,
+          itemCount: _cardListData.length,
           padding: const EdgeInsets.all(12),
           itemBuilder: (context, index) {
-            return Card.outlined(
+            return Card(
               margin: const EdgeInsets.only(bottom: 12),
               child: ListTile(
                   leading: const Icon(Icons.smart_toy),
-                  title: Text('关于母猪和牛的故事$index'),
+                  title: Text(_cardListData[index]['title']),
                   subtitle: const Text("关于母猪和牛的故事"),
-                  trailing: const Icon(Icons.more_vert),
+                  trailing: const Icon(Icons.delete),
                   onTap: () {
                     context.pushNamed('chat');
                   }),
