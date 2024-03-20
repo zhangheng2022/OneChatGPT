@@ -1,19 +1,13 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mime/mime.dart';
-import 'package:open_filex/open_filex.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:uuid/uuid.dart';
 
 final supabase = Supabase.instance.client;
+final User? user = supabase.auth.currentUser;
 
 String randomString() {
   final random = Random.secure();
@@ -30,8 +24,12 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final List<types.Message> _messages = [];
-  final _user = const types.User(
-    id: '82091008-a484-4a89-ae75-a22bf8d6f3ac',
+
+  final _user = types.User(
+    id: user!.id,
+  );
+  final _chatuser = types.User(
+    id: "123123123123123",
   );
 
   @override
@@ -79,20 +77,35 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  void _addMessage(types.Message message) {
+  Future<void> _addMessage(types.Message message) async {
     setState(() {
       _messages.insert(0, message);
     });
   }
 
-  void _handleSendPressed(types.PartialText message) {
+  Future<void> _handleSendPressed(types.PartialText message) async {
     final textMessage = types.TextMessage(
       author: _user,
       createdAt: DateTime.now().millisecondsSinceEpoch,
       id: randomString(),
       text: message.text,
     );
-
     _addMessage(textMessage);
+    try {
+      final res = await supabase.functions.invoke(
+        'google/gemini-pro',
+        body: {'message': message.text},
+      );
+      final data = res.data;
+      final chatMessage = types.TextMessage(
+        author: _chatuser,
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+        id: randomString(),
+        text: data['text'],
+      );
+      _addMessage(chatMessage);
+    } catch (e) {
+      print(e);
+    }
   }
 }
