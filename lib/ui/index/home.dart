@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:one_chatgpt_flutter/database/chat_tables.dart';
+import 'package:one_chatgpt_flutter/database/database.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -9,21 +11,52 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final _cardListData = <Map<dynamic, dynamic>>[];
+  final database = AppDatabase();
 
-  void _addCardListData() {
-    // String dateNow = DateFormat.yMMMd().format(DateTime.now());
+  List<ChatTable> _cardListData = [];
+
+  Future<void> _addCardListData() async {
+    final insertResult =
+        await database.into(database.chatTables).insertReturning(
+              ChatTablesCompanion.insert(
+                title: '新的对话',
+                datetime: DateTime.now(),
+              ),
+            );
+
     setState(() {
-      _cardListData.add({"title": "新的对话", "dateTime": "dateNow"});
+      _cardListData.add(insertResult);
     });
+  }
+
+  Future<void> _initCardListData() async {
+    List<ChatTable> allChatTables =
+        await database.select(database.chatTables).get();
+
+    print(allChatTables);
+    // database.delete(database.chatTables).go();
+    if (allChatTables.isEmpty) {
+      final insertResult =
+          await database.into(database.chatTables).insertReturning(
+                ChatTablesCompanion.insert(
+                  title: '新的对话',
+                  datetime: DateTime.now(),
+                ),
+              );
+      setState(() {
+        _cardListData.add(insertResult);
+      });
+    } else {
+      setState(() {
+        _cardListData = allChatTables;
+      });
+    }
   }
 
   @override
   void initState() {
     super.initState();
-    if (_cardListData.isEmpty) {
-      _addCardListData();
-    }
+    _initCardListData();
   }
 
   @override
@@ -64,8 +97,8 @@ class _HomeState extends State<Home> {
               margin: const EdgeInsets.only(bottom: 12),
               child: ListTile(
                   leading: const Icon(Icons.smart_toy),
-                  title: Text(_cardListData[index]['title']),
-                  subtitle: const Text("关于母猪和牛的故事"),
+                  title: Text(_cardListData[index].title),
+                  subtitle: Text(_cardListData[index].datetime.toString()),
                   trailing: const Icon(Icons.delete),
                   onTap: () {
                     context.pushNamed('chat');

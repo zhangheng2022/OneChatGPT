@@ -7,10 +7,11 @@ import 'package:path/path.dart' as p;
 import 'package:sqlite3/sqlite3.dart';
 
 import 'package:one_chatgpt_flutter/database/chat_tables.dart';
+import 'package:one_chatgpt_flutter/database/chat_content_tables.dart';
 
 part 'database.g.dart';
 
-@DriftDatabase(tables: [ChatTables])
+@DriftDatabase(tables: [ChatTables, ChatContentTables])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 

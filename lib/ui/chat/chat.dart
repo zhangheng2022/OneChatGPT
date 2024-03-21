@@ -28,7 +28,7 @@ class _ChatPageState extends State<ChatPage> {
   final _user = types.User(
     id: user!.id,
   );
-  final _chatuser = types.User(
+  final _chatuser = const types.User(
     id: "123123123123123",
   );
 
@@ -39,15 +39,12 @@ class _ChatPageState extends State<ChatPage> {
           title: const Text("新的对话"),
           centerTitle: true,
         ),
-        body: SafeArea(
-          bottom: false,
-          child: Chat(
-            messages: _messages,
-            onSendPressed: _handleSendPressed,
-            onAttachmentPressed: _handleImageSelection,
-            l10n: const ChatL10nZhCN(),
-            user: _user,
-          ),
+        body: Chat(
+          messages: _messages,
+          onSendPressed: _handleSendPressed,
+          onAttachmentPressed: _handleImageSelection,
+          l10n: const ChatL10nZhCN(),
+          user: _user,
         ));
   }
 
