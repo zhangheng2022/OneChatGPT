@@ -97,9 +97,9 @@ class LoginFooter extends StatelessWidget {
         OAuthProvider.github,
         redirectTo: 'http://one.zhangheng.eu.org/home',
       );
-      print(result);
+      // print(result);
     } catch (e) {
-      print(e);
+      // print(e);
     }
   }
 }

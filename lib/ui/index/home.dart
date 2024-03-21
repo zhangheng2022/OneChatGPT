@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -8,11 +9,12 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final _cardListData = <Map>[];
+  final _cardListData = <Map<dynamic, dynamic>>[];
 
   void _addCardListData() {
+    // String dateNow = DateFormat.yMMMd().format(DateTime.now());
     setState(() {
-      _cardListData.add({"title": "新的对话", "dateTime": ""});
+      _cardListData.add({"title": "新的对话", "dateTime": "dateNow"});
     });
   }
 
