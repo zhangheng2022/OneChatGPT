@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:one_chatgpt_flutter/database/chat_tables.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
 
 class Home extends StatefulWidget {
@@ -11,48 +10,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final database = AppDatabase();
-
-  List<ChatTable> _cardListData = [];
-
-  Future<void> _addCardListData() async {
-    final insertResult =
-        await database.into(database.chatTables).insertReturning(
-              ChatTablesCompanion.insert(
-                title: '新的对话',
-                datetime: DateTime.now(),
-              ),
-            );
-
-    setState(() {
-      _cardListData.add(insertResult);
-    });
-  }
-
-  Future<void> _initCardListData() async {
-    List<ChatTable> allChatTables =
-        await database.select(database.chatTables).get();
-
-    print(allChatTables);
-    // database.delete(database.chatTables).go();
-    if (allChatTables.isEmpty) {
-      final insertResult =
-          await database.into(database.chatTables).insertReturning(
-                ChatTablesCompanion.insert(
-                  title: '新的对话',
-                  datetime: DateTime.now(),
-                ),
-              );
-      setState(() {
-        _cardListData.add(insertResult);
-      });
-    } else {
-      setState(() {
-        _cardListData = allChatTables;
-      });
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -99,12 +56,66 @@ class _HomeState extends State<Home> {
                   leading: const Icon(Icons.smart_toy),
                   title: Text(_cardListData[index].title),
                   subtitle: Text(_cardListData[index].datetime.toString()),
-                  trailing: const Icon(Icons.delete),
+                  // trailing: const Icon(Icons.delete),
+                  trailing: IconButton(
+                    onPressed: () =>
+                        _deleteCardListData(_cardListData[index].id),
+                    icon: const Icon(Icons.delete),
+                  ),
                   onTap: () {
-                    context.pushNamed('chat');
+                    context.goNamed('chat', pathParameters: {
+                      'chatID': _cardListData[index].id.toString()
+                    });
                   }),
             );
           },
         ));
+  }
+
+  final database = AppDatabase();
+
+  List<ChatTable> _cardListData = [];
+
+  Future<void> _addCardListData() async {
+    final insertResult =
+        await database.into(database.chatTables).insertReturning(
+              ChatTablesCompanion.insert(
+                title: '新的对话',
+                datetime: DateTime.now(),
+              ),
+            );
+
+    setState(() {
+      _cardListData.add(insertResult);
+    });
+  }
+
+  Future<void> _deleteCardListData(int index) async {
+    (database.delete(database.chatTables)
+          ..where((row) => row.id.isValue(index)))
+        .go();
+    _initCardListData();
+  }
+
+  Future<void> _initCardListData() async {
+    List<ChatTable> allChatTables =
+        await database.select(database.chatTables).get();
+
+    if (allChatTables.isNotEmpty) {
+      setState(() {
+        _cardListData = allChatTables;
+      });
+    } else {
+      final insertResult =
+          await database.into(database.chatTables).insertReturning(
+                ChatTablesCompanion.insert(
+                  title: '新的对话',
+                  datetime: DateTime.now(),
+                ),
+              );
+      setState(() {
+        _cardListData = [insertResult];
+      });
+    }
   }
 }
