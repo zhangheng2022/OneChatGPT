@@ -63,8 +63,8 @@ class _HomeState extends State<Home> {
                     icon: const Icon(Icons.delete),
                   ),
                   onTap: () {
-                    context.goNamed('chat', pathParameters: {
-                      'chatID': _cardListData[index].id.toString()
+                    context.goNamed('chat', queryParameters: {
+                      'chatid': _cardListData[index].id.toString()
                     });
                   }),
             );
