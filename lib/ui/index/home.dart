@@ -56,14 +56,13 @@ class _HomeState extends State<Home> {
                   leading: const Icon(Icons.smart_toy),
                   title: Text(_cardListData[index].title),
                   subtitle: Text(_cardListData[index].datetime.toString()),
-                  // trailing: const Icon(Icons.delete),
                   trailing: IconButton(
                     onPressed: () =>
                         _deleteCardListData(_cardListData[index].id),
                     icon: const Icon(Icons.delete),
                   ),
                   onTap: () {
-                    context.goNamed('chat', queryParameters: {
+                    context.goNamed('chat', pathParameters: {
                       'chatid': _cardListData[index].id.toString()
                     });
                   }),

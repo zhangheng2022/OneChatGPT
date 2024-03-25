@@ -43,10 +43,12 @@ class AppRoutes {
               routes: <RouteBase>[
                 GoRoute(
                   name: 'chat',
-                  path: 'chat',
+                  path: 'chat/:chatid',
                   parentNavigatorKey: _rootNavigatorKey,
-                  builder: (BuildContext context, GoRouterState state) =>
-                      const ChatPage(),
+                  builder: (BuildContext context, GoRouterState state) {
+                    final String chatid = state.pathParameters['chatid']!;
+                    return ChatPage(chatid: chatid);
+                  },
                 ),
               ]),
           GoRoute(

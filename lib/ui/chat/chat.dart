@@ -16,7 +16,9 @@ String randomString() {
 }
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({super.key});
+  const ChatPage({super.key, required this.chatid});
+
+  final String chatid;
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -25,12 +27,20 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final List<types.Message> _messages = [];
 
-  final _user = types.User(
-    id: user!.id,
+  types.User _user = const types.User(
+    id: "",
   );
-  final _chatuser = const types.User(
-    id: "123123123123123",
+  types.User _chatUser = const types.User(
+    id: "",
   );
+
+  @override
+  void initState() {
+    super.initState();
+    _user = types.User(
+      id: widget.chatid,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +105,7 @@ class _ChatPageState extends State<ChatPage> {
       );
       final data = res.data;
       final chatMessage = types.TextMessage(
-        author: _chatuser,
+        author: _chatUser,
         createdAt: DateTime.now().millisecondsSinceEpoch,
         id: randomString(),
         text: data['text'],
