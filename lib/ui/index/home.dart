@@ -89,9 +89,8 @@ class _HomeState extends State<Home> {
     });
   }
 
-  Future<void> _deleteCardListData(int index) async {
-    (database.delete(database.chatTables)
-          ..where((row) => row.id.isValue(index)))
+  Future<void> _deleteCardListData(int id) async {
+    (database.delete(database.chatTables)..where((row) => row.id.isValue(id)))
         .go();
     _initCardListData();
   }
