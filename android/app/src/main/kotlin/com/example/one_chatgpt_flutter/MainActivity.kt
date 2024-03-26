@@ -1,4 +1,4 @@
-package com.example.one_chatgpt_flutter
+package com.onechatgpt
 
 import io.flutter.embedding.android.FlutterActivity
 
