@@ -80,7 +80,6 @@ class _HomeState extends State<Home> {
         await database.into(database.chatTables).insertReturning(
               ChatTablesCompanion.insert(
                 title: '新的对话',
-                datetime: DateTime.now(),
               ),
             );
 
@@ -108,7 +107,6 @@ class _HomeState extends State<Home> {
           await database.into(database.chatTables).insertReturning(
                 ChatTablesCompanion.insert(
                   title: '新的对话',
-                  datetime: DateTime.now(),
                 ),
               );
       setState(() {

@@ -5,9 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:uuid/uuid.dart';
+import 'package:one_chatgpt_flutter/database/database.dart';
 
 final supabase = Supabase.instance.client;
 final User? user = supabase.auth.currentUser;
+final database = AppDatabase();
+const uuid = Uuid();
 
 String randomString() {
   final random = Random.secure();
@@ -30,8 +34,8 @@ class _ChatPageState extends State<ChatPage> {
   types.User _user = const types.User(
     id: "",
   );
-  types.User _chatUser = const types.User(
-    id: "",
+  final _chatUser = types.User(
+    id: uuid.v4(),
   );
 
   @override
@@ -91,14 +95,22 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Future<void> _handleSendPressed(types.PartialText message) async {
-    final textMessage = types.TextMessage(
-      author: _user,
-      createdAt: DateTime.now().millisecondsSinceEpoch,
-      id: randomString(),
-      text: message.text,
-    );
-    _addMessage(textMessage);
     try {
+      final textMessage = types.TextMessage(
+        author: _user,
+        id: randomString(),
+        text: message.text,
+      );
+      _addMessage(textMessage);
+
+      await database.into(database.chatContentTables).insert(
+            ChatContentTablesCompanion.insert(
+              title: '新的对话',
+              content: message.text,
+              parentid: int.parse(_user.id),
+            ),
+          );
+
       final res = await supabase.functions.invoke(
         'google/gemini-pro',
         body: {'message': message.text},
@@ -106,7 +118,6 @@ class _ChatPageState extends State<ChatPage> {
       final data = res.data;
       final chatMessage = types.TextMessage(
         author: _chatUser,
-        createdAt: DateTime.now().millisecondsSinceEpoch,
         id: randomString(),
         text: data['text'],
       );
