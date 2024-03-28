@@ -252,10 +252,7 @@ class $ChatContentTablesTable extends ChatContentTables
   @override
   late final GeneratedColumn<String> contentType = GeneratedColumn<String>(
       'content_type', aliasedName, false,
-      check: () => contentType.regexp(r'^(user|chat)', caseSensitive: false),
-      type: DriftSqlType.string,
-      requiredDuringInsert: false,
-      defaultValue: const Constant('user'));
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _datetimeMeta =
       const VerificationMeta('datetime');
   @override
@@ -303,6 +300,8 @@ class $ChatContentTablesTable extends ChatContentTables
           _contentTypeMeta,
           contentType.isAcceptableOrUnknown(
               data['content_type']!, _contentTypeMeta));
+    } else if (isInserting) {
+      context.missing(_contentTypeMeta);
     }
     if (data.containsKey('datetime')) {
       context.handle(_datetimeMeta,
@@ -464,11 +463,12 @@ class ChatContentTablesCompanion extends UpdateCompanion<ChatContentTable> {
     required int parentid,
     required String title,
     required String content,
-    this.contentType = const Value.absent(),
+    required String contentType,
     this.datetime = const Value.absent(),
   })  : parentid = Value(parentid),
         title = Value(title),
-        content = Value(content);
+        content = Value(content),
+        contentType = Value(contentType);
   static Insertable<ChatContentTable> custom({
     Expression<int>? id,
     Expression<int>? parentid,

@@ -5,8 +5,6 @@ class ChatContentTables extends Table {
   IntColumn get parentid => integer()();
   TextColumn get title => text().withLength(min: 1, max: 20)();
   TextColumn get content => text()();
-  TextColumn get contentType => text()
-      .check(contentType.regexp(r'^(user|chat)', caseSensitive: false))
-      .withDefault(const Constant('user'))();
+  TextColumn get contentType => text()();
   DateTimeColumn get datetime => dateTime().withDefault(currentDateAndTime)();
 }

@@ -44,6 +44,13 @@ class _ChatPageState extends State<ChatPage> {
     _user = types.User(
       id: widget.chatid,
     );
+    initMessage();
+  }
+
+  Future<void> initMessage() async {
+    List<ChatContentTable> messages =
+        await database.select(database.chatContentTables).get();
+    print(messages);
   }
 
   @override
@@ -96,6 +103,8 @@ class _ChatPageState extends State<ChatPage> {
 
   Future<void> _handleSendPressed(types.PartialText message) async {
     try {
+      final title = message.text.substring(0, 18);
+
       final textMessage = types.TextMessage(
         author: _user,
         id: randomString(),
@@ -105,9 +114,10 @@ class _ChatPageState extends State<ChatPage> {
 
       await database.into(database.chatContentTables).insert(
             ChatContentTablesCompanion.insert(
-              title: '新的对话',
+              title: title,
               content: message.text,
               parentid: int.parse(_user.id),
+              contentType: 'user',
             ),
           );
 
@@ -122,6 +132,15 @@ class _ChatPageState extends State<ChatPage> {
         text: data['text'],
       );
       _addMessage(chatMessage);
+
+      await database.into(database.chatContentTables).insert(
+            ChatContentTablesCompanion.insert(
+              title: '新的对话',
+              content: message.text,
+              parentid: int.parse(_chatUser.id),
+              contentType: 'chatUser',
+            ),
+          );
     } catch (e) {
       print(e);
     }
