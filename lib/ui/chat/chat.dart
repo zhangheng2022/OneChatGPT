@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:drift/drift.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
@@ -7,6 +8,7 @@ import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
+import 'package:one_chatgpt_flutter/models/response/chat_message.dart';
 
 final supabase = Supabase.instance.client;
 final User? user = supabase.auth.currentUser;
@@ -34,7 +36,7 @@ class _ChatPageState extends State<ChatPage> {
   types.User _user = const types.User(
     id: "",
   );
-  final _chatUser = types.User(
+  final _model = types.User(
     id: uuid.v4(),
   );
 
@@ -103,16 +105,16 @@ class _ChatPageState extends State<ChatPage> {
 
   Future<void> _handleSendPressed(types.PartialText message) async {
     try {
+      String title = "新的对话";
       final textMessage = types.TextMessage(
         author: _user,
         id: randomString(),
         text: message.text,
       );
       _addMessage(textMessage);
-
       await database.into(database.chatContentTables).insert(
             ChatContentTablesCompanion.insert(
-              title: "title",
+              title: title,
               content: message.text,
               parentid: int.parse(_user.id),
               contentType: 'user',
@@ -123,24 +125,40 @@ class _ChatPageState extends State<ChatPage> {
         'google/gemini-pro',
         body: {'message': message.text},
       );
-      final data = res.data;
+      ChatMessage data = res.data;
+      if (data.text.isNotEmpty) {
+        title = await _updateTitle();
+      }
+
       final chatMessage = types.TextMessage(
-        author: _chatUser,
+        author: _model,
         id: randomString(),
-        text: data['text'],
+        text: data.text,
       );
       _addMessage(chatMessage);
 
       await database.into(database.chatContentTables).insert(
             ChatContentTablesCompanion.insert(
-              title: '新的对话',
+              title: title,
               content: message.text,
-              parentid: int.parse(_chatUser.id),
-              contentType: 'chatUser',
+              parentid: int.parse(_model.id),
+              contentType: 'model',
             ),
           );
     } catch (err) {
       print(err);
     }
+  }
+
+  Future<String> _updateTitle() async {
+    final res = await supabase.functions
+        .invoke('google/chat-title', method: HttpMethod.get);
+    ChatMessage data = res.data;
+    (database.update(database.chatTables)
+          ..where((t) => t.id.isValue(int.parse(_user.id))))
+        .write(ChatTablesCompanion(
+      title: Value(data.text),
+    ));
+    return data.text;
   }
 }
