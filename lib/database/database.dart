@@ -25,6 +25,7 @@ LazyDatabase _openConnection() {
     // put the database file, called db.sqlite here, into the documents folder
     // for your app.
     final dbFolder = await getApplicationDocumentsDirectory();
+    print(dbFolder.path);
     final file = File(p.join(dbFolder.path, 'db.sqlite'));
 
     // Also work around limitations on old Android versions
