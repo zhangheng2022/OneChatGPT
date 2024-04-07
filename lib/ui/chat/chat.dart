@@ -48,9 +48,9 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Future<void> initMessage() async {
-    List<ChatContentTable> messages =
-        await database.select(database.chatContentTables).get();
-    print(messages);
+    // List<ChatContentTable> messages =
+    //     await database.select(database.chatContentTables).get();
+    // print(messages);
   }
 
   @override
@@ -103,8 +103,6 @@ class _ChatPageState extends State<ChatPage> {
 
   Future<void> _handleSendPressed(types.PartialText message) async {
     try {
-      final title = message.text.substring(0, 18);
-
       final textMessage = types.TextMessage(
         author: _user,
         id: randomString(),
@@ -112,37 +110,37 @@ class _ChatPageState extends State<ChatPage> {
       );
       _addMessage(textMessage);
 
-      await database.into(database.chatContentTables).insert(
-            ChatContentTablesCompanion.insert(
-              title: title,
-              content: message.text,
-              parentid: int.parse(_user.id),
-              contentType: 'user',
-            ),
-          );
+      // await database.into(database.chatContentTables).insert(
+      //       ChatContentTablesCompanion.insert(
+      //         title: title,
+      //         content: message.text,
+      //         parentid: int.parse(_user.id),
+      //         contentType: 'user',
+      //       ),
+      //     );
 
-      final res = await supabase.functions.invoke(
-        'google/gemini-pro',
-        body: {'message': message.text},
-      );
-      final data = res.data;
-      final chatMessage = types.TextMessage(
-        author: _chatUser,
-        id: randomString(),
-        text: data['text'],
-      );
-      _addMessage(chatMessage);
+      // final res = await supabase.functions.invoke(
+      //   'google/gemini-pro',
+      //   body: {'message': message.text},
+      // );
+      // final data = res.data;
+      // final chatMessage = types.TextMessage(
+      //   author: _chatUser,
+      //   id: randomString(),
+      //   text: data['text'],
+      // );
+      // _addMessage(chatMessage);
 
-      await database.into(database.chatContentTables).insert(
-            ChatContentTablesCompanion.insert(
-              title: '新的对话',
-              content: message.text,
-              parentid: int.parse(_chatUser.id),
-              contentType: 'chatUser',
-            ),
-          );
-    } catch (e) {
-      print(e);
+      // await database.into(database.chatContentTables).insert(
+      //       ChatContentTablesCompanion.insert(
+      //         title: '新的对话',
+      //         content: message.text,
+      //         parentid: int.parse(_chatUser.id),
+      //         contentType: 'chatUser',
+      //       ),
+      //     );
+    } catch (err) {
+      print(err);
     }
   }
 }
