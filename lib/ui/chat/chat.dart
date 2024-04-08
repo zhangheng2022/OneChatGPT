@@ -1,25 +1,15 @@
-import 'dart:convert';
-import 'dart:math';
-import 'package:drift/drift.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:uuid/uuid.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
 import 'package:one_chatgpt_flutter/models/response/chat_message.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 final supabase = Supabase.instance.client;
 final User? user = supabase.auth.currentUser;
 final database = AppDatabase();
 const uuid = Uuid();
-
-String randomString() {
-  final random = Random.secure();
-  final values = List<int>.generate(16, (i) => random.nextInt(255));
-  return base64UrlEncode(values);
-}
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key, required this.chatid});
@@ -31,15 +21,6 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  final List<types.Message> _messages = [];
-
-  types.User _user = const types.User(
-    id: "",
-  );
-  final _model = types.User(
-    id: uuid.v4(),
-  );
-
   @override
   void initState() {
     super.initState();
@@ -47,12 +28,6 @@ class _ChatPageState extends State<ChatPage> {
       id: widget.chatid,
     );
     initMessage();
-  }
-
-  Future<void> initMessage() async {
-    List<ChatContentTable> messages =
-        await database.select(database.chatContentTables).get();
-    print(messages);
   }
 
   @override
@@ -64,37 +39,51 @@ class _ChatPageState extends State<ChatPage> {
         ),
         body: Chat(
           messages: _messages,
-          onSendPressed: _handleSendPressed,
-          onAttachmentPressed: _handleImageSelection,
-          l10n: const ChatL10nZhCN(),
+          onSendPressed: _handleSendText,
           user: _user,
+          showUserAvatars: true,
+          l10n: const ChatL10nZhCN(),
         ));
   }
 
-  Future<void> _handleImageSelection() async {
-    final result = await ImagePicker().pickImage(
-      imageQuality: 70,
-      maxWidth: 1440,
-      source: ImageSource.gallery,
-    );
+  final List<types.Message> _messages = [];
 
-    if (result != null) {
-      final bytes = await result.readAsBytes();
-      final image = await decodeImageFromList(bytes);
+  var _user = const types.User(
+    id: "",
+  );
+  final _model = types.User(
+    id: uuid.v4(),
+  );
 
-      final message = types.ImageMessage(
-        author: _user,
-        createdAt: DateTime.now().millisecondsSinceEpoch,
-        height: image.height.toDouble(),
-        id: randomString(),
-        name: result.name,
-        size: bytes.length,
-        uri: result.path,
-        width: image.width.toDouble(),
-      );
-
-      _addMessage(message);
+  Future<void> initMessage() async {
+    final messages = await (database.select(database.chatContentTables)
+          ..where((tbl) => tbl.parentid.equals(int.parse(_user.id))))
+        .get();
+    if (messages.isNotEmpty) {
+      for (var i = 0; i < messages.length; i++) {
+        final chatMessage = types.TextMessage(
+          author: messages[i].contentType == 'user' ? _user : _model,
+          id: uuid.v4(),
+          text: messages[i].content,
+        );
+        _addMessage(chatMessage);
+      }
+      return;
     }
+    final chatMessage = types.TextMessage(
+      author: _model,
+      id: uuid.v4(),
+      text: "你好，有什么可以帮你的吗？",
+    );
+    _addMessage(chatMessage);
+    await database.into(database.chatContentTables).insert(
+          ChatContentTablesCompanion.insert(
+            title: "新的对话",
+            content: "你好，有什么可以帮你的吗？",
+            parentid: int.parse(_user.id),
+            contentType: 'model',
+          ),
+        );
   }
 
   Future<void> _addMessage(types.Message message) async {
@@ -103,12 +92,14 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  Future<void> _handleSendPressed(types.PartialText message) async {
+  Future<void> _updateMessage(types.Message message, int index) async {}
+
+  Future<void> _handleSendText(types.PartialText message) async {
     try {
       String title = "新的对话";
       final textMessage = types.TextMessage(
         author: _user,
-        id: randomString(),
+        id: uuid.v4(),
         text: message.text,
       );
       _addMessage(textMessage);
@@ -125,14 +116,14 @@ class _ChatPageState extends State<ChatPage> {
         'google/gemini-pro',
         body: {'message': message.text},
       );
-      ChatMessage data = res.data;
+      final data = ChatMessage.fromJson(res.data);
       if (data.text.isNotEmpty) {
         title = await _updateTitle();
       }
 
       final chatMessage = types.TextMessage(
         author: _model,
-        id: randomString(),
+        id: uuid.v4(),
         text: data.text,
       );
       _addMessage(chatMessage);
@@ -140,8 +131,8 @@ class _ChatPageState extends State<ChatPage> {
       await database.into(database.chatContentTables).insert(
             ChatContentTablesCompanion.insert(
               title: title,
-              content: message.text,
-              parentid: int.parse(_model.id),
+              content: data.text,
+              parentid: int.parse(_user.id),
               contentType: 'model',
             ),
           );
@@ -151,14 +142,45 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Future<String> _updateTitle() async {
-    final res = await supabase.functions
-        .invoke('google/chat-title', method: HttpMethod.get);
-    ChatMessage data = res.data;
-    (database.update(database.chatTables)
-          ..where((t) => t.id.isValue(int.parse(_user.id))))
-        .write(ChatTablesCompanion(
-      title: Value(data.text),
-    ));
-    return data.text;
+    print(_messages.last.type);
+    // String text = _messages.last;
+    // final res = await supabase.functions.invoke(
+    //   'google/chat-title',
+    //   body: {'message': text},
+    // );
+    // final data = ChatMessage.fromJson(res.data);
+    // (database.update(database.chatTables)
+    //       ..where((t) => t.id.isValue(int.parse(_user.id))))
+    //     .write(ChatTablesCompanion(
+    //   title: Value(data.text),
+    // ));
+    // return data.text;
+    return "123123";
   }
+
+  // Future<void> _handleImageSelection() async {
+  //   final result = await ImagePicker().pickImage(
+  //     imageQuality: 70,
+  //     maxWidth: 1440,
+  //     source: ImageSource.gallery,
+  //   );
+
+  //   if (result != null) {
+  //     final bytes = await result.readAsBytes();
+  //     final image = await decodeImageFromList(bytes);
+
+  //     final message = types.ImageMessage(
+  //       author: _user,
+  //       createdAt: DateTime.now().millisecondsSinceEpoch,
+  //       height: image.height.toDouble(),
+  //       id: randomString(),
+  //       name: result.name,
+  //       size: bytes.length,
+  //       uri: result.path,
+  //       width: image.width.toDouble(),
+  //     );
+
+  //     _addMessage(message);
+  //   }
+  // }
 }

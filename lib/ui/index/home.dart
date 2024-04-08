@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
 
@@ -55,7 +56,9 @@ class _HomeState extends State<Home> {
               child: ListTile(
                   leading: const Icon(Icons.smart_toy),
                   title: Text(_cardListData[index].title),
-                  subtitle: Text(_cardListData[index].datetime.toString()),
+                  subtitle: Text(DateFormat.MMMEd()
+                      .add_Hm()
+                      .format(_cardListData[index].datetime)),
                   trailing: IconButton(
                     onPressed: () =>
                         _deleteCardListData(_cardListData[index].id),

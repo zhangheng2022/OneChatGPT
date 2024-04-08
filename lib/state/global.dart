@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 class Global {
   //初始化全局信息，会在APP启动时执行
   static Future init() async {
     WidgetsFlutterBinding.ensureInitialized();
-    // Intl.defaultLocale = 'zh_CN';
+    Intl.defaultLocale = 'zh_CN';
+    await initializeDateFormatting();
     await Supabase.initialize(
       url: 'https://jkdxuuhjdoxqsjyhlubj.supabase.co',
       anonKey:
