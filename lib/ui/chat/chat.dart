@@ -34,7 +34,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text("新的对话"),
+          title: Text(appBarTitle),
           centerTitle: true,
         ),
         body: Chat(
@@ -45,6 +45,8 @@ class _ChatPageState extends State<ChatPage> {
           l10n: const ChatL10nZhCN(),
         ));
   }
+
+  String appBarTitle = "新的对话";
 
   final List<types.Message> _messages = [];
 
@@ -90,47 +92,45 @@ class _ChatPageState extends State<ChatPage> {
     setState(() {
       _messages.insert(0, message);
     });
+    _updateAppBarTitle();
   }
 
   Future<void> _updateMessage(types.Message message, int index) async {}
 
   Future<void> _handleSendText(types.PartialText message) async {
     try {
-      String title = "新的对话";
       final textMessage = types.TextMessage(
         author: _user,
         id: uuid.v4(),
         text: message.text,
       );
       _addMessage(textMessage);
+      // 写入数据库
       await database.into(database.chatContentTables).insert(
             ChatContentTablesCompanion.insert(
-              title: title,
+              title: appBarTitle,
               content: message.text,
               parentid: int.parse(_user.id),
               contentType: 'user',
             ),
           );
-
+      // 获取模型回复
       final res = await supabase.functions.invoke(
         'google/gemini-pro',
         body: {'message': message.text},
       );
       final data = ChatMessage.fromJson(res.data);
-      if (data.text.isNotEmpty) {
-        title = await _updateTitle();
-      }
-
+      // 发送模型回复消息
       final chatMessage = types.TextMessage(
         author: _model,
         id: uuid.v4(),
         text: data.text,
       );
       _addMessage(chatMessage);
-
+      // 写入数据库
       await database.into(database.chatContentTables).insert(
             ChatContentTablesCompanion.insert(
-              title: title,
+              title: appBarTitle,
               content: data.text,
               parentid: int.parse(_user.id),
               contentType: 'model',
@@ -141,8 +141,14 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  Future<String> _updateTitle() async {
-    print(_messages.last.type);
+  void _updateAppBarTitle() {
+    final msg = _messages.indexWhere((element) {
+      final jso = element.toJson();
+      print(jso.);
+      return false;
+    });
+    print(msg);
+
     // String text = _messages.last;
     // final res = await supabase.functions.invoke(
     //   'google/chat-title',
@@ -155,7 +161,6 @@ class _ChatPageState extends State<ChatPage> {
     //   title: Value(data.text),
     // ));
     // return data.text;
-    return "123123";
   }
 
   // Future<void> _handleImageSelection() async {
