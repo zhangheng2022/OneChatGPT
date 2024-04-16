@@ -142,13 +142,10 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _updateAppBarTitle() {
-    final msg = _messages.indexWhere((element) {
-      final jso = element.toJson();
-      print(jso.);
-      return false;
-    });
+    print(_messages);
+    final msg = _messages.map((e) => e.toJson());
     print(msg);
-
+    // final msgText = _messages.firstWhere((element) => element.);
     // String text = _messages.last;
     // final res = await supabase.functions.invoke(
     //   'google/chat-title',
