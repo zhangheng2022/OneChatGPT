@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
@@ -5,6 +6,7 @@ import 'package:one_chatgpt_flutter/database/database.dart';
 import 'package:one_chatgpt_flutter/models/response/chat_message.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
+import 'package:one_chatgpt_flutter/common/log.dart';
 
 final supabase = Supabase.instance.client;
 final User? user = supabase.auth.currentUser;
@@ -39,7 +41,7 @@ class _ChatPageState extends State<ChatPage> {
         ),
         body: Chat(
           messages: _messages,
-          onSendPressed: _handleSendText,
+          onSendPressed: _sendMessage,
           user: _user,
           showUserAvatars: true,
           l10n: const ChatL10nZhCN(),
@@ -89,15 +91,31 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Future<void> _addMessage(types.Message message) async {
+    // 添加消息
     setState(() {
       _messages.insert(0, message);
     });
-    _updateAppBarTitle();
+    // 如果_messages.length == 2, 那么就更新appBarTitle
+    if (_messages.length >= 3 && _messages.length < 6) _updateAppBarTitle();
   }
 
   Future<void> _updateMessage(types.Message message, int index) async {}
 
-  Future<void> _handleSendText(types.PartialText message) async {
+  /// 发送用户输入的消息并获取模型生成的响应。
+  ///
+  /// 该方法接收一个 [types.PartialText] 消息，代表用户输入的文本。然后执行以下操作：
+  /// 1. 根据用户的输入构造一个 [types.TextMessage] 并将其添加到聊天中。
+  /// 2. 将用户的消息插入到数据库中。
+  /// 3. 调用 Supabase 函数获取模型生成的响应。
+  /// 4. 用模型的响应构造一个新的 [types.TextMessage] 并将其添加到聊天中。
+  /// 5. 将模型的响应插入到数据库中。
+  ///
+  /// 参数：
+  /// - [message]: 一个包含用户消息文本的 [types.PartialText] 对象。
+  ///
+  /// 返回值：
+  /// 该方法不返回值；它是异步的，并且作为副作用更新 UI 和数据库。
+  Future<void> _sendMessage(types.PartialText message) async {
     try {
       final textMessage = types.TextMessage(
         author: _user,
@@ -137,27 +155,49 @@ class _ChatPageState extends State<ChatPage> {
             ),
           );
     } catch (err) {
-      print(err);
+      Log.e(err);
     }
   }
 
-  void _updateAppBarTitle() {
-    print(_messages);
-    final msg = _messages.map((e) => e.toJson());
-    print(msg);
-    // final msgText = _messages.firstWhere((element) => element.);
-    // String text = _messages.last;
-    // final res = await supabase.functions.invoke(
-    //   'google/chat-title',
-    //   body: {'message': text},
-    // );
-    // final data = ChatMessage.fromJson(res.data);
-    // (database.update(database.chatTables)
-    //       ..where((t) => t.id.isValue(int.parse(_user.id))))
-    //     .write(ChatTablesCompanion(
-    //   title: Value(data.text),
-    // ));
-    // return data.text;
+  // 获取历史消息
+  Future<List<Map<String, Object>>> _getHistoryMessages() async {
+    final messages = await (database.select(database.chatContentTables)
+          ..where((tbl) => tbl.parentid.equals(int.parse(_user.id))))
+        .get();
+    final historyMessages = messages
+        .map((e) => {
+              "role": e.contentType,
+              'parts': [
+                {'text': e.content}
+              ]
+            })
+        .skip(1)
+        .toList();
+    Log.w(historyMessages);
+    return historyMessages;
+  }
+
+  // 更新数据Title
+  Future<void> _updateAppBarTitle() async {
+    try {
+      final historyMessages = await _getHistoryMessages();
+      final res = await supabase.functions.invoke(
+        'google/chat-title',
+        body: {'history': historyMessages},
+      );
+      Log.d(res);
+      final data = ChatMessage.fromJson(res.data);
+      await (database.update(database.chatTables)
+            ..where((t) => t.id.isValue(int.parse(_user.id))))
+          .write(ChatTablesCompanion(
+        title: Value(data.text),
+      ));
+      setState(() {
+        appBarTitle = data.text;
+      });
+    } catch (err) {
+      Log.e(err);
+    }
   }
 
   // Future<void> _handleImageSelection() async {
