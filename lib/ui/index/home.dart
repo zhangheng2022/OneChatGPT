@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -80,9 +81,7 @@ class _HomeState extends State<Home> {
   Future<void> _addCardListData() async {
     final insertResult =
         await database.into(database.chatTables).insertReturning(
-              ChatTablesCompanion.insert(
-                title: '新的对话',
-              ),
+              ChatTablesCompanion.insert(),
             );
 
     setState(() {
@@ -107,9 +106,7 @@ class _HomeState extends State<Home> {
     } else {
       final insertResult =
           await database.into(database.chatTables).insertReturning(
-                ChatTablesCompanion.insert(
-                  title: '新的对话',
-                ),
+                ChatTablesCompanion.insert(),
               );
       setState(() {
         _cardListData = [insertResult];

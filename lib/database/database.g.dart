@@ -25,7 +25,18 @@ class $ChatTablesTable extends ChatTables
       additionalChecks:
           GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 20),
       type: DriftSqlType.string,
-      requiredDuringInsert: true);
+      requiredDuringInsert: false,
+      defaultValue: const Constant("新的对话"));
+  static const VerificationMeta _isupdateMeta =
+      const VerificationMeta('isupdate');
+  @override
+  late final GeneratedColumn<bool> isupdate = GeneratedColumn<bool>(
+      'isupdate', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("isupdate" IN (0, 1))'),
+      defaultValue: const Constant(true));
   static const VerificationMeta _datetimeMeta =
       const VerificationMeta('datetime');
   @override
@@ -35,7 +46,7 @@ class $ChatTablesTable extends ChatTables
       requiredDuringInsert: false,
       defaultValue: currentDateAndTime);
   @override
-  List<GeneratedColumn> get $columns => [id, title, datetime];
+  List<GeneratedColumn> get $columns => [id, title, isupdate, datetime];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -52,8 +63,10 @@ class $ChatTablesTable extends ChatTables
     if (data.containsKey('title')) {
       context.handle(
           _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
-    } else if (isInserting) {
-      context.missing(_titleMeta);
+    }
+    if (data.containsKey('isupdate')) {
+      context.handle(_isupdateMeta,
+          isupdate.isAcceptableOrUnknown(data['isupdate']!, _isupdateMeta));
     }
     if (data.containsKey('datetime')) {
       context.handle(_datetimeMeta,
@@ -72,6 +85,8 @@ class $ChatTablesTable extends ChatTables
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       title: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
+      isupdate: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}isupdate'])!,
       datetime: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}datetime'])!,
     );
@@ -86,14 +101,19 @@ class $ChatTablesTable extends ChatTables
 class ChatTable extends DataClass implements Insertable<ChatTable> {
   final int id;
   final String title;
+  final bool isupdate;
   final DateTime datetime;
   const ChatTable(
-      {required this.id, required this.title, required this.datetime});
+      {required this.id,
+      required this.title,
+      required this.isupdate,
+      required this.datetime});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['title'] = Variable<String>(title);
+    map['isupdate'] = Variable<bool>(isupdate);
     map['datetime'] = Variable<DateTime>(datetime);
     return map;
   }
@@ -102,6 +122,7 @@ class ChatTable extends DataClass implements Insertable<ChatTable> {
     return ChatTablesCompanion(
       id: Value(id),
       title: Value(title),
+      isupdate: Value(isupdate),
       datetime: Value(datetime),
     );
   }
@@ -112,6 +133,7 @@ class ChatTable extends DataClass implements Insertable<ChatTable> {
     return ChatTable(
       id: serializer.fromJson<int>(json['id']),
       title: serializer.fromJson<String>(json['title']),
+      isupdate: serializer.fromJson<bool>(json['isupdate']),
       datetime: serializer.fromJson<DateTime>(json['datetime']),
     );
   }
@@ -121,13 +143,17 @@ class ChatTable extends DataClass implements Insertable<ChatTable> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'title': serializer.toJson<String>(title),
+      'isupdate': serializer.toJson<bool>(isupdate),
       'datetime': serializer.toJson<DateTime>(datetime),
     };
   }
 
-  ChatTable copyWith({int? id, String? title, DateTime? datetime}) => ChatTable(
+  ChatTable copyWith(
+          {int? id, String? title, bool? isupdate, DateTime? datetime}) =>
+      ChatTable(
         id: id ?? this.id,
         title: title ?? this.title,
+        isupdate: isupdate ?? this.isupdate,
         datetime: datetime ?? this.datetime,
       );
   @override
@@ -135,53 +161,64 @@ class ChatTable extends DataClass implements Insertable<ChatTable> {
     return (StringBuffer('ChatTable(')
           ..write('id: $id, ')
           ..write('title: $title, ')
+          ..write('isupdate: $isupdate, ')
           ..write('datetime: $datetime')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, title, datetime);
+  int get hashCode => Object.hash(id, title, isupdate, datetime);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is ChatTable &&
           other.id == this.id &&
           other.title == this.title &&
+          other.isupdate == this.isupdate &&
           other.datetime == this.datetime);
 }
 
 class ChatTablesCompanion extends UpdateCompanion<ChatTable> {
   final Value<int> id;
   final Value<String> title;
+  final Value<bool> isupdate;
   final Value<DateTime> datetime;
   const ChatTablesCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
+    this.isupdate = const Value.absent(),
     this.datetime = const Value.absent(),
   });
   ChatTablesCompanion.insert({
     this.id = const Value.absent(),
-    required String title,
+    this.title = const Value.absent(),
+    this.isupdate = const Value.absent(),
     this.datetime = const Value.absent(),
-  }) : title = Value(title);
+  });
   static Insertable<ChatTable> custom({
     Expression<int>? id,
     Expression<String>? title,
+    Expression<bool>? isupdate,
     Expression<DateTime>? datetime,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (title != null) 'title': title,
+      if (isupdate != null) 'isupdate': isupdate,
       if (datetime != null) 'datetime': datetime,
     });
   }
 
   ChatTablesCompanion copyWith(
-      {Value<int>? id, Value<String>? title, Value<DateTime>? datetime}) {
+      {Value<int>? id,
+      Value<String>? title,
+      Value<bool>? isupdate,
+      Value<DateTime>? datetime}) {
     return ChatTablesCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
+      isupdate: isupdate ?? this.isupdate,
       datetime: datetime ?? this.datetime,
     );
   }
@@ -195,6 +232,9 @@ class ChatTablesCompanion extends UpdateCompanion<ChatTable> {
     if (title.present) {
       map['title'] = Variable<String>(title.value);
     }
+    if (isupdate.present) {
+      map['isupdate'] = Variable<bool>(isupdate.value);
+    }
     if (datetime.present) {
       map['datetime'] = Variable<DateTime>(datetime.value);
     }
@@ -206,6 +246,7 @@ class ChatTablesCompanion extends UpdateCompanion<ChatTable> {
     return (StringBuffer('ChatTablesCompanion(')
           ..write('id: $id, ')
           ..write('title: $title, ')
+          ..write('isupdate: $isupdate, ')
           ..write('datetime: $datetime')
           ..write(')'))
         .toString();
