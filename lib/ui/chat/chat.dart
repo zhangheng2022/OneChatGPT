@@ -95,8 +95,6 @@ class _ChatPageState extends State<ChatPage> {
     setState(() {
       _messages.insert(0, message);
     });
-    // 如果_messages.length == 2, 那么就更新appBarTitle
-    if (_messages.length >= 3 && _messages.length < 6) _updateAppBarTitle();
   }
 
   Future<void> _updateMessage(types.Message message, int index) async {}
@@ -154,6 +152,8 @@ class _ChatPageState extends State<ChatPage> {
               contentType: 'model',
             ),
           );
+      // 如果_messages.length == 2, 那么就更新appBarTitle
+      if (_messages.length >= 3 && _messages.length < 6) _updateAppBarTitle();
     } catch (err) {
       Log.e(err);
     }
