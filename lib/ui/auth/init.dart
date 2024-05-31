@@ -14,7 +14,7 @@ class _InitPageState extends State<InitPage> {
       appBar: AppBar(
         title: const Text('Init'),
       ),
-      body: Center(
+      body: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
