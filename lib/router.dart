@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -60,17 +62,36 @@ class AppRoutes {
         ],
       ),
       GoRoute(
-        name: 'login',
-        path: '/login',
-        builder: (context, state) => const LoginPage(),
-        routes: <RouteBase>[
-          GoRoute(
-            name: 'register',
-            path: 'register',
-            builder: (context, state) => const RegisterPage(),
-          ),
-        ],
-      ),
+          name: 'login',
+          path: '/login',
+          builder: (context, state) => const LoginPage(),
+          routes: <RouteBase>[
+            GoRoute(
+              name: 'register',
+              path: 'register',
+              builder: (context, state) => const RegisterPage(),
+            ),
+          ],
+          onExit: (BuildContext context, GoRouterState state) async {
+            bool canPopState = false;
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                showCloseIcon: false,
+                duration: Duration(milliseconds: 2000),
+                behavior: SnackBarBehavior.floating,
+                content: Text(
+                  '再按一次退出',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+            canPopState = true;
+            const timeout = Duration(seconds: 2);
+            Timer(timeout, () {
+              canPopState = false;
+            });
+            return canPopState;
+          }),
     ],
   );
 }

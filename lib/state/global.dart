@@ -10,9 +10,8 @@ class Global {
     Intl.defaultLocale = 'zh_CN';
     await initializeDateFormatting();
     await Supabase.initialize(
-      url: 'https://jkdxuuhjdoxqsjyhlubj.supabase.co',
-      anonKey:
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZHh1dWhqZG94cXNqeWhsdWJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTAzMzE4MTksImV4cCI6MjAyNTkwNzgxOX0.bOYWtTR1EAfR2oj51cf2m1J-A6vOX3Uc4q8UFf_8dHw',
-    );
+        url: "https://jkdxuuhjdoxqsjyhlubj.supabase.co",
+        anonKey:
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprZHh1dWhqZG94cXNqeWhsdWJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTAzMzE4MTksImV4cCI6MjAyNTkwNzgxOX0.bOYWtTR1EAfR2oj51cf2m1J-A6vOX3Uc4q8UFf_8dHw");
   }
 }

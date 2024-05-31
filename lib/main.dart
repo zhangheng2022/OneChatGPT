@@ -33,10 +33,10 @@ class InitApp extends StatelessWidget {
         title: 'OneChatGPT',
         theme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.blueGrey, // 设置紫色
-            brightness: Brightness.light,
-          ),
+          // colorScheme: ColorScheme.fromSeed(
+          //   seedColor: Colors.black, // 设置紫色
+          //   brightness: Brightness.light,
+          // ),
         ),
         // darkTheme: ThemeData.dark(),
         debugShowCheckedModeBanner: false,
