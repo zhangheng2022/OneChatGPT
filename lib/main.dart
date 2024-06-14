@@ -32,13 +32,11 @@ class InitApp extends StatelessWidget {
       child: MaterialApp.router(
         title: 'OneChatGPT',
         theme: ThemeData(
-          useMaterial3: true,
-          // colorScheme: ColorScheme.fromSeed(
-          //   seedColor: Colors.black, // 设置紫色
-          //   brightness: Brightness.light,
-          // ),
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.blue, // 你想要的主题色
+            brightness: Brightness.light,
+          ),
         ),
-        // darkTheme: ThemeData.dark(),
         debugShowCheckedModeBanner: false,
         routerConfig: AppRoutes.router,
       ),

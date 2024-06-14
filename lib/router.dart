@@ -62,36 +62,46 @@ class AppRoutes {
         ],
       ),
       GoRoute(
-          name: 'login',
-          path: '/login',
-          builder: (context, state) => const LoginPage(),
-          routes: <RouteBase>[
-            GoRoute(
-              name: 'register',
-              path: 'register',
-              builder: (context, state) => const RegisterPage(),
-            ),
-          ],
-          onExit: (BuildContext context, GoRouterState state) async {
-            bool canPopState = false;
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                showCloseIcon: false,
-                duration: Duration(milliseconds: 2000),
-                behavior: SnackBarBehavior.floating,
-                content: Text(
-                  '再按一次退出',
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            );
-            canPopState = true;
-            const timeout = Duration(seconds: 2);
-            Timer(timeout, () {
-              canPopState = false;
-            });
-            return canPopState;
-          }),
+        name: 'login',
+        path: '/login',
+        builder: (context, state) => const LoginPage(),
+        routes: <RouteBase>[
+          GoRoute(
+            name: 'register',
+            path: 'register',
+            builder: (context, state) => const RegisterPage(),
+          ),
+        ],
+        onExit: (BuildContext context, GoRouterState state) =>
+            _showDialog(context, state),
+      ),
     ],
   );
+}
+
+Future<bool> _showDialog(BuildContext context, GoRouterState state) async {
+  final response = await showDialog<bool>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('提示'),
+        content: const Text("确定退出？"),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('取消'),
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            },
+          ),
+          TextButton(
+            child: const Text('退出'),
+            onPressed: () {
+              Navigator.of(context).pop(true);
+            },
+          ),
+        ],
+      );
+    },
+  );
+  return response ?? false;
 }

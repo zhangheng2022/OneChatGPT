@@ -52,7 +52,7 @@ class _LoginEmailState extends State<LoginEmail> {
       child: (Column(
         children: <Widget>[
           TextFormField(
-            autofocus: true,
+            autofocus: false,
             keyboardType: TextInputType.emailAddress,
             decoration: const InputDecoration(
               prefixIcon: Icon(Icons.mail_outlined),
