@@ -50,6 +50,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    permissions:
+      contents: write
     steps:
       - name: Download APK from Artifacts
         uses: actions/download-artifact@v2
