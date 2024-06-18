@@ -24,9 +24,6 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
 
-    - name: Grant execute permission for gradlew # 为gradlew脚本授予执行权限
-      run: chmod +x ./android/gradlew
-
     - name: Build APK # 构建发布版APK
       run: |
         flutter pub get
