@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:one_chatgpt_flutter/ui/auth/login.dart';
-import 'package:one_chatgpt_flutter/ui/auth/Register.dart';
+import 'package:one_chatgpt_flutter/ui/auth/register.dart';
 import 'package:one_chatgpt_flutter/ui/chat/chat.dart';
 import 'package:one_chatgpt_flutter/ui/index/scaffold_nav_bar.dart';
 import 'package:one_chatgpt_flutter/ui/index/home.dart';
