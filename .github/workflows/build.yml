@@ -64,8 +64,12 @@ jobs:
         with:
           tag_name: ${{ github.run_number }} # 使用运行编号作为标签名称
           release_name: Release ${{ github.run_number }} # 设置发布名称
+          body: |
+            Changes in this Release
+            - First Change
+            - Second Change
           draft: false
-          prerelease: false
+          prerelease: true
 
       - name: Upload APK to Release # 将APK上传到创建的GitHub发布中
         uses: actions/upload-release-asset@v1
