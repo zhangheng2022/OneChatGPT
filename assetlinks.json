@@ -2,10 +2,10 @@
   {
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
-      "namespace": "one_chatgpt_flutter",
+      "namespace": "android_app",
       "package_name": "com.onechatgpt",
       "sha256_cert_fingerprints": [
-        "FF:2A:CF:7B:DD:CC:F1:03:3E:E8:B2:27:7C:A2:E3:3C:DE:13:DB:AC:8E:EB:3A:B9:72:A1:0E:26:8A:F5:EC:AF"
+        "2A:7D:29:20:EE:5E:46:9A:75:59:BD:F8:C5:16:AF:E9:7A:95:E4:97:3C:E7:F3:5F:58:49:3A:64:36:6E:67:E1"
       ]
     }
   }

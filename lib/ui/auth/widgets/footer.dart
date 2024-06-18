@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:one_chatgpt_flutter/common/log.dart';
 
 class LoginFooter extends StatelessWidget {
   LoginFooter({super.key});
@@ -95,11 +96,11 @@ class LoginFooter extends StatelessWidget {
     try {
       final result = await supabase.auth.signInWithOAuth(
         OAuthProvider.github,
-        redirectTo: 'http://one.zhangheng.eu.org/home',
+        redirectTo: 'https://one.zhangheng.eu.org/home'
       );
-      // print(result);
+      Log.d(result);
     } catch (e) {
-      // print(e);
+      Log.e(e);
     }
   }
 }
