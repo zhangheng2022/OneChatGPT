@@ -65,7 +65,7 @@ jobs:
           tag: ${{ github.run_number }}
           name: Release ${{ github.run_number }}
           body: |
-            Changes in this Release
+            Changes in this Release:
             - First Change
             - Second Change
           draft: false
@@ -75,7 +75,7 @@ jobs:
       - name: Upload APK to Release
         run: |
           for apk in release/*.apk; do
-            apk_name=$(basename $apk)
+            apk_name=$(basename "$apk")
             echo "Uploading $apk_name"
-            curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary @"$apk" ${{ steps.create_release.outputs.upload_url }}?name=$apk_name
+            curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary @"$apk" "${{ steps.create_release.outputs.upload_url }}"?name="$apk_name"
           done
