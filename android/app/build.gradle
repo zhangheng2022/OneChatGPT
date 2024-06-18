@@ -60,7 +60,7 @@ android {
         release {
            keyAlias keystoreProperties['keyAlias']
            keyPassword keystoreProperties['keyPassword']
-           storeFile file('${github.workspace}/android/app/keystore.jks')
+           storeFile file('System.getenv('GITHUB_WORKSPACE')/android/app/keystore.jks')
            storePassword keystoreProperties['storePassword']
         }
         debug {
