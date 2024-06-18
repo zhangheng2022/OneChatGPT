@@ -20,6 +20,10 @@ jobs:
       STOREPASSWORD: ${{ secrets.STOREPASSWORD }}
 
     steps:
+    - name: Print non-sensitive environment variable
+      run: echo "Example variable: ${{ env.KEYPASSWORD }}"
+
+    steps:
       - name: Checkout code # 检出代码
         uses: actions/checkout@v4
 
