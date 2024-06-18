@@ -37,13 +37,13 @@ jobs:
 
       - name: Rename APK
         run: |
-          mv build/app/outputs/flutter-apk/app-${{ matrix.abi }}-release.apk build/app/outputs/flutter-apk/OneChatGPT-${{ matrix.abi }}-${GITHUB_RUN_NUMBER}.apk
+          mv build/app/outputs/flutter-apk/app-${{ matrix.abi }}-release.apk build/app/outputs/flutter-apk/OneChatGPT-${{ matrix.abi }}.apk
 
       - name: Upload APK to Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: OneChatGPT-${{ matrix.abi }}-${GITHUB_RUN_NUMBER}.apk
-          path: build/app/outputs/flutter-apk/OneChatGPT-${{ matrix.abi }}-${GITHUB_RUN_NUMBER}.apk
+          name: OneChatGPT-${{ matrix.abi }}.apk
+          path: build/app/outputs/flutter-apk/OneChatGPT-${{ matrix.abi }}.apk
 
   release:
     name: Release APK
