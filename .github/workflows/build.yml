@@ -1,7 +1,7 @@
 # 工作流名称
 name: Build and Release APK
 
-# 触发工作流的条件：master分支有push事件时触发
+# 触触发工作流的条件：master分支有push事件时触发
 on:
   push:
     branches:
@@ -28,20 +28,20 @@ jobs:
           echo ${{ secrets.KEYSTORE }} | base64 --decode > ${{ github.workspace }}/android/app/keystore.jks
         shell: bash
 
-      - name: Build APK # 构建发布版APK
+      - name: Build APK # 构建发布版APK，为不同的ABI平台生成不同的APK
         run: |
           flutter pub get
-          flutter build apk --release
+          flutter build apk --release --split-per-abi
         env:
           KEYALIAS: ${{ secrets.KEYALIAS }}
           KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
           STOREPASSWORD: ${{ secrets.STOREPASSWORD }}
 
-      - name: Upload APK to Artifacts # 将构建的APK上传为工件
+      - name: Upload APKs to Artifacts # 将构建的多个APK上传为工件
         uses: actions/upload-artifact@v2
         with:
-          name: app-release.apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          name: app-release-apks
+          path: build/app/outputs/flutter-apk/*-release.apk
 
   # 发布APK的工作
   release:
@@ -52,10 +52,10 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Download APK from Artifacts # 从工件中下载APK
+      - name: Download APKs from Artifacts # 从工件中下载多个APK
         uses: actions/download-artifact@v2
         with:
-          name: app-release.apk
+          name: app-release-apks
           path: release
 
       - name: Create Release # 创建GitHub发布
@@ -73,15 +73,12 @@ jobs:
           draft: false
           prerelease: true
 
-      - name: Upload APK to Release # 将APK上传到创建的GitHub发布中
+      - name: Upload APKs to Release # 将多个APK上传到创建的GitHub发布中
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./release/app-release.apk
+          asset_path: ./release/*-release.apk
           asset_name: app-release.apk
           asset_content_type: application/vnd.android.package-archive
-
-
-# [Convert]::ToBase64String([IO.File]::ReadAllBytes("your_keystore_file.keystore")) | Set-Clipboard
