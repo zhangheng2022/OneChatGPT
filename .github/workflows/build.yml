@@ -29,14 +29,14 @@ jobs:
 
     - name: Build APK # 构建发布版APK
       run: |
-        cd android
-        ./gradlew assembleRelease
+        flutter pub get
+        flutter build apk --release
 
     - name: Upload APK to Artifacts # 将构建的APK上传为工件
       uses: actions/upload-artifact@v2
       with:
         name: app-release.apk
-        path: android/app/build/outputs/apk/release/app-release.apk
+        path: build/app/outputs/flutter-apk/app-release.apk
 
   # 发布APK的工作
   release:
