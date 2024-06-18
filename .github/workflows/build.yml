@@ -20,12 +20,14 @@ jobs:
       STOREPASSWORD: ${{ secrets.STOREPASSWORD }}
 
     steps:
-      - name: Print non-sensitive environment variable
-        run: echo "Example variable: ${{ env.KEYPASSWORD }}"
-
 
       - name: Checkout code # 检出代码
         uses: actions/checkout@v4
+
+      - name: Print non-sensitive environment variable
+        run: | 
+          echo "Example variable: ${{ env.KEYPASSWORD }}"
+        shell: bash
 
       - name: Setup Flutter # 设置Flutter环境
         uses: subosito/flutter-action@v2
