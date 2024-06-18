@@ -27,6 +27,7 @@ def keystorePropertiesFile = rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
+println "KEYPASSWORD: ${System.getenv('KEYPASSWORD')}"
 
 android {
     namespace "com.onechatgpt"
