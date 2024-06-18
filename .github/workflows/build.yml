@@ -1,0 +1,73 @@
+# 工作流名称
+name: Build and Release APK
+
+# 触发工作流的条件：master分支有push事件时触发
+on:
+  push:
+    branches:
+      - master
+
+# 定义工作
+jobs:
+  # 构建APK的工作
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest # 指定运行环境
+
+    steps:
+    - name: Checkout code # 检出代码
+      uses: actions/checkout@v2
+
+    - name: Set up JDK 11 # 设置Java开发工具包11
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+        distribution: 'adopt'
+
+    - name: Grant execute permission for gradlew # 为gradlew脚本授予执行权限
+      run: chmod +x ./android/gradlew
+
+    - name: Build APK # 构建发布版APK
+      run: |
+        cd android
+        ./gradlew assembleRelease
+
+    - name: Upload APK to Artifacts # 将构建的APK上传为工件
+      uses: actions/upload-artifact@v2
+      with:
+        name: app-release.apk
+        path: android/app/build/outputs/apk/release/app-release.apk
+
+  # 发布APK的工作
+  release:
+    name: Release APK
+    needs: build # 该工作依赖于成功完成的构建工作
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master' # 运行该工作的条件
+    steps:
+    - name: Download APK from Artifacts # 从工件中下载APK
+      uses: actions/download-artifact@v2
+      with:
+        name: app-release.apk
+        path: release
+
+    - name: Create Release # 创建GitHub发布
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 使用GitHub令牌进行认证
+      with:
+        tag_name: ${{ github.run_number }} # 使用运行编号作为标签名称
+        release_name: Release ${{ github.run_number }} # 设置发布名称
+        draft: false
+        prerelease: false
+
+    - name: Upload APK to Release # 将APK上传到创建的GitHub发布中
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./release/app-release.apk
+        asset_name: app-release.apk
+        asset_content_type: application/vnd.android.package-archive
