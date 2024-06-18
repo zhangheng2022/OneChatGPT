@@ -94,10 +94,8 @@ class LoginFooter extends StatelessWidget {
 
   Future<void> _githubLogin() async {
     try {
-      final result = await supabase.auth.signInWithOAuth(
-        OAuthProvider.github,
-        redirectTo: 'https://one.zhangheng.eu.org/home'
-      );
+      final result = await supabase.auth.signInWithOAuth(OAuthProvider.github,
+          redirectTo: 'onechat://onechatgpt/');
       Log.d(result);
     } catch (e) {
       Log.e(e);

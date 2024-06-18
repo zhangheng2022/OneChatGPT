@@ -53,6 +53,7 @@ dependencies:
   path: ^1.9.0
   sqlite3: ^2.4.0
   logger: ^2.2.0
+  app_links: ^6.1.1
 
 dev_dependencies:
   flutter_test:
