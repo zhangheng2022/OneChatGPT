@@ -58,10 +58,10 @@ android {
     }
     signingConfigs {
         release {
-            keyAlias System.getenv('KEYALIAS')
-            keyPassword System.getenv('KEYPASSWORD')
+            keyAlias 'upload'
+            keyPassword 'lhsgdd123'
             storeFile file(System.getenv('GITHUB_WORKSPACE') + '/android/app/keystore.jks')
-            storePassword System.getenv('STOREPASSWORD')
+            storePassword 'lhsgdd123'
         }
         debug {
            keyAlias keystoreProperties['keyAlias']
