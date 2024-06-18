@@ -49,6 +49,8 @@ jobs:
     needs: build # 该工作依赖于成功完成的构建工作
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/master' # 运行该工作的条件
+    permissions:
+      contents: write
     steps:
       - name: Download APK from Artifacts # 从工件中下载APK
         uses: actions/download-artifact@v2
