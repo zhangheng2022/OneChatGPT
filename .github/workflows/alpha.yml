@@ -1,0 +1,75 @@
+name: Build and Release APK
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        abi: ["armeabi-v7a", "arm64-v8a", "x86_64"]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.x"
+
+      - name: Decode keystore
+        run: |
+          echo ${{ secrets.KEYSTORE }} | base64 --decode > ${{ github.workspace }}/android/app/keystore.jks
+        shell: bash
+
+      - name: Build APK
+        run: |
+          flutter pub get
+          flutter build apk --release --split-per-abi
+        env:
+          KEYALIAS: ${{ secrets.KEYALIAS }}
+          KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
+          STOREPASSWORD: ${{ secrets.STOREPASSWORD }}
+
+      - name: Rename APK
+        run: |
+          mv build/app/outputs/flutter-apk/app-${{ matrix.abi }}-release.apk build/app/outputs/flutter-apk/OneChatGPT-${{ matrix.abi }}.apk
+
+      - name: Upload APK to Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: OneChatGPT-${{ matrix.abi }}.apk
+          path: build/app/outputs/flutter-apk/OneChatGPT-${{ matrix.abi }}.apk
+
+  release:
+    name: Release APK
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    permissions:
+      contents: write
+    steps:
+      - name: Download APK from Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release
+          merge-multiple: true
+
+      - name: Create Release
+        id: create_release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "release/*.apk"
+          tag: ${{ github.run_number }}
+          name: Release ${{ github.run_number }}
+          body: |
+            Changes in this Release:
+            - First Change
+            - Second Change
+          draft: false
+          prerelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}
