@@ -47,7 +47,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: OneChatGPT-${{ matrix.abi }}.apk
-          path: build/app/outputs/flutter-apk/*.apk
+          path: build/app/outputs/flutter-apk/OneChatGPT-${{ matrix.abi }}.apk
 
   release:
     name: Release APK
