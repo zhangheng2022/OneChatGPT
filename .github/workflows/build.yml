@@ -57,12 +57,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: release
+          merge-multiple: true
 
       - name: Create Release
         id: create_release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "release/OneChatGPT-armeabi-v7a.apk,release/OneChatGPT-arm64-v8a.apk,release/OneChatGPT-x86_64.apk"
+          artifacts: "release/*.apk"
           tag: ${{ github.run_number }}
           name: Release ${{ github.run_number }}
           body: |
