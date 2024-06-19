@@ -30,6 +30,12 @@ jobs:
           echo ${{ secrets.KEYSTORE }} | base64 --decode > ${{ github.workspace }}/android/app/keystore.jks
         shell: bash
 
+      - name: Extract version
+        run: |
+          echo "VERSION=$(grep 'version:' pubspec.yaml | sed 's/version: //')" >> $GITHUB_ENV
+          echo "BUILDTIME=$(TZ=Asia/Shanghai date '+%Y年%m月%d日 %H时%M分%S秒')" >> $GITHUB_ENV
+        shell: bash
+
       - name: Build APK
         run: |
           flutter pub get
@@ -41,13 +47,13 @@ jobs:
 
       - name: Rename APK
         run: |
-          mv build/app/outputs/flutter-apk/app-${{ matrix.abi }}-release.apk build/app/outputs/flutter-apk/OneChatGPT-${{ matrix.abi }}.apk
+          mv build/app/outputs/flutter-apk/app-${{ matrix.abi }}-release.apk build/app/outputs/flutter-apk/OneChatGPT-${{ env.VERSION }}-${{ matrix.abi }}.apk
 
       - name: Upload APK to Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: OneChatGPT-${{ matrix.abi }}.apk
-          path: build/app/outputs/flutter-apk/OneChatGPT-${{ matrix.abi }}.apk
+          name: OneChatGPT-${{ env.VERSION }}-${{ matrix.abi }}.apk
+          path: build/app/outputs/flutter-apk/OneChatGPT-${{ env.VERSION }}-${{ matrix.abi }}.apk
 
   release:
     name: Release APK
@@ -70,7 +76,6 @@ jobs:
           tag: Alpha
           name: OneChatGPT Alpha
           body:  |
-            cat > release.txt << 'EOF'
             ## 我应该下载哪个版本？
 
             ### fat APK
@@ -81,8 +86,7 @@ jobs:
             - ARM 32位: armeabi-v7a.apk（用于较旧的 Android 设备）
             - x86_64: x86_64.apk（用于 Android 模拟器和一些基于 x86 的 Android 设备）
 
-            更新时间：  ${{ env.BUILDTIME }}.
-            EOF
+            更新时间：${{ env.BUILDTIME }}
           draft: false
           prerelease: true
           token: ${{ secrets.GITHUB_TOKEN }}
