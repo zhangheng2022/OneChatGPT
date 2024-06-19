@@ -62,6 +62,7 @@ jobs:
         id: create_release
         uses: ncipollo/release-action@v1
         with:
+          artifacts: release/*.apk
           tag: ${{ github.run_number }}
           name: Release ${{ github.run_number }}
           body: |
@@ -72,10 +73,10 @@ jobs:
           prerelease: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload APK to Release
-        run: |
-          for apk in release/*.apk; do
-            apk_name=$(basename "$apk")
-            echo "Uploading $apk_name"
-            curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: multipart/form-data" -F "file=@$apk;name=$apk_name" "${{ steps.create_release.outputs.upload_url }}?name=$apk_name"
-          done
+      # - name: Upload APK to Release
+      #   run: |
+      #     for apk in release/*.apk; do
+      #       apk_name=$(basename "$apk")
+      #       echo "Uploading $apk_name"
+      #       curl -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: multipart/form-data" -F "file=@$apk;name=$apk_name" "${{ steps.create_release.outputs.upload_url }}?name=$apk_name"
+      #     done
