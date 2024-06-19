@@ -13,6 +13,8 @@ jobs:
   build-and-release:
     name: Build and Release APK
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -44,8 +46,9 @@ jobs:
         run: |
           mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/OneChatGPT-${{ env.VERSION }}-fat.apk
           for apk in build/app/outputs/flutter-apk/*-release.apk; do
-            newname=$(echo "$apk" | sed "s/-release/-${{ env.VERSION }}/g")
-            mv "$apk" "$newname"
+            abi=$(echo "$apk" | sed -n 's/.*app-\(.*\)-release.apk/\1/p')
+            newname="OneChatGPT-${{ env.VERSION }}-${abi}.apk"
+            mv "$apk" "build/app/outputs/flutter-apk/$newname"
           done
 
       - name: Upload APKs to Artifacts
