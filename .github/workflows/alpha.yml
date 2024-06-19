@@ -10,15 +10,12 @@ on:
     types: [closed]
 
 jobs:
-  build:
-    name: Build APK
+  build-and-release:
+    name: Build and Release APK
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        abi: ["armeabi-v7a", "arm64-v8a", "x86_64"]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -28,71 +25,55 @@ jobs:
       - name: Decode keystore
         run: |
           echo ${{ secrets.KEYSTORE }} | base64 --decode > ${{ github.workspace }}/android/app/keystore.jks
-        shell: bash
 
       - name: Extract version
         run: |
           echo "VERSION=$(grep 'version:' pubspec.yaml | sed 's/version: //')" >> $GITHUB_ENV
-        shell: bash
 
-      - name: Build APK
+      - name: Build APKs
         run: |
           flutter pub get
+          flutter build apk --release
           flutter build apk --release --split-per-abi
         env:
           KEYALIAS: ${{ secrets.KEYALIAS }}
           KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
           STOREPASSWORD: ${{ secrets.STOREPASSWORD }}
 
-      - name: Rename APK
+      - name: Rename and Prepare APKs for Upload
         run: |
-          mv build/app/outputs/flutter-apk/app-${{ matrix.abi }}-release.apk build/app/outputs/flutter-apk/OneChatGPT-${{ env.VERSION }}-${{ matrix.abi }}.apk
+          mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/OneChatGPT-${{ env.VERSION }}-fat.apk
+          for apk in build/app/outputs/flutter-apk/*-release.apk; do
+            newname=$(echo "$apk" | sed "s/-release/-${{ env.VERSION }}/g")
+            mv "$apk" "$newname"
+          done
 
-      - name: Upload APK to Artifacts
-        uses: actions/upload-artifact@v4
+      - name: Upload APKs to Artifacts
+        uses: actions/upload-artifact@v2
         with:
-          name: OneChatGPT-${{ env.VERSION }}-${{ matrix.abi }}.apk
-          path: build/app/outputs/flutter-apk/OneChatGPT-${{ env.VERSION }}-${{ matrix.abi }}.apk
-
-  release:
-    name: Release APK
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Download APK from Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: release
-          merge-multiple: true
-
-      - name: Extract build-time
-        run: |
-          echo "BUILDTIME=$(TZ=Asia/Shanghai date '+%Y年%m月%d日 %H时%M分%S秒')" >> $GITHUB_ENV
-        shell: bash
+          name: APKs
+          path: build/app/outputs/flutter-apk/*.apk
 
       - name: Create Release
-        id: create_release
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
           removeArtifacts: true
-          artifacts: "release/*.apk"
-          tag: Alpha
-          name: OneChatGPT Alpha
-          body:  |
+          artifacts: "build/app/outputs/flutter-apk/*.apk"
+          tag: Alpha-${{ env.VERSION }}
+          name: OneChatGPT Alpha ${{ env.VERSION }}
+          body: |
             ## 我应该下载哪个版本？
 
             ### fat APK
-            - 如果你不能分辨设备： OneChatGPT.apk（其中包含为所有目标 ABI 编译的代码。此类 APK 的大小比拆分的 APK 大，导致用户下载不适用于其设备架构的本机二进制文件）
+            - 如果你不能分辨设备：OneChatGPT-${{ env.VERSION }}-fat.apk（包含为所有目标 ABI 编译的代码）
 
             ### APKs
-            - ARM 64位: arm64-v8a.apk（支持 64 位指令的现代 Android 设备）
-            - ARM 32位: armeabi-v7a.apk（用于较旧的 Android 设备）
-            - x86_64: x86_64.apk（用于 Android 模拟器和一些基于 x86 的 Android 设备）
+            - ARM 64位: OneChatGPT-${{ env.VERSION }}-arm64-v8a.apk
+            - ARM 32位: OneChatGPT-${{ env.VERSION }}-armeabi-v7a.apk
+            - x86_64: OneChatGPT-${{ env.VERSION }}-x86_64.apk
 
-            更新时间：${{ env.BUILDTIME }}
+            更新时间：$(TZ=Asia/Shanghai date '+%Y年%m月%d日 %H时%M分%S秒')
           draft: false
           prerelease: true
           token: ${{ secrets.GITHUB_TOKEN }}
