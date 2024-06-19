@@ -57,26 +57,29 @@ jobs:
           name: APKs
           path: build/app/outputs/flutter-apk/*.apk
 
+      - name: Get current time
+        run: echo "CURRENT_TIME=$(TZ=Asia/Shanghai date '+%Y年%m月%d日 %H时%M分%S秒')" >> $GITHUB_ENV
+
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
           removeArtifacts: true
           artifacts: "build/app/outputs/flutter-apk/*.apk"
-          tag: Alpha-${{ env.VERSION }}
-          name: OneChatGPT Alpha ${{ env.VERSION }}
+          tag: Alpha
+          name: OneChatGPT Alpha
           body: |
             ## 我应该下载哪个版本？
 
             ### fat APK
-            - 如果你不能分辨设备：OneChatGPT-${{ env.VERSION }}-fat.apk（包含为所有目标 ABI 编译的代码）
+            - 如果你不能分辨设备：OneChatGPT-***-fat.apk（包含为所有目标 ABI 编译的代码）
 
             ### APKs
-            - ARM 64位: OneChatGPT-${{ env.VERSION }}-arm64-v8a.apk
-            - ARM 32位: OneChatGPT-${{ env.VERSION }}-armeabi-v7a.apk
-            - x86_64: OneChatGPT-${{ env.VERSION }}-x86_64.apk
+            - ARM 64位: OneChatGPT-***-arm64-v8a.apk
+            - ARM 32位: OneChatGPT-***-armeabi-v7a.apk
+            - x86_64: OneChatGPT-***-x86_64.apk
 
-            更新时间：$(TZ=Asia/Shanghai date '+%Y年%m月%d日 %H时%M分%S秒')
+            更新时间：${{ env.CURRENT_TIME }}
           draft: false
           prerelease: true
           token: ${{ secrets.GITHUB_TOKEN }}
