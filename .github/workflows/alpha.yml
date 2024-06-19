@@ -33,7 +33,6 @@ jobs:
       - name: Extract version
         run: |
           echo "VERSION=$(grep 'version:' pubspec.yaml | sed 's/version: //')" >> $GITHUB_ENV
-          echo "BUILDTIME=$(TZ=Asia/Shanghai date '+%Y年%m月%d日 %H时%M分%S秒')" >> $GITHUB_ENV
         shell: bash
 
       - name: Build APK
@@ -67,6 +66,11 @@ jobs:
         with:
           path: release
           merge-multiple: true
+
+      - name: Extract build-time
+        run: |
+          echo "BUILDTIME=$(TZ=Asia/Shanghai date '+%Y年%m月%d日 %H时%M分%S秒')" >> $GITHUB_ENV
+        shell: bash
 
       - name: Create Release
         id: create_release
