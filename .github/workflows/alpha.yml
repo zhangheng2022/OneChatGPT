@@ -34,7 +34,6 @@ jobs:
         run: |
           flutter pub get
           flutter build apk --release --split-per-abi
-          flutter build apk --release
         env:
           KEYALIAS: ${{ secrets.KEYALIAS }}
           KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
@@ -43,11 +42,11 @@ jobs:
       - name: Rename APK
         run: |
           mv build/app/outputs/flutter-apk/app-${{ matrix.abi }}-release.apk build/app/outputs/flutter-apk/OneChatGPT-${{ matrix.abi }}.apk
-          mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/OneChatGPT.apk
 
       - name: Upload APK to Artifacts
         uses: actions/upload-artifact@v4
         with:
+          name: OneChatGPT-${{ matrix.abi }}.apk
           path: build/app/outputs/flutter-apk/*.apk
 
   release:
