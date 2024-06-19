@@ -97,7 +97,7 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  Future<void> _updateMessage(types.Message message, int index) async {}
+  // Future<void> _updateMessage(types.Message message, int index) async {}
 
   /// 发送用户输入的消息并获取模型生成的响应。
   ///
