@@ -1,9 +1,13 @@
-name: Build and Release APK
+name: Build and Alpha APK
 
 on:
   push:
     branches:
-      - master
+      - alpha
+  pull_request:
+    branches:
+      - alpha
+    types: [closed]
 
 jobs:
   build:
@@ -30,6 +34,7 @@ jobs:
         run: |
           flutter pub get
           flutter build apk --release --split-per-abi
+          flutter build apk --release
         env:
           KEYALIAS: ${{ secrets.KEYALIAS }}
           KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
@@ -38,12 +43,12 @@ jobs:
       - name: Rename APK
         run: |
           mv build/app/outputs/flutter-apk/app-${{ matrix.abi }}-release.apk build/app/outputs/flutter-apk/OneChatGPT-${{ matrix.abi }}.apk
+          mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/OneChatGPT.apk
 
       - name: Upload APK to Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: OneChatGPT-${{ matrix.abi }}.apk
-          path: build/app/outputs/flutter-apk/OneChatGPT-${{ matrix.abi }}.apk
+          path: build/app/outputs/flutter-apk/*.apk
 
   release:
     name: Release APK
@@ -64,12 +69,22 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: "release/*.apk"
-          tag: ${{ github.run_number }}
-          name: Release ${{ github.run_number }}
-          body: |
-            Changes in this Release:
-            - First Change
-            - Second Change
+          tag: Alpha
+          name: OneChatGPT Alpha
+          body:  |
+            cat > release.txt << 'EOF'
+            ## 我应该下载哪个版本？
+
+            ### fat APK
+            - 如果你不能分辨设备： OneChatGPT.apk（其中包含为所有目标 ABI 编译的代码。此类 APK 的大小比拆分的 APK 大，导致用户下载不适用于其设备架构的本机二进制文件）
+
+            ### APKs
+            - ARM 64位: arm64-v8a.apk（支持 64 位指令的现代 Android 设备）
+            - ARM 32位: armeabi-v7a.apk（用于较旧的 Android 设备）
+            - x86_64: x86_64.apk（用于 Android 模拟器和一些基于 x86 的 Android 设备）
+
+            更新时间：  ${{ env.BUILDTIME }}.
+            EOF
           draft: false
           prerelease: true
           token: ${{ secrets.GITHUB_TOKEN }}
