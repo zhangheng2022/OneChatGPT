@@ -73,6 +73,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
+          removeArtifacts: true
           artifacts: "release/*.apk"
           tag: Alpha
           name: OneChatGPT Alpha
