@@ -17,7 +17,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -52,7 +52,7 @@ jobs:
           done
 
       - name: Upload APKs to Artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: APKs
           path: build/app/outputs/flutter-apk/*.apk
@@ -69,15 +69,15 @@ jobs:
           tag: Alpha
           name: OneChatGPT Alpha
           body: |
-            ## 我应该下载哪个版本？
+            ## 选择合适的版本下载
 
-            ### fat APK
-            - 如果你不能分辨设备：OneChatGPT-***-fat.apk（包含为所有目标 ABI 编译的代码）
+            ### 通用 APK
+            - 如果您不确定您的设备类型，请下载：OneChatGPT-***-fat.apk（这是一个包含所有目标 ABI 的通用包）
 
-            ### APKs
-            - ARM 64位: OneChatGPT-***-arm64-v8a.apk
-            - ARM 32位: OneChatGPT-***-armeabi-v7a.apk
-            - x86_64: OneChatGPT-***-x86_64.apk
+            ### 针对特定架构的 APKs
+            - 对于 ARM 64位设备：OneChatGPT-***-arm64-v8a.apk
+            - 对于 ARM 32位设备：OneChatGPT-***-armeabi-v7a.apk
+            - 对于 x86_64 设备：OneChatGPT-***-x86_64.apk
 
             更新时间：${{ env.CURRENT_TIME }}
           draft: false
