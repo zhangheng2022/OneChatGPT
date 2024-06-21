@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:one_chatgpt_flutter/ui/auth/widgets/email_login.dart';
 import 'package:go_router/go_router.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -81,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
                                       color:
                                           Theme.of(context).colorScheme.primary,
                                       fontFamily:
-                                          GoogleFonts.oswald().fontFamily,
+                                          GoogleFonts.rubik().fontFamily,
                                     ),
                                   ),
                                 ],
@@ -102,7 +103,13 @@ class _LoginPageState extends State<LoginPage> {
                                   height: 20,
                                 ),
                                 label: const Text("Google登录"),
-                                onPressed: () {},
+                                onPressed: () {
+                                  Fluttertoast.showToast(
+                                    msg: "正在开发中...",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.CENTER,
+                                  );
+                                },
                               ),
                             ),
                             const SizedBox(height: 20),

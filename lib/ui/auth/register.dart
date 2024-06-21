@@ -33,7 +33,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.primary,
-                  fontFamily: GoogleFonts.oswald().fontFamily,
+                  fontFamily: GoogleFonts.rubik().fontFamily,
                 ),
               ),
               const SizedBox(width: 20),

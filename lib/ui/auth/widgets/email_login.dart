@@ -2,6 +2,8 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:one_chatgpt_flutter/utils/validator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:one_chatgpt_flutter/common/log.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginEmail extends StatefulWidget {
   const LoginEmail({super.key});
@@ -32,12 +34,11 @@ class _LoginEmailState extends State<LoginEmail> {
       if (!mounted) return;
       context.goNamed('home');
     } catch (err) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          showCloseIcon: true,
-          behavior: SnackBarBehavior.floating,
-          content: Text('邮箱或密码不正确，请检查'),
-        ),
+      Log.e("登录错误===>$err");
+      Fluttertoast.showToast(
+        msg: "邮箱或密码不正确，请检查",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
       );
     } finally {
       setState(() => _isLoading = false);
@@ -105,7 +106,9 @@ class _LoginEmailState extends State<LoginEmail> {
                 icon: _isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
                     : const Icon(Icons.send),
-                label: const Text("登录", style: TextStyle(fontSize: 16)),
+                label: !_isLoading
+                    ? const Text("登录", style: TextStyle(fontSize: 16))
+                    : const Text(""),
                 onPressed: _isLoading ? null : _onSubmit,
                 style: FilledButton.styleFrom(
                   shape: RoundedRectangleBorder(

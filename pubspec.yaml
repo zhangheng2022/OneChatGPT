@@ -54,6 +54,7 @@ dependencies:
   logger: ^2.2.0
   app_links: ^6.1.1
   google_fonts: ^6.2.1
+  fluttertoast: ^8.2.6
 
 dev_dependencies:
   flutter_test:
