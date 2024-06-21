@@ -1,4 +1,9 @@
-# OneChatGPT
+<h1 align="center">
+  <img src="./assets/logos/logo.png" alt="OneChatGPT" width="128" />
+  <br>
+  OneChatGPT
+  <br>
+</h1>
 
 一个基于Flutter的chatGPT开源项目，免费使用GPT-3.5和Google genmini等
 
