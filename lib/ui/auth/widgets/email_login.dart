@@ -46,82 +46,86 @@ class _LoginEmailState extends State<LoginEmail> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      child: (Column(
-        children: <Widget>[
-          TextFormField(
-            autofocus: false,
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.mail_outlined),
-              labelText: '邮箱',
-              border: OutlineInputBorder(),
-            ),
-            validator: (value) {
-              if (value!.isEmpty) return "请输入邮箱";
-              if (!Validator.validatorEmail(value)) return "请输入正确的邮箱";
-              return null;
-            },
-            onChanged: (val) {
-              setState(() {
-                _userEmail = val;
-              });
-            },
-          ),
-          const SizedBox(height: 20),
-          TextFormField(
-            obscureText: _hideObscureText,
-            keyboardType: TextInputType.visiblePassword,
-            decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.lock_outlined),
-              labelText: '密码',
-              border: const OutlineInputBorder(),
-              suffixIcon: _userPassword.isNotEmpty
-                  ? IconButton(
-                      icon: const Icon(Icons.remove_red_eye),
-                      onPressed: () {
-                        setState(() {
-                          _hideObscureText = !_hideObscureText;
-                        });
-                      },
-                    )
-                  : null,
-            ),
-            validator: (value) {
-              if (value!.isEmpty) return "请输入密码";
-              if (!Validator.validatorPassword(value)) return "请输入正确的密码";
-              return null;
-            },
-            onChanged: (val) {
-              setState(() {
-                _userPassword = val;
-              });
-            },
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: FilledButton.icon(
-              icon: _isLoading ? loading(context) : const Icon(Icons.login),
-              label: const Text("登录"),
-              onPressed: () {
-                if (!_isLoading) _onSubmit();
+    return Padding(
+      padding: const EdgeInsets.all(20.0), // 增加边距
+      child: Form(
+        key: _formKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        child: Column(
+          children: <Widget>[
+            TextFormField(
+              autofocus: false,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.mail_outline),
+                labelText: '邮箱',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10), // 圆角边框
+                ),
+              ),
+              validator: (value) {
+                if (value!.isEmpty) return "请输入邮箱";
+                if (!Validator.validatorEmail(value)) return "请输入正确的邮箱";
+                return null;
               },
+              onChanged: (val) => setState(() => _userEmail = val),
             ),
-          ),
-        ],
-      )),
+            const SizedBox(height: 20),
+            TextFormField(
+              obscureText: _hideObscureText,
+              keyboardType: TextInputType.visiblePassword,
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.lock_outline),
+                labelText: '密码',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10), // 圆角边框
+                ),
+                suffixIcon: _userPassword.isNotEmpty
+                    ? IconButton(
+                        icon: Icon(_hideObscureText
+                            ? Icons.visibility_off
+                            : Icons.visibility),
+                        onPressed: () => setState(
+                            () => _hideObscureText = !_hideObscureText),
+                      )
+                    : null,
+              ),
+              validator: (value) {
+                if (value!.isEmpty) return "请输入密码";
+                if (!Validator.validatorPassword(value)) return "请输入正确的密码";
+                return null;
+              },
+              onChanged: (val) => setState(() => _userPassword = val),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: FilledButton.icon(
+                icon: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Icon(Icons.send),
+                label: const Text("登录", style: TextStyle(fontSize: 16)),
+                onPressed: _isLoading ? null : _onSubmit,
+                style: FilledButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10), // 圆角按钮
+                  ),
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () {
+                  // TODO: Implement the functionality to reset password
+                },
+                child: const Text('忘记密码?'),
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
-}
-
-Widget loading(BuildContext context) {
-  return const SizedBox(
-    width: 24,
-    height: 24,
-    child: CircularProgressIndicator(color: Colors.white),
-  );
 }

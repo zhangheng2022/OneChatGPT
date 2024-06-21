@@ -46,114 +46,125 @@ class _RegisterEmailState extends State<RegisterEmail> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: (Column(
-        children: <Widget>[
-          TextFormField(
-            autofocus: true,
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.mail_outlined),
-              labelText: '邮箱',
-              border: OutlineInputBorder(),
-              hintText: "请输入邮箱",
-              helperText: "请输入邮箱",
-            ),
-            validator: (value) {
-              if (value!.isEmpty) return "请输入邮箱";
-              if (!Validator.validatorEmail(value)) return "请输入正确的邮箱";
-              return null;
-            },
-            onChanged: (val) {
-              setState(() {
-                _userEmail = val;
-              });
-            },
-          ),
-          const SizedBox(height: 10),
-          TextFormField(
-            obscureText: _hideObscureText,
-            keyboardType: TextInputType.visiblePassword,
-            decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.lock_outlined),
-              labelText: '密码',
-              border: const OutlineInputBorder(),
-              hintText: "请输入密码",
-              helperText: "最少6位，包括至少1个字母，1个数字",
-              suffixIcon: _userPassword.isNotEmpty
-                  ? IconButton(
-                      icon: const Icon(Icons.remove_red_eye),
-                      onPressed: () {
-                        setState(() {
-                          _hideObscureText = !_hideObscureText;
-                        });
-                      },
-                    )
-                  : null,
-            ),
-            validator: (value) {
-              if (value!.isEmpty) return "请输入密码";
-              if (!Validator.validatorPassword(value)) return "请输入正确的密码";
-              return null;
-            },
-            onChanged: (val) {
-              setState(() {
-                _userPassword = val;
-              });
-            },
-          ),
-          const SizedBox(height: 10),
-          TextFormField(
-            obscureText: _hideRepeatObscureText,
-            keyboardType: TextInputType.visiblePassword,
-            decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.lock_outlined),
-              labelText: '密码',
-              border: const OutlineInputBorder(),
-              hintText: "请再次输入密码",
-              helperText: "请再次输入密码",
-              suffixIcon: _userPassword.isNotEmpty
-                  ? IconButton(
-                      icon: const Icon(Icons.remove_red_eye),
-                      onPressed: () {
-                        setState(() {
-                          _hideRepeatObscureText = !_hideRepeatObscureText;
-                        });
-                      },
-                    )
-                  : null,
-            ),
-            validator: (value) {
-              if (value!.isEmpty) return "请输入密码";
-              if (value != _userPassword) return "两次输入密码不一致";
-              return null;
-            },
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: FilledButton.icon(
-              icon: _isLoading ? loading(context) : const Icon(Icons.add),
-              label: const Text("注册"),
-              onPressed: () {
-                if (!_isLoading) _onSubmit(context);
+    return Padding(
+      padding: const EdgeInsets.all(20.0), // 增加边距
+      child: Form(
+        key: _formKey,
+        child: (Column(
+          children: <Widget>[
+            TextFormField(
+              autofocus: true,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.mail_outlined),
+                labelText: '邮箱',
+                border: OutlineInputBorder(
+                  borderRadius:
+                      BorderRadius.circular(10), // Set the border radius here
+                ),
+                hintText: "请输入邮箱",
+                helperText: "请输入邮箱",
+              ),
+              validator: (value) {
+                if (value!.isEmpty) return "请输入邮箱";
+                if (!Validator.validatorEmail(value)) return "请输入正确的邮箱";
+                return null;
+              },
+              onChanged: (val) {
+                setState(() {
+                  _userEmail = val;
+                });
               },
             ),
-          )
-        ],
-      )),
+            const SizedBox(height: 10),
+            TextFormField(
+              obscureText: _hideObscureText,
+              keyboardType: TextInputType.visiblePassword,
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.lock_outlined),
+                labelText: '密码',
+                border: OutlineInputBorder(
+                  borderRadius:
+                      BorderRadius.circular(10), // Set the border radius here
+                ),
+                hintText: "请输入密码",
+                helperText: "最少6位，包括至少1个字母，1个数字",
+                suffixIcon: _userPassword.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.remove_red_eye),
+                        onPressed: () {
+                          setState(() {
+                            _hideObscureText = !_hideObscureText;
+                          });
+                        },
+                      )
+                    : null,
+              ),
+              validator: (value) {
+                if (value!.isEmpty) return "请输入密码";
+                if (!Validator.validatorPassword(value)) return "请输入正确的密码";
+                return null;
+              },
+              onChanged: (val) {
+                setState(() {
+                  _userPassword = val;
+                });
+              },
+            ),
+            const SizedBox(height: 10),
+            TextFormField(
+              obscureText: _hideRepeatObscureText,
+              keyboardType: TextInputType.visiblePassword,
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.lock_outlined),
+                labelText: '密码',
+                border: OutlineInputBorder(
+                  borderRadius:
+                      BorderRadius.circular(10), // Set the border radius here
+                ),
+                hintText: "请再次输入密码",
+                helperText: "请再次输入密码",
+                suffixIcon: _userPassword.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.remove_red_eye),
+                        onPressed: () {
+                          setState(() {
+                            _hideRepeatObscureText = !_hideRepeatObscureText;
+                          });
+                        },
+                      )
+                    : null,
+              ),
+              validator: (value) {
+                if (value!.isEmpty) return "请输入密码";
+                if (value != _userPassword) return "两次输入密码不一致";
+                return null;
+              },
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: FilledButton.icon(
+                icon: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Icon(Icons.app_registration),
+                label: const Text("注册账户", style: TextStyle(fontSize: 16)),
+                style: FilledButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10), // 圆角按钮
+                  ),
+                ),
+                onPressed: () {
+                  if (!_isLoading) _onSubmit(context);
+                },
+              ),
+            )
+          ],
+        )),
+      ),
     );
   }
-}
-
-Widget loading(BuildContext context) {
-  return const SizedBox(
-    width: 24,
-    height: 24,
-    child: CircularProgressIndicator(color: Colors.white),
-  );
 }
 
 Future<void> _showDialog(context) async {
@@ -168,7 +179,7 @@ Future<void> _showDialog(context) async {
         ),
         icon: Icon(
           Icons.check_circle,
-          size: 80,
+          size: 40,
           color: Theme.of(context).primaryColor,
         ),
         actionsAlignment: MainAxisAlignment.center,
