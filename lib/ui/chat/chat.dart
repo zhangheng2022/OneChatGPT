@@ -9,7 +9,6 @@ import 'package:uuid/uuid.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
 
 final supabase = Supabase.instance.client;
-final User? user = supabase.auth.currentUser;
 final database = AppDatabase();
 const uuid = Uuid();
 
@@ -23,206 +22,143 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+  static const String defaultAppBarTitle = "新的对话";
+  static const int messageThresholdForTitleUpdate = 3;
+  static const int maxMessagesBeforeTitleUpdate = 6;
+
+  String appBarTitle = defaultAppBarTitle;
+  final List<types.Message> _messages = []; // 消息列表
+  late types.User _user; // 当前用户
+  final _model = types.User(id: uuid.v4()); // 模型用户，用于表示非当前用户的消息
+
   @override
   void initState() {
     super.initState();
-    _user = types.User(
-      id: widget.chatid,
-    );
-    initMessage();
+    _user = types.User(id: widget.chatid); // 初始化当前用户
+    _initMessage(); // 初始化消息
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(appBarTitle),
-          centerTitle: true,
-        ),
-        body: Chat(
-          messages: _messages,
-          onSendPressed: _sendMessage,
-          user: _user,
-          showUserAvatars: true,
-          l10n: const ChatL10nZhCN(),
-        ));
+      appBar: AppBar(
+        title: Text(appBarTitle), // 设置AppBar标题
+        centerTitle: true,
+      ),
+      body: Chat(
+        messages: _messages, // 消息列表
+        onSendPressed: _sendMessage, // 发送消息的回调
+        user: _user, // 当前用户
+        showUserAvatars: true, // 显示用户头像
+        l10n: const ChatL10nZhCN(), // 设置中文本地化
+      ),
+    );
   }
 
-  String appBarTitle = "新的对话";
+  Future<void> _initMessage() async {
+    final messages = await _fetchMessagesFromDatabase(); // 从数据库获取消息
+    if (messages.isNotEmpty) {
+      _populateChatWithMessages(messages); // 如果有消息，则填充到聊天界面
+    } else {
+      _addWelcomeMessage(); // 如果没有消息，则添加欢迎消息
+    }
+  }
 
-  final List<types.Message> _messages = [];
-
-  var _user = const types.User(
-    id: "",
-  );
-  final _model = types.User(
-    id: uuid.v4(),
-  );
-
-  Future<void> initMessage() async {
-    final messages = await (database.select(database.chatContentTables)
+  // 从数据库获取消息的实现
+  Future _fetchMessagesFromDatabase() async {
+    return (database.select(database.chatContentTableData)
           ..where((tbl) => tbl.parentid.equals(int.parse(_user.id))))
         .get();
-    if (messages.isNotEmpty) {
-      for (var i = 0; i < messages.length; i++) {
-        final chatMessage = types.TextMessage(
-          author: messages[i].contentType == 'user' ? _user : _model,
-          id: uuid.v4(),
-          text: messages[i].content,
-        );
-        _addMessage(chatMessage);
-      }
-      return;
+  }
+
+// 将消息填充到聊天界面的实现
+  void _populateChatWithMessages(List messages) {
+    for (var message in messages) {
+      final chatMessage = _createTextMessage(
+        content: message.content,
+        isUserMessage: message.contentType == 'user',
+      );
+      _addMessage(chatMessage);
     }
-    final chatMessage = types.TextMessage(
-      author: _model,
+  }
+
+// 添加欢迎消息的实现
+  void _addWelcomeMessage() async {
+    const welcomeText = "你好，有什么可以帮你的吗？";
+    final welcomeMessage =
+        _createTextMessage(content: welcomeText, isUserMessage: false);
+    _addMessage(welcomeMessage);
+    await _insertMessageIntoDatabase(welcomeText, 'model');
+  }
+
+// 创建文本消息的实现
+  types.TextMessage _createTextMessage(
+      {required String content, required bool isUserMessage}) {
+    return types.TextMessage(
+      author: isUserMessage ? _user : _model,
       id: uuid.v4(),
-      text: "你好，有什么可以帮你的吗？",
+      text: content,
     );
-    _addMessage(chatMessage);
-    await database.into(database.chatContentTables).insert(
-          ChatContentTablesCompanion.insert(
-            title: "新的对话",
-            content: "你好，有什么可以帮你的吗？",
+  }
+
+// 将消息添加到聊天界面的实现
+  Future<void> _addMessage(types.Message message) async {
+    setState(() => _messages.insert(0, message));
+  }
+
+// 发送消息的实现
+  Future<void> _sendMessage(types.PartialText message) async {
+    final textMessage =
+        _createTextMessage(content: message.text, isUserMessage: true);
+    await _addMessage(textMessage);
+    await _insertMessageIntoDatabase(message.text, 'user');
+    await _fetchAndDisplayModelResponse(message.text);
+  }
+
+// 将消息插入数据库的实现
+  Future<void> _insertMessageIntoDatabase(
+      String content, String contentType) async {
+    await database.into(database.chatContentTableData).insert(
+          ChatContentTableDataCompanion.insert(
+            title: appBarTitle,
+            content: content,
             parentid: int.parse(_user.id),
-            contentType: 'model',
+            contentType: contentType,
           ),
         );
   }
 
-  Future<void> _addMessage(types.Message message) async {
-    // 添加消息
-    setState(() {
-      _messages.insert(0, message);
-    });
-  }
-
-  // Future<void> _updateMessage(types.Message message, int index) async {}
-
-  /// 发送用户输入的消息并获取模型生成的响应。
-  ///
-  /// 该方法接收一个 [types.PartialText] 消息，代表用户输入的文本。然后执行以下操作：
-  /// 1. 根据用户的输入构造一个 [types.TextMessage] 并将其添加到聊天中。
-  /// 2. 将用户的消息插入到数据库中。
-  /// 3. 调用 Supabase 函数获取模型生成的响应。
-  /// 4. 用模型的响应构造一个新的 [types.TextMessage] 并将其添加到聊天中。
-  /// 5. 将模型的响应插入到数据库中。
-  ///
-  /// 参数：
-  /// - [message]: 一个包含用户消息文本的 [types.PartialText] 对象。
-  ///
-  /// 返回值：
-  /// 该方法不返回值；它是异步的，并且作为副作用更新 UI 和数据库。
-  Future<void> _sendMessage(types.PartialText message) async {
+// 获取并显示模型响应的实现
+  Future<void> _fetchAndDisplayModelResponse(String userMessage) async {
     try {
-      final textMessage = types.TextMessage(
-        author: _user,
-        id: uuid.v4(),
-        text: message.text,
-      );
-      _addMessage(textMessage);
-      // 写入数据库
-      await database.into(database.chatContentTables).insert(
-            ChatContentTablesCompanion.insert(
-              title: appBarTitle,
-              content: message.text,
-              parentid: int.parse(_user.id),
-              contentType: 'user',
-            ),
-          );
-      // 获取模型回复
-      final res = await supabase.functions.invoke(
-        'google/gemini-pro',
-        body: {'message': message.text},
-      );
-      final data = ChatMessage.fromJson(res.data);
-      // 发送模型回复消息
-      final chatMessage = types.TextMessage(
-        author: _model,
-        id: uuid.v4(),
-        text: data.text,
-      );
-      _addMessage(chatMessage);
-      // 写入数据库
-      await database.into(database.chatContentTables).insert(
-            ChatContentTablesCompanion.insert(
-              title: appBarTitle,
-              content: data.text,
-              parentid: int.parse(_user.id),
-              contentType: 'model',
-            ),
-          );
-      // 如果_messages.length == 2, 那么就更新appBarTitle
-      if (_messages.length >= 3 && _messages.length < 6) _updateAppBarTitle();
+      final response = await _fetchModelResponse(userMessage);
+      final modelMessage =
+          _createTextMessage(content: response.text, isUserMessage: false);
+      await _addMessage(modelMessage);
+      await _insertMessageIntoDatabase(response.text, 'model');
+      if (_shouldUpdateAppBarTitle()) {
+        _updateAppBarTitle();
+      }
     } catch (err) {
       Log.e(err);
     }
   }
 
-  // 获取历史消息
-  Future<List<Map<String, Object>>> _getHistoryMessages() async {
-    final messages = await (database.select(database.chatContentTables)
-          ..where((tbl) => tbl.parentid.equals(int.parse(_user.id))))
-        .get();
-    final historyMessages = messages
-        .map((e) => {
-              "role": e.contentType,
-              'parts': [
-                {'text': e.content}
-              ]
-            })
-        .skip(1)
-        .toList();
-    Log.w(historyMessages);
-    return historyMessages;
+// 从模型获取响应的实现
+  Future<ChatMessage> _fetchModelResponse(String message) async {
+    final res = await supabase.functions.invoke(
+      'google/gemini-pro',
+      body: {'message': message},
+    );
+    return ChatMessage.fromJson(res.data);
   }
 
-  // 更新数据Title
-  Future<void> _updateAppBarTitle() async {
-    try {
-      final historyMessages = await _getHistoryMessages();
-      final res = await supabase.functions.invoke(
-        'google/chat-title',
-        body: {'history': historyMessages},
-      );
-      Log.d(res);
-      final data = ChatMessage.fromJson(res.data);
-      await (database.update(database.chatTables)
-            ..where((t) => t.id.isValue(int.parse(_user.id))))
-          .write(ChatTablesCompanion(
-        title: Value(data.text),
-      ));
-      setState(() {
-        appBarTitle = data.text;
-      });
-    } catch (err) {
-      Log.e(err);
-    }
+  // 判断是否应更新AppBar标题的实现
+  bool _shouldUpdateAppBarTitle() {
+    return _messages.length >= messageThresholdForTitleUpdate &&
+        _messages.length < maxMessagesBeforeTitleUpdate;
   }
 
-  // Future<void> _handleImageSelection() async {
-  //   final result = await ImagePicker().pickImage(
-  //     imageQuality: 70,
-  //     maxWidth: 1440,
-  //     source: ImageSource.gallery,
-  //   );
-
-  //   if (result != null) {
-  //     final bytes = await result.readAsBytes();
-  //     final image = await decodeImageFromList(bytes);
-
-  //     final message = types.ImageMessage(
-  //       author: _user,
-  //       createdAt: DateTime.now().millisecondsSinceEpoch,
-  //       height: image.height.toDouble(),
-  //       id: randomString(),
-  //       name: result.name,
-  //       size: bytes.length,
-  //       uri: result.path,
-  //       width: image.width.toDouble(),
-  //     );
-
-  //     _addMessage(message);
-  //   }
-  // }
+  // 更新AppBar标题的实现
+  Future<void> _updateAppBarTitle() async {}
 }

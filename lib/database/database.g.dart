@@ -3,12 +3,12 @@
 part of 'database.dart';
 
 // ignore_for_file: type=lint
-class $ChatTablesTable extends ChatTables
-    with TableInfo<$ChatTablesTable, ChatTable> {
+class $ChatTableDataTable extends ChatTableData
+    with TableInfo<$ChatTableDataTable, ChatTableDataData> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $ChatTablesTable(this.attachedDatabase, [this._alias]);
+  $ChatTableDataTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -51,9 +51,9 @@ class $ChatTablesTable extends ChatTables
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'chat_tables';
+  static const String $name = 'chat_table_data';
   @override
-  VerificationContext validateIntegrity(Insertable<ChatTable> instance,
+  VerificationContext validateIntegrity(Insertable<ChatTableDataData> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -78,9 +78,9 @@ class $ChatTablesTable extends ChatTables
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  ChatTable map(Map<String, dynamic> data, {String? tablePrefix}) {
+  ChatTableDataData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return ChatTable(
+    return ChatTableDataData(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       title: attachedDatabase.typeMapping
@@ -93,17 +93,18 @@ class $ChatTablesTable extends ChatTables
   }
 
   @override
-  $ChatTablesTable createAlias(String alias) {
-    return $ChatTablesTable(attachedDatabase, alias);
+  $ChatTableDataTable createAlias(String alias) {
+    return $ChatTableDataTable(attachedDatabase, alias);
   }
 }
 
-class ChatTable extends DataClass implements Insertable<ChatTable> {
+class ChatTableDataData extends DataClass
+    implements Insertable<ChatTableDataData> {
   final int id;
   final String title;
   final bool isupdate;
   final DateTime datetime;
-  const ChatTable(
+  const ChatTableDataData(
       {required this.id,
       required this.title,
       required this.isupdate,
@@ -118,8 +119,8 @@ class ChatTable extends DataClass implements Insertable<ChatTable> {
     return map;
   }
 
-  ChatTablesCompanion toCompanion(bool nullToAbsent) {
-    return ChatTablesCompanion(
+  ChatTableDataCompanion toCompanion(bool nullToAbsent) {
+    return ChatTableDataCompanion(
       id: Value(id),
       title: Value(title),
       isupdate: Value(isupdate),
@@ -127,10 +128,10 @@ class ChatTable extends DataClass implements Insertable<ChatTable> {
     );
   }
 
-  factory ChatTable.fromJson(Map<String, dynamic> json,
+  factory ChatTableDataData.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return ChatTable(
+    return ChatTableDataData(
       id: serializer.fromJson<int>(json['id']),
       title: serializer.fromJson<String>(json['title']),
       isupdate: serializer.fromJson<bool>(json['isupdate']),
@@ -148,9 +149,9 @@ class ChatTable extends DataClass implements Insertable<ChatTable> {
     };
   }
 
-  ChatTable copyWith(
+  ChatTableDataData copyWith(
           {int? id, String? title, bool? isupdate, DateTime? datetime}) =>
-      ChatTable(
+      ChatTableDataData(
         id: id ?? this.id,
         title: title ?? this.title,
         isupdate: isupdate ?? this.isupdate,
@@ -158,7 +159,7 @@ class ChatTable extends DataClass implements Insertable<ChatTable> {
       );
   @override
   String toString() {
-    return (StringBuffer('ChatTable(')
+    return (StringBuffer('ChatTableDataData(')
           ..write('id: $id, ')
           ..write('title: $title, ')
           ..write('isupdate: $isupdate, ')
@@ -172,31 +173,31 @@ class ChatTable extends DataClass implements Insertable<ChatTable> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is ChatTable &&
+      (other is ChatTableDataData &&
           other.id == this.id &&
           other.title == this.title &&
           other.isupdate == this.isupdate &&
           other.datetime == this.datetime);
 }
 
-class ChatTablesCompanion extends UpdateCompanion<ChatTable> {
+class ChatTableDataCompanion extends UpdateCompanion<ChatTableDataData> {
   final Value<int> id;
   final Value<String> title;
   final Value<bool> isupdate;
   final Value<DateTime> datetime;
-  const ChatTablesCompanion({
+  const ChatTableDataCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
     this.isupdate = const Value.absent(),
     this.datetime = const Value.absent(),
   });
-  ChatTablesCompanion.insert({
+  ChatTableDataCompanion.insert({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
     this.isupdate = const Value.absent(),
     this.datetime = const Value.absent(),
   });
-  static Insertable<ChatTable> custom({
+  static Insertable<ChatTableDataData> custom({
     Expression<int>? id,
     Expression<String>? title,
     Expression<bool>? isupdate,
@@ -210,12 +211,12 @@ class ChatTablesCompanion extends UpdateCompanion<ChatTable> {
     });
   }
 
-  ChatTablesCompanion copyWith(
+  ChatTableDataCompanion copyWith(
       {Value<int>? id,
       Value<String>? title,
       Value<bool>? isupdate,
       Value<DateTime>? datetime}) {
-    return ChatTablesCompanion(
+    return ChatTableDataCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
       isupdate: isupdate ?? this.isupdate,
@@ -243,7 +244,7 @@ class ChatTablesCompanion extends UpdateCompanion<ChatTable> {
 
   @override
   String toString() {
-    return (StringBuffer('ChatTablesCompanion(')
+    return (StringBuffer('ChatTableDataCompanion(')
           ..write('id: $id, ')
           ..write('title: $title, ')
           ..write('isupdate: $isupdate, ')
@@ -253,12 +254,12 @@ class ChatTablesCompanion extends UpdateCompanion<ChatTable> {
   }
 }
 
-class $ChatContentTablesTable extends ChatContentTables
-    with TableInfo<$ChatContentTablesTable, ChatContentTable> {
+class $ChatContentTableDataTable extends ChatContentTableData
+    with TableInfo<$ChatContentTableDataTable, ChatContentTableDataData> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $ChatContentTablesTable(this.attachedDatabase, [this._alias]);
+  $ChatContentTableDataTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -309,9 +310,10 @@ class $ChatContentTablesTable extends ChatContentTables
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'chat_content_tables';
+  static const String $name = 'chat_content_table_data';
   @override
-  VerificationContext validateIntegrity(Insertable<ChatContentTable> instance,
+  VerificationContext validateIntegrity(
+      Insertable<ChatContentTableDataData> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -354,9 +356,10 @@ class $ChatContentTablesTable extends ChatContentTables
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  ChatContentTable map(Map<String, dynamic> data, {String? tablePrefix}) {
+  ChatContentTableDataData map(Map<String, dynamic> data,
+      {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return ChatContentTable(
+    return ChatContentTableDataData(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       parentid: attachedDatabase.typeMapping
@@ -373,20 +376,20 @@ class $ChatContentTablesTable extends ChatContentTables
   }
 
   @override
-  $ChatContentTablesTable createAlias(String alias) {
-    return $ChatContentTablesTable(attachedDatabase, alias);
+  $ChatContentTableDataTable createAlias(String alias) {
+    return $ChatContentTableDataTable(attachedDatabase, alias);
   }
 }
 
-class ChatContentTable extends DataClass
-    implements Insertable<ChatContentTable> {
+class ChatContentTableDataData extends DataClass
+    implements Insertable<ChatContentTableDataData> {
   final int id;
   final int parentid;
   final String title;
   final String content;
   final String contentType;
   final DateTime datetime;
-  const ChatContentTable(
+  const ChatContentTableDataData(
       {required this.id,
       required this.parentid,
       required this.title,
@@ -405,8 +408,8 @@ class ChatContentTable extends DataClass
     return map;
   }
 
-  ChatContentTablesCompanion toCompanion(bool nullToAbsent) {
-    return ChatContentTablesCompanion(
+  ChatContentTableDataCompanion toCompanion(bool nullToAbsent) {
+    return ChatContentTableDataCompanion(
       id: Value(id),
       parentid: Value(parentid),
       title: Value(title),
@@ -416,10 +419,10 @@ class ChatContentTable extends DataClass
     );
   }
 
-  factory ChatContentTable.fromJson(Map<String, dynamic> json,
+  factory ChatContentTableDataData.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return ChatContentTable(
+    return ChatContentTableDataData(
       id: serializer.fromJson<int>(json['id']),
       parentid: serializer.fromJson<int>(json['parentid']),
       title: serializer.fromJson<String>(json['title']),
@@ -441,14 +444,14 @@ class ChatContentTable extends DataClass
     };
   }
 
-  ChatContentTable copyWith(
+  ChatContentTableDataData copyWith(
           {int? id,
           int? parentid,
           String? title,
           String? content,
           String? contentType,
           DateTime? datetime}) =>
-      ChatContentTable(
+      ChatContentTableDataData(
         id: id ?? this.id,
         parentid: parentid ?? this.parentid,
         title: title ?? this.title,
@@ -458,7 +461,7 @@ class ChatContentTable extends DataClass
       );
   @override
   String toString() {
-    return (StringBuffer('ChatContentTable(')
+    return (StringBuffer('ChatContentTableDataData(')
           ..write('id: $id, ')
           ..write('parentid: $parentid, ')
           ..write('title: $title, ')
@@ -475,7 +478,7 @@ class ChatContentTable extends DataClass
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is ChatContentTable &&
+      (other is ChatContentTableDataData &&
           other.id == this.id &&
           other.parentid == this.parentid &&
           other.title == this.title &&
@@ -484,14 +487,15 @@ class ChatContentTable extends DataClass
           other.datetime == this.datetime);
 }
 
-class ChatContentTablesCompanion extends UpdateCompanion<ChatContentTable> {
+class ChatContentTableDataCompanion
+    extends UpdateCompanion<ChatContentTableDataData> {
   final Value<int> id;
   final Value<int> parentid;
   final Value<String> title;
   final Value<String> content;
   final Value<String> contentType;
   final Value<DateTime> datetime;
-  const ChatContentTablesCompanion({
+  const ChatContentTableDataCompanion({
     this.id = const Value.absent(),
     this.parentid = const Value.absent(),
     this.title = const Value.absent(),
@@ -499,7 +503,7 @@ class ChatContentTablesCompanion extends UpdateCompanion<ChatContentTable> {
     this.contentType = const Value.absent(),
     this.datetime = const Value.absent(),
   });
-  ChatContentTablesCompanion.insert({
+  ChatContentTableDataCompanion.insert({
     this.id = const Value.absent(),
     required int parentid,
     required String title,
@@ -510,7 +514,7 @@ class ChatContentTablesCompanion extends UpdateCompanion<ChatContentTable> {
         title = Value(title),
         content = Value(content),
         contentType = Value(contentType);
-  static Insertable<ChatContentTable> custom({
+  static Insertable<ChatContentTableDataData> custom({
     Expression<int>? id,
     Expression<int>? parentid,
     Expression<String>? title,
@@ -528,14 +532,14 @@ class ChatContentTablesCompanion extends UpdateCompanion<ChatContentTable> {
     });
   }
 
-  ChatContentTablesCompanion copyWith(
+  ChatContentTableDataCompanion copyWith(
       {Value<int>? id,
       Value<int>? parentid,
       Value<String>? title,
       Value<String>? content,
       Value<String>? contentType,
       Value<DateTime>? datetime}) {
-    return ChatContentTablesCompanion(
+    return ChatContentTableDataCompanion(
       id: id ?? this.id,
       parentid: parentid ?? this.parentid,
       title: title ?? this.title,
@@ -571,7 +575,7 @@ class ChatContentTablesCompanion extends UpdateCompanion<ChatContentTable> {
 
   @override
   String toString() {
-    return (StringBuffer('ChatContentTablesCompanion(')
+    return (StringBuffer('ChatContentTableDataCompanion(')
           ..write('id: $id, ')
           ..write('parentid: $parentid, ')
           ..write('title: $title, ')
@@ -585,13 +589,299 @@ class ChatContentTablesCompanion extends UpdateCompanion<ChatContentTable> {
 
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
-  late final $ChatTablesTable chatTables = $ChatTablesTable(this);
-  late final $ChatContentTablesTable chatContentTables =
-      $ChatContentTablesTable(this);
+  _$AppDatabaseManager get managers => _$AppDatabaseManager(this);
+  late final $ChatTableDataTable chatTableData = $ChatTableDataTable(this);
+  late final $ChatContentTableDataTable chatContentTableData =
+      $ChatContentTableDataTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [chatTables, chatContentTables];
+      [chatTableData, chatContentTableData];
+}
+
+typedef $$ChatTableDataTableInsertCompanionBuilder = ChatTableDataCompanion
+    Function({
+  Value<int> id,
+  Value<String> title,
+  Value<bool> isupdate,
+  Value<DateTime> datetime,
+});
+typedef $$ChatTableDataTableUpdateCompanionBuilder = ChatTableDataCompanion
+    Function({
+  Value<int> id,
+  Value<String> title,
+  Value<bool> isupdate,
+  Value<DateTime> datetime,
+});
+
+class $$ChatTableDataTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $ChatTableDataTable,
+    ChatTableDataData,
+    $$ChatTableDataTableFilterComposer,
+    $$ChatTableDataTableOrderingComposer,
+    $$ChatTableDataTableProcessedTableManager,
+    $$ChatTableDataTableInsertCompanionBuilder,
+    $$ChatTableDataTableUpdateCompanionBuilder> {
+  $$ChatTableDataTableTableManager(_$AppDatabase db, $ChatTableDataTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$ChatTableDataTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$ChatTableDataTableOrderingComposer(ComposerState(db, table)),
+          getChildManagerBuilder: (p) =>
+              $$ChatTableDataTableProcessedTableManager(p),
+          getUpdateCompanionBuilder: ({
+            Value<int> id = const Value.absent(),
+            Value<String> title = const Value.absent(),
+            Value<bool> isupdate = const Value.absent(),
+            Value<DateTime> datetime = const Value.absent(),
+          }) =>
+              ChatTableDataCompanion(
+            id: id,
+            title: title,
+            isupdate: isupdate,
+            datetime: datetime,
+          ),
+          getInsertCompanionBuilder: ({
+            Value<int> id = const Value.absent(),
+            Value<String> title = const Value.absent(),
+            Value<bool> isupdate = const Value.absent(),
+            Value<DateTime> datetime = const Value.absent(),
+          }) =>
+              ChatTableDataCompanion.insert(
+            id: id,
+            title: title,
+            isupdate: isupdate,
+            datetime: datetime,
+          ),
+        ));
+}
+
+class $$ChatTableDataTableProcessedTableManager extends ProcessedTableManager<
+    _$AppDatabase,
+    $ChatTableDataTable,
+    ChatTableDataData,
+    $$ChatTableDataTableFilterComposer,
+    $$ChatTableDataTableOrderingComposer,
+    $$ChatTableDataTableProcessedTableManager,
+    $$ChatTableDataTableInsertCompanionBuilder,
+    $$ChatTableDataTableUpdateCompanionBuilder> {
+  $$ChatTableDataTableProcessedTableManager(super.$state);
+}
+
+class $$ChatTableDataTableFilterComposer
+    extends FilterComposer<_$AppDatabase, $ChatTableDataTable> {
+  $$ChatTableDataTableFilterComposer(super.$state);
+  ColumnFilters<int> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get title => $state.composableBuilder(
+      column: $state.table.title,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<bool> get isupdate => $state.composableBuilder(
+      column: $state.table.isupdate,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get datetime => $state.composableBuilder(
+      column: $state.table.datetime,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+}
+
+class $$ChatTableDataTableOrderingComposer
+    extends OrderingComposer<_$AppDatabase, $ChatTableDataTable> {
+  $$ChatTableDataTableOrderingComposer(super.$state);
+  ColumnOrderings<int> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get title => $state.composableBuilder(
+      column: $state.table.title,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<bool> get isupdate => $state.composableBuilder(
+      column: $state.table.isupdate,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get datetime => $state.composableBuilder(
+      column: $state.table.datetime,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+typedef $$ChatContentTableDataTableInsertCompanionBuilder
+    = ChatContentTableDataCompanion Function({
+  Value<int> id,
+  required int parentid,
+  required String title,
+  required String content,
+  required String contentType,
+  Value<DateTime> datetime,
+});
+typedef $$ChatContentTableDataTableUpdateCompanionBuilder
+    = ChatContentTableDataCompanion Function({
+  Value<int> id,
+  Value<int> parentid,
+  Value<String> title,
+  Value<String> content,
+  Value<String> contentType,
+  Value<DateTime> datetime,
+});
+
+class $$ChatContentTableDataTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $ChatContentTableDataTable,
+    ChatContentTableDataData,
+    $$ChatContentTableDataTableFilterComposer,
+    $$ChatContentTableDataTableOrderingComposer,
+    $$ChatContentTableDataTableProcessedTableManager,
+    $$ChatContentTableDataTableInsertCompanionBuilder,
+    $$ChatContentTableDataTableUpdateCompanionBuilder> {
+  $$ChatContentTableDataTableTableManager(
+      _$AppDatabase db, $ChatContentTableDataTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer: $$ChatContentTableDataTableFilterComposer(
+              ComposerState(db, table)),
+          orderingComposer: $$ChatContentTableDataTableOrderingComposer(
+              ComposerState(db, table)),
+          getChildManagerBuilder: (p) =>
+              $$ChatContentTableDataTableProcessedTableManager(p),
+          getUpdateCompanionBuilder: ({
+            Value<int> id = const Value.absent(),
+            Value<int> parentid = const Value.absent(),
+            Value<String> title = const Value.absent(),
+            Value<String> content = const Value.absent(),
+            Value<String> contentType = const Value.absent(),
+            Value<DateTime> datetime = const Value.absent(),
+          }) =>
+              ChatContentTableDataCompanion(
+            id: id,
+            parentid: parentid,
+            title: title,
+            content: content,
+            contentType: contentType,
+            datetime: datetime,
+          ),
+          getInsertCompanionBuilder: ({
+            Value<int> id = const Value.absent(),
+            required int parentid,
+            required String title,
+            required String content,
+            required String contentType,
+            Value<DateTime> datetime = const Value.absent(),
+          }) =>
+              ChatContentTableDataCompanion.insert(
+            id: id,
+            parentid: parentid,
+            title: title,
+            content: content,
+            contentType: contentType,
+            datetime: datetime,
+          ),
+        ));
+}
+
+class $$ChatContentTableDataTableProcessedTableManager
+    extends ProcessedTableManager<
+        _$AppDatabase,
+        $ChatContentTableDataTable,
+        ChatContentTableDataData,
+        $$ChatContentTableDataTableFilterComposer,
+        $$ChatContentTableDataTableOrderingComposer,
+        $$ChatContentTableDataTableProcessedTableManager,
+        $$ChatContentTableDataTableInsertCompanionBuilder,
+        $$ChatContentTableDataTableUpdateCompanionBuilder> {
+  $$ChatContentTableDataTableProcessedTableManager(super.$state);
+}
+
+class $$ChatContentTableDataTableFilterComposer
+    extends FilterComposer<_$AppDatabase, $ChatContentTableDataTable> {
+  $$ChatContentTableDataTableFilterComposer(super.$state);
+  ColumnFilters<int> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<int> get parentid => $state.composableBuilder(
+      column: $state.table.parentid,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get title => $state.composableBuilder(
+      column: $state.table.title,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get content => $state.composableBuilder(
+      column: $state.table.content,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get contentType => $state.composableBuilder(
+      column: $state.table.contentType,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get datetime => $state.composableBuilder(
+      column: $state.table.datetime,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+}
+
+class $$ChatContentTableDataTableOrderingComposer
+    extends OrderingComposer<_$AppDatabase, $ChatContentTableDataTable> {
+  $$ChatContentTableDataTableOrderingComposer(super.$state);
+  ColumnOrderings<int> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get parentid => $state.composableBuilder(
+      column: $state.table.parentid,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get title => $state.composableBuilder(
+      column: $state.table.title,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get content => $state.composableBuilder(
+      column: $state.table.content,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get contentType => $state.composableBuilder(
+      column: $state.table.contentType,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get datetime => $state.composableBuilder(
+      column: $state.table.datetime,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+class _$AppDatabaseManager {
+  final _$AppDatabase _db;
+  _$AppDatabaseManager(this._db);
+  $$ChatTableDataTableTableManager get chatTableData =>
+      $$ChatTableDataTableTableManager(_db, _db.chatTableData);
+  $$ChatContentTableDataTableTableManager get chatContentTableData =>
+      $$ChatContentTableDataTableTableManager(_db, _db.chatContentTableData);
 }

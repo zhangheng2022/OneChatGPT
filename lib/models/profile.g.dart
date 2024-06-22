@@ -10,7 +10,7 @@ Profile _$ProfileFromJson(Map<String, dynamic> json) => Profile(
       json['user'] == null
           ? null
           : User.fromJson(json['user'] as Map<String, dynamic>),
-      json['theme'] as int?,
+      (json['theme'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$ProfileToJson(Profile instance) => <String, dynamic>{

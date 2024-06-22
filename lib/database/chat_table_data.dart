@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
 
-class ChatTables extends Table {
+class ChatTableData extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get title =>
       text().withLength(min: 1, max: 20).withDefault(const Constant("新的对话"))();

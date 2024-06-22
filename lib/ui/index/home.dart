@@ -75,12 +75,12 @@ class _HomeState extends State<Home> {
 
   final database = AppDatabase();
 
-  List<ChatTable> _cardListData = [];
+  List _cardListData = [];
 
   Future<void> _addCardListData() async {
     final insertResult =
-        await database.into(database.chatTables).insertReturning(
-              ChatTablesCompanion.insert(),
+        await database.into(database.chatTableData).insertReturning(
+              ChatTableDataCompanion.insert(),
             );
 
     setState(() {
@@ -89,14 +89,14 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> _deleteCardListData(int id) async {
-    (database.delete(database.chatTables)..where((row) => row.id.isValue(id)))
+    (database.delete(database.chatTableData)
+          ..where((row) => row.id.isValue(id)))
         .go();
     _initCardListData();
   }
 
   Future<void> _initCardListData() async {
-    List<ChatTable> allChatTables =
-        await database.select(database.chatTables).get();
+    List allChatTables = await database.select(database.chatTableData).get();
 
     if (allChatTables.isNotEmpty) {
       setState(() {
@@ -104,8 +104,8 @@ class _HomeState extends State<Home> {
       });
     } else {
       final insertResult =
-          await database.into(database.chatTables).insertReturning(
-                ChatTablesCompanion.insert(),
+          await database.into(database.chatTableData).insertReturning(
+                ChatTableDataCompanion.insert(),
               );
       setState(() {
         _cardListData = [insertResult];
