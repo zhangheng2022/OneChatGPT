@@ -31,11 +31,80 @@ class _ChatPageState extends State<ChatPage> {
   late types.User _user; // 当前用户
   final _model = types.User(id: uuid.v4()); // 模型用户，用于表示非当前用户的消息
 
+  bool _isWaitingForReply = false; // 新增状态变量
+
   @override
   void initState() {
     super.initState();
     _user = types.User(id: widget.chatid); // 初始化当前用户
     _initMessage(); // 初始化消息
+  }
+
+  Widget _sendButtonIcon() {
+    if (_isWaitingForReply) {
+      return const SizedBox(
+        width: 20, // Match the expected size of an icon
+        height: 20,
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(
+              Colors.white), // Adjust the color as needed
+        ),
+      );
+    } else {
+      return const Icon(
+        Icons.send,
+        color: Colors.white,
+      ); // Your default send icon
+    }
+  }
+
+  Future<String?> _showEditTitleDialog(BuildContext context) async {
+    String? newTitle;
+    return showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('修改标题'),
+          content: TextField(
+            autofocus: true,
+            maxLength: 10,
+            decoration: const InputDecoration(hintText: '输入新的对话标题'),
+            onChanged: (value) {
+              newTitle = value;
+            },
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('取消'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('确定'),
+              onPressed: () {
+                Navigator.of(context).pop(newTitle);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> test() async {
+    // 假设我们更新第一个聊天数据的标题
+    final firstChat = await database.select(database.chatTableData).getSingle();
+    final updatedTitle = "updatedTitle"; // 创建一个基于当前时间的新标题，以确保它是唯一的
+
+    await (database.update(database.chatTableData)
+          ..where((tbl) => tbl.id.equals(firstChat.id)))
+        .write(ChatTableDataCompanion(
+      title: Value(updatedTitle),
+    ));
+
+    // 打印日志以确认方法被调用
+    print("Test method executed: title updated to $updatedTitle");
   }
 
   @override
@@ -44,6 +113,20 @@ class _ChatPageState extends State<ChatPage> {
       appBar: AppBar(
         title: Text(appBarTitle), // 设置AppBar标题
         centerTitle: true,
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () async {
+              final String? newTitle = await _showEditTitleDialog(context);
+              if (newTitle != null && newTitle.isNotEmpty) {
+                setState(() {
+                  appBarTitle = newTitle;
+                  updateChatTitle(widget.chatid, newTitle);
+                });
+              }
+            },
+          ),
+        ],
       ),
       body: Chat(
         messages: _messages, // 消息列表
@@ -51,6 +134,12 @@ class _ChatPageState extends State<ChatPage> {
         user: _user, // 当前用户
         showUserAvatars: true, // 显示用户头像
         l10n: const ChatL10nZhCN(), // 设置中文本地化
+        theme: DefaultChatTheme(
+          primaryColor: Theme.of(context).primaryColor,
+          sendButtonIcon: _sendButtonIcon(),
+        ),
+        inputOptions: const InputOptions(
+            sendButtonVisibilityMode: SendButtonVisibilityMode.always),
       ),
     );
   }
@@ -108,11 +197,28 @@ class _ChatPageState extends State<ChatPage> {
 
 // 发送消息的实现
   Future<void> _sendMessage(types.PartialText message) async {
+    if (_isWaitingForReply) return; // 如果正在等待回复，则不执行发送操作
+
+    setState(() {
+      _isWaitingForReply = true; // 开始发送消息，设置等待回复状态为true
+    });
+
     final textMessage =
         _createTextMessage(content: message.text, isUserMessage: true);
     await _addMessage(textMessage);
     await _insertMessageIntoDatabase(message.text, 'user');
-    await _fetchAndDisplayModelResponse(message.text);
+
+    try {
+      await _fetchAndDisplayModelResponse(message.text);
+    } catch (err) {
+      Log.e(err);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isWaitingForReply = false; // 收到回复或发生错误，设置等待回复状态为false
+        });
+      }
+    }
   }
 
 // 将消息插入数据库的实现
@@ -160,5 +266,17 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   // 更新AppBar标题的实现
+  Future<void> updateChatTitle(String chatId, String newTitle) async {
+    try {
+      final int chatIdInt = int.parse(chatId);
+      await (database.update(database.chatTableData)
+            ..where((tbl) => tbl.id.equals(chatIdInt)))
+          .write(ChatTableDataCompanion(title: Value(newTitle)));
+    } catch (e) {
+      // Consider logging the error or handling it appropriately
+      print("Error updating chat title: $e");
+    }
+  }
+
   Future<void> _updateAppBarTitle() async {}
 }
