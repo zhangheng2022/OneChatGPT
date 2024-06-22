@@ -17,11 +17,11 @@ class AppRoutes {
   static GoRouter router = GoRouter(
     redirect: (BuildContext context, GoRouterState state) {
       final supabase = Supabase.instance.client;
-      final Session? session = supabase.auth.currentSession;
-
+      final session = supabase.auth.currentSession;
+      // Check if the session is valid.
+      final isSessionExpired = session?.isExpired;
       final noSessionPath = <String>['/login', '/login/register'];
-      if (!noSessionPath.contains(state.fullPath) &&
-          session?.accessToken == null) {
+      if (!noSessionPath.contains(state.fullPath) && isSessionExpired!) {
         return "/login";
       } else {
         return null;

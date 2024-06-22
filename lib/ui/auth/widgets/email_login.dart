@@ -120,9 +120,7 @@ class _LoginEmailState extends State<LoginEmail> {
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
-                onPressed: () {
-                  // TODO: Implement the functionality to reset password
-                },
+                onPressed: () {},
                 child: const Text('忘记密码?'),
               ),
             )

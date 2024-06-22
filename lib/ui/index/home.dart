@@ -10,106 +10,96 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final database = AppDatabase();
+  List _cardListData = [];
+
   @override
   void initState() {
     super.initState();
     _initCardListData();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text("对话"),
-          centerTitle: true,
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => _addCardListData(),
-          tooltip: '新增对话',
-          child: const Icon(Icons.add),
-        ),
-        drawer: Drawer(
-          child: ListView(
-            children: [
-              const DrawerHeader(
-                child: Text('Drawer Header'),
-              ),
-              ListTile(
-                title: const Text('Item 1'),
-                onTap: () {},
-              ),
-              ListTile(
-                title: const Text('Item 2'),
-                subtitle: const Text("data"),
-                onTap: () {},
-              ),
-            ],
-          ),
-        ),
-        body: ListView.builder(
-          itemCount: _cardListData.length,
-          padding: const EdgeInsets.all(12),
-          itemBuilder: (context, index) {
-            return Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              child: ListTile(
-                  leading: const Icon(Icons.smart_toy),
-                  title: Text(_cardListData[index].title),
-                  subtitle: Text(DateFormat.MMMEd()
-                      .add_Hm()
-                      .format(_cardListData[index].datetime)),
-                  trailing: IconButton(
-                    onPressed: () =>
-                        _deleteCardListData(_cardListData[index].id),
-                    icon: const Icon(Icons.delete),
-                  ),
-                  onTap: () {
-                    context.goNamed('chat', pathParameters: {
-                      'chatid': _cardListData[index].id.toString()
-                    });
-                  }),
-            );
-          },
-        ));
-  }
-
-  final database = AppDatabase();
-
-  List _cardListData = [];
-
-  Future<void> _addCardListData() async {
-    final insertResult =
-        await database.into(database.chatTableData).insertReturning(
-              ChatTableDataCompanion.insert(),
-            );
-
-    setState(() {
-      _cardListData.add(insertResult);
-    });
-  }
-
-  Future<void> _deleteCardListData(int id) async {
-    (database.delete(database.chatTableData)
-          ..where((row) => row.id.isValue(id)))
-        .go();
-    _initCardListData();
-  }
-
   Future<void> _initCardListData() async {
-    List allChatTables = await database.select(database.chatTableData).get();
-
-    if (allChatTables.isNotEmpty) {
+    try {
+      final allChatTables = await database.select(database.chatTableData).get();
       setState(() {
         _cardListData = allChatTables;
       });
-    } else {
-      final insertResult =
-          await database.into(database.chatTableData).insertReturning(
-                ChatTableDataCompanion.insert(),
-              );
-      setState(() {
-        _cardListData = [insertResult];
-      });
+    } catch (e) {
+      // Handle errors or show an error message
     }
+  }
+
+  Future<void> _addCardListData() async {
+    try {
+      final insertResult = await database
+          .into(database.chatTableData)
+          .insertReturning(ChatTableDataCompanion.insert());
+      setState(() {
+        _cardListData.add(insertResult);
+      });
+    } catch (e) {
+      // Handle errors or show an error message
+    }
+  }
+
+  Future<void> _deleteCardListData(int id) async {
+    try {
+      await (database.delete(database.chatTableData)
+            ..where((row) => row.id.isValue(id)))
+          .go();
+      setState(() {
+        _cardListData.removeWhere((chat) => chat.id == id);
+      });
+    } catch (e) {
+      // Handle errors or show an error message
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("对话"),
+        centerTitle: true,
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _addCardListData,
+        tooltip: '新增对话',
+        child: const Icon(Icons.add),
+      ),
+      body: ListView.builder(
+        itemCount: _cardListData.length,
+        padding: const EdgeInsets.all(20),
+        itemBuilder: (context, index) =>
+            _buildChatCard(context, _cardListData[index]),
+      ),
+    );
+  }
+
+  Widget _buildChatCard(BuildContext context, chatData) {
+    return Card(
+      color: Theme.of(context).colorScheme.tertiary,
+      margin: const EdgeInsets.only(bottom: 20),
+      child: ListTile(
+        leading: const Icon(Icons.smart_toy),
+        title: Text(
+          chatData.title,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(
+          DateFormat.MMMEd().add_Hm().format(chatData.datetime),
+          style: const TextStyle(color: Colors.grey),
+        ),
+        trailing: IconButton(
+          onPressed: () => _deleteCardListData(chatData.id),
+          icon: const Icon(Icons.delete_outline),
+        ),
+        onTap: () {
+          context.goNamed('chat',
+              pathParameters: {'chatid': chatData.id.toString()});
+        },
+      ),
+    );
   }
 }
