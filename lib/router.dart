@@ -19,9 +19,9 @@ class AppRoutes {
       final supabase = Supabase.instance.client;
       final session = supabase.auth.currentSession;
       // Check if the session is valid.
-      final isSessionExpired = session?.isExpired;
+      final isSessionExpired = session?.isExpired ?? true;
       final noSessionPath = <String>['/login', '/login/register'];
-      if (!noSessionPath.contains(state.fullPath) && isSessionExpired!) {
+      if (!noSessionPath.contains(state.fullPath) && isSessionExpired) {
         return "/login";
       } else {
         return null;
@@ -30,13 +30,10 @@ class AppRoutes {
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/home',
     routes: <RouteBase>[
-      ShellRoute(
-        navigatorKey: _shellNavigatorKey,
-        builder: (BuildContext context, GoRouterState state, Widget child) {
-          return ScaffoldNavBar(child: child);
-        },
-        routes: <RouteBase>[
-          GoRoute(
+      StatefulShellRoute.indexedStack(
+        branches: <StatefulShellBranch>[
+          StatefulShellBranch(routes: <RouteBase>[
+            GoRoute(
               name: 'home',
               path: '/home',
               builder: (BuildContext context, GoRouterState state) =>
@@ -48,18 +45,60 @@ class AppRoutes {
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (BuildContext context, GoRouterState state) {
                     final String chatid = state.pathParameters['chatid']!;
-                    return ChatPage(chatid: chatid);
+                    return ChatPage(
+                      chatid: chatid,
+                    );
                   },
                 ),
-              ]),
-          GoRoute(
-            name: 'person',
-            path: '/person',
-            builder: (BuildContext context, GoRouterState state) =>
-                const Person(),
+              ],
+            ),
+          ]),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                name: 'person',
+                path: '/person',
+                builder: (BuildContext context, GoRouterState state) =>
+                    const Person(),
+              ),
+            ],
           ),
         ],
+        builder: (BuildContext context, GoRouterState state,
+            StatefulNavigationShell navigationShell) {
+          return ScaffoldNavBar(navigationShell: navigationShell);
+        },
       ),
+      // ShellRoute(
+      //   navigatorKey: _shellNavigatorKey,
+      //   builder: (BuildContext context, GoRouterState state, Widget child) {
+      //     return ScaffoldNavBar(child: child);
+      //   },
+      //   routes: <RouteBase>[
+      //     GoRoute(
+      //         name: 'home',
+      //         path: '/home',
+      //         builder: (BuildContext context, GoRouterState state) =>
+      //             const Home(),
+      //         routes: <RouteBase>[
+      //           GoRoute(
+      //             name: 'chat',
+      //             path: 'chat/:chatid',
+      //             parentNavigatorKey: _rootNavigatorKey,
+      //             builder: (BuildContext context, GoRouterState state) {
+      //               final String chatid = state.pathParameters['chatid']!;
+      //               return ChatPage(chatid: chatid);
+      //             },
+      //           ),
+      //         ]),
+      //     GoRoute(
+      //       name: 'person',
+      //       path: '/person',
+      //       builder: (BuildContext context, GoRouterState state) =>
+      //           const Person(),
+      //     ),
+      //   ],
+      // ),
       GoRoute(
         name: 'login',
         path: '/login',

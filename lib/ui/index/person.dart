@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:drift/drift.dart' hide Column;
+
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:one_chatgpt_flutter/database/database.dart';
 
 class Person extends StatefulWidget {
   const Person({super.key});
@@ -10,10 +13,21 @@ class Person extends StatefulWidget {
 
 class _PersonState extends State<Person> {
   final supabase = Supabase.instance.client;
+  final database = AppDatabase();
   void _loginOut() {
     supabase.auth
         .signOut()
         .then((value) => {context.pushReplacement('/login')});
+  }
+
+  Future<void> test() async {
+    try {
+      await database
+          .into(database.chatTableData)
+          .insertReturning(ChatTableDataCompanion.insert());
+    } catch (e) {
+      // Handle errors or show an error message
+    }
   }
 
   @override
@@ -30,6 +44,21 @@ class _PersonState extends State<Person> {
             FilledButton(
               onPressed: _loginOut,
               child: const Text('退出登录'),
+            ),
+            FilledButton(
+              onPressed: test,
+              child: const Text('测试'),
+            ),
+            TextFormField(
+              autofocus: false,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.mail_outline),
+                labelText: '邮箱',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10), // 圆角边框
+                ),
+              ),
             ),
           ],
         ),

@@ -4,19 +4,19 @@ import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
 import 'package:one_chatgpt_flutter/models/response/chat_message.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
 
 final supabase = Supabase.instance.client;
-final database = AppDatabase();
 const uuid = Uuid();
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({super.key, required this.chatid});
+  const ChatPage({super.key, required this.chatid, this.refreshChatList});
 
   final String chatid;
-
+  final VoidCallback? refreshChatList;
   @override
   State<ChatPage> createState() => _ChatPageState();
 }
@@ -32,11 +32,18 @@ class _ChatPageState extends State<ChatPage> {
   final _model = types.User(id: uuid.v4()); // 模型用户，用于表示非当前用户的消息
 
   bool _isWaitingForReply = false; // 新增状态变量
+  late AppDatabase database;
 
   @override
   void initState() {
     super.initState();
     _user = types.User(id: widget.chatid); // 初始化当前用户
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    database = Provider.of<AppDatabase>(context); // Initialize database here
     _initMessage(); // 初始化消息
   }
 
