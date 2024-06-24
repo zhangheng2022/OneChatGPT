@@ -69,36 +69,6 @@ class AppRoutes {
           return ScaffoldNavBar(navigationShell: navigationShell);
         },
       ),
-      // ShellRoute(
-      //   navigatorKey: _shellNavigatorKey,
-      //   builder: (BuildContext context, GoRouterState state, Widget child) {
-      //     return ScaffoldNavBar(child: child);
-      //   },
-      //   routes: <RouteBase>[
-      //     GoRoute(
-      //         name: 'home',
-      //         path: '/home',
-      //         builder: (BuildContext context, GoRouterState state) =>
-      //             const Home(),
-      //         routes: <RouteBase>[
-      //           GoRoute(
-      //             name: 'chat',
-      //             path: 'chat/:chatid',
-      //             parentNavigatorKey: _rootNavigatorKey,
-      //             builder: (BuildContext context, GoRouterState state) {
-      //               final String chatid = state.pathParameters['chatid']!;
-      //               return ChatPage(chatid: chatid);
-      //             },
-      //           ),
-      //         ]),
-      //     GoRoute(
-      //       name: 'person',
-      //       path: '/person',
-      //       builder: (BuildContext context, GoRouterState state) =>
-      //           const Person(),
-      //     ),
-      //   ],
-      // ),
       GoRoute(
         name: 'login',
         path: '/login',

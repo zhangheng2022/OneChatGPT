@@ -1,4 +1,4 @@
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -82,6 +82,26 @@ class _HomeState extends State<Home> {
               return Center(child: Text('Error: ${snapshot.error}'));
             } else if (snapshot.hasData) {
               final List<ChatTableDataData> cardListData = snapshot.data!;
+              if (cardListData.isEmpty) {
+                // 列表为空时的处理
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        "assets/icons/not_message.png", // The path to your local image
+                        height: 200, // Optional, adjust the height as needed
+                        fit: BoxFit
+                            .cover, // Maintain the aspect ratio of the image
+                      ),
+                      const Text(
+                        '暂无对话，点击右下角+新增对话',
+                        style: TextStyle(color: Colors.grey),
+                      )
+                    ],
+                  ),
+                );
+              }
               return ListView.builder(
                 itemCount: cardListData.length,
                 padding: const EdgeInsets.all(20),
@@ -119,7 +139,6 @@ class _HomeState extends State<Home> {
           context.goNamed(
             'chat',
             pathParameters: {'chatid': chatData.id.toString()},
-            extra: {'refreshChatList': _refreshChatList},
           );
         },
       ),
