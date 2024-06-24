@@ -290,7 +290,7 @@ class _ChatPageState extends State<ChatPage> {
         theme: DefaultChatTheme(
           primaryColor: Theme.of(context).primaryColor,
           sendButtonIcon: _sendButtonIcon(),
-          userNameTextStyle: TextStyle(color: Theme.of(context).primaryColor),
+          userAvatarNameColors: [Theme.of(context).primaryColor],
         ),
         inputOptions: InputOptions(
           sendButtonVisibilityMode: SendButtonVisibilityMode.always,
