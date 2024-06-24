@@ -156,19 +156,25 @@ class _ChatPageState extends State<ChatPage> {
 
   // 获取历史消息
   List<Map<String, Object>> _getHistoryMessages() {
-    return _messages.map((message) {
-      final isUserMessage = message.author.id == _user.id;
-      return {
-        "role": isUserMessage ? "user" : "model",
-        'parts': [
-          {'text': (message as types.TextMessage).text}
-        ]
-      };
-    }).toList();
+    if (_messages.length <= 2) {
+      return [];
+    } else {
+      return _messages.sublist(1, _messages.length - 1).reversed.map((message) {
+        final isUserMessage = message.author.id == _user.id;
+        return {
+          "role": isUserMessage ? "user" : "model",
+          'parts': [
+            {'text': (message as types.TextMessage).text}
+          ],
+        };
+      }).toList();
+    }
   }
 
   // 获取并显示模型响应
   Future<void> _fetchModelResponse(String userMessage) async {
+    print(_messages);
+    print(_getHistoryMessages());
     final response = await supabase.functions.invoke(
       'google/gemini-pro',
       body: {

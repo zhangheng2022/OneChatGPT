@@ -95,7 +95,7 @@ class _HomeState extends State<Home> {
                             .cover, // Maintain the aspect ratio of the image
                       ),
                       const Text(
-                        '暂无对话，点击右下角+新增对话',
+                        '点击右下角+新增对话',
                         style: TextStyle(color: Colors.grey),
                       )
                     ],
