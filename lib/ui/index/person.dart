@@ -45,21 +45,6 @@ class _PersonState extends State<Person> {
               onPressed: _loginOut,
               child: const Text('退出登录'),
             ),
-            FilledButton(
-              onPressed: test,
-              child: const Text('测试'),
-            ),
-            TextFormField(
-              autofocus: false,
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.mail_outline),
-                labelText: '邮箱',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10), // 圆角边框
-                ),
-              ),
-            ),
           ],
         ),
       ),
