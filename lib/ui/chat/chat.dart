@@ -1,14 +1,21 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'package:intl/intl.dart';
+import 'package:mime/mime.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
-import 'package:one_chatgpt_flutter/database/database.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:path/path.dart' as path;
 import 'package:one_chatgpt_flutter/common/log.dart';
+import 'package:one_chatgpt_flutter/database/database.dart';
 
 final supabase = Supabase.instance.client;
 const uuid = Uuid();
@@ -81,23 +88,40 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   // 将消息填充到聊天界面
-  void _populateChatWithMessages(List messages) {
+  void _populateChatWithMessages(List<ChatContentTableDataData> messages) {
     for (var message in messages) {
-      final chatMessage = _createTextMessage(
-        content: message.content,
-        isUserMessage: message.contentType == 'user',
-      );
-      _addMessage(chatMessage);
+      if (message.contentType == 'text') {
+        _addMessage(
+          _createTextMessage(
+            content: message.textarea as String,
+            isUserMessage: message.role == 'user',
+          ),
+        );
+      }
+      if (message.contentType == 'file') {
+        _addMessage(
+          _createImageMessage(
+            content: message.fileUri as String,
+            isUserMessage: message.role == 'user',
+            size: message.fileSize as int,
+          ),
+        );
+      }
     }
   }
 
   // 添加欢迎消息
   void _addWelcomeMessage() async {
     const welcomeText = "你好，有什么可以帮你的吗？";
-    final welcomeMessage =
-        _createTextMessage(content: welcomeText, isUserMessage: false);
+    final welcomeMessage = _createTextMessage(
+      content: welcomeText,
+      isUserMessage: false,
+    );
     _addMessage(welcomeMessage);
-    await _insertMessageIntoDatabase(welcomeText, 'model');
+    await _insertMessageIntoDatabase(
+      text: welcomeText,
+      role: 'model',
+    );
   }
 
   // 创建文本消息
@@ -107,6 +131,21 @@ class _ChatPageState extends State<ChatPage> {
       author: isUserMessage ? _user : _model,
       id: uuid.v4(),
       text: content,
+    );
+  }
+
+  // 创建文本消息
+  types.ImageMessage _createImageMessage({
+    required String content,
+    required bool isUserMessage,
+    required int size,
+  }) {
+    return types.ImageMessage(
+      author: isUserMessage ? _user : _model,
+      id: uuid.v4(),
+      uri: content,
+      size: size,
+      name: uuid.v4(),
     );
   }
 
@@ -123,13 +162,18 @@ class _ChatPageState extends State<ChatPage> {
       _isWaitingForReply = true; // 开始发送消息，设置等待回复状态为true
     });
 
-    final textMessage =
-        _createTextMessage(content: message.text, isUserMessage: true);
+    final textMessage = _createTextMessage(
+      content: message.text,
+      isUserMessage: true,
+    );
     await _addMessage(textMessage);
-    await _insertMessageIntoDatabase(message.text, 'user');
+    await _insertMessageIntoDatabase(
+      text: message.text,
+      role: 'user',
+    );
 
     try {
-      await _fetchModelResponse(message.text);
+      await _fetchModelResponse(text: message.text);
     } catch (err) {
       Log.e(err);
     } finally {
@@ -142,43 +186,83 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   // 将消息插入数据库
-  Future<void> _insertMessageIntoDatabase(
-      String content, String contentType) async {
+  Future<void> _insertMessageIntoDatabase({
+    required String text,
+    required String role,
+    String contentType = 'text',
+    int fileSize = 0,
+  }) async {
     await database.into(database.chatContentTableData).insert(
           ChatContentTableDataCompanion.insert(
-            title: appBarTitle,
-            content: content,
             parentid: int.parse(_user.id),
+            title: appBarTitle,
+            role: role,
             contentType: contentType,
+            textarea:
+                contentType == 'text' ? Value(text) : const Value.absent(),
+            fileUri: contentType == 'file' ? Value(text) : const Value.absent(),
+            fileSize: Value(fileSize),
           ),
         );
   }
 
-  // 获取历史消息
-  List<Map<String, Object>> _getHistoryMessages() {
+// 获取历史消息
+  Future<List<Map<String, Object>>> _getHistoryMessages() async {
     if (_messages.length <= 2) {
       return [];
     } else {
-      return _messages.sublist(1, _messages.length - 1).reversed.map((message) {
+      return Future.wait(_messages
+          .sublist(1, _messages.length - 1)
+          .reversed
+          .map((message) async {
         final isUserMessage = message.author.id == _user.id;
-        return {
-          "role": isUserMessage ? "user" : "model",
-          'parts': [
-            {'text': (message as types.TextMessage).text}
-          ],
-        };
-      }).toList();
+        if (message is types.TextMessage) {
+          return {
+            "role": isUserMessage ? "user" : "model",
+            'parts': [
+              {'text': message.text}
+            ],
+          };
+        } else if (message is types.ImageMessage) {
+          //将message.uri指向的图片转为base64编码
+          final file = File(message.uri);
+          final bytes = await file.readAsBytes();
+          final base64 = base64Encode(bytes);
+          final mimeType = lookupMimeType(file.path); // Get the MIME type
+          return {
+            "role": isUserMessage ? "user" : "model",
+            'parts': [
+              {
+                'inline_data': {
+                  'data': base64,
+                  "mime_type": mimeType,
+                },
+              }
+            ],
+          };
+        } else {
+          return {
+            "role": isUserMessage ? "user" : "model",
+            'parts': [
+              {'unknown': 'Unknown message type'}
+            ],
+          };
+        }
+      }).toList());
     }
   }
 
   // 获取并显示模型响应
-  Future<void> _fetchModelResponse(String userMessage) async {
+  Future<void> _fetchModelResponse({
+    required String text,
+    String contentType = 'text',
+  }) async {
     print(_messages);
     print(_getHistoryMessages());
     final response = await supabase.functions.invoke(
       'google/gemini-pro',
       body: {
-        'message': userMessage,
+        'message': text,
         'history': _getHistoryMessages(),
       },
     );
@@ -196,7 +280,10 @@ class _ChatPageState extends State<ChatPage> {
         _addOrUpdateMessage(modelMessage);
       },
       onDone: () {
-        _insertMessageIntoDatabase(message, 'model');
+        _insertMessageIntoDatabase(
+          text: message,
+          role: 'model',
+        );
         completer.complete(); // 在onDone中完成Completer
       },
       onError: (e) {
@@ -228,6 +315,58 @@ class _ChatPageState extends State<ChatPage> {
               title: Value(newTitle), isupdate: const Value(false)));
     } catch (e) {
       Log.e("Error updating chat title: $e");
+    }
+  }
+
+  void _handleImageSelection() async {
+    if (_isWaitingForReply) return; // 如果正在等待回复，则不执行发送操作
+
+    setState(() {
+      _isWaitingForReply = true; // 开始发送消息，设置等待回复状态为true
+    });
+
+    final XFile? result = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 30,
+    );
+
+    if (result == null) return; // 如果没有选择图片，则不执行发送操作
+
+    try {
+      final bytes = await result.readAsBytes();
+      String currentDate = DateFormat('yyyyMMdd').format(DateTime.now());
+      final uploadResult = await supabase.storage.from('chat_images').upload(
+          '$currentDate/${uuid.v4()}${path.extension(result.path)}',
+          File(result.path));
+
+      final fullImageUrl =
+          '${dotenv.get('SUPABASE_URL', fallback: null)}/storage/v1/object/public/$uploadResult';
+      final message = types.ImageMessage(
+        author: _user,
+        id: uuid.v4(),
+        name: result.name,
+        size: bytes.length,
+        uri: fullImageUrl,
+      );
+      await _addMessage(message);
+      await _insertMessageIntoDatabase(
+        text: fullImageUrl,
+        role: 'user',
+        contentType: 'file',
+        fileSize: bytes.length,
+      );
+      // await _fetchModelResponse(
+      //   text: file.path,
+      //   contentType: 'image',
+      // );
+    } catch (err) {
+      Log.e(err);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isWaitingForReply = false; // 收到回复或发生错误，设置等待回复状态为false
+        });
+      }
     }
   }
 
@@ -305,6 +444,7 @@ class _ChatPageState extends State<ChatPage> {
       body: Chat(
         messages: _messages, // 消息列表
         onSendPressed: _sendMessage, // 发送消息的回调
+        onAttachmentPressed: _handleImageSelection,
         user: _user, // 当前用户
         showUserAvatars: true, // 显示用户头像
         showUserNames: true, // 显示用户昵称
@@ -312,6 +452,10 @@ class _ChatPageState extends State<ChatPage> {
         theme: DefaultChatTheme(
           primaryColor: Theme.of(context).primaryColor,
           sendButtonIcon: _sendButtonIcon(),
+          attachmentButtonIcon: const Icon(
+            Icons.add_photo_alternate_outlined,
+            color: Colors.white,
+          ),
           userAvatarNameColors: [Theme.of(context).primaryColor],
         ),
         inputOptions: InputOptions(

@@ -283,18 +283,38 @@ class $ChatContentTableDataTable extends ChatContentTableData
           GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 20),
       type: DriftSqlType.string,
       requiredDuringInsert: true);
-  static const VerificationMeta _contentMeta =
-      const VerificationMeta('content');
+  static const VerificationMeta _textareaMeta =
+      const VerificationMeta('textarea');
   @override
-  late final GeneratedColumn<String> content = GeneratedColumn<String>(
-      'content', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+  late final GeneratedColumn<String> textarea = GeneratedColumn<String>(
+      'textarea', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _roleMeta = const VerificationMeta('role');
+  @override
+  late final GeneratedColumn<String> role = GeneratedColumn<String>(
+      'role', aliasedName, false,
+      additionalChecks:
+          GeneratedColumn.checkTextLength(minTextLength: 4, maxTextLength: 5),
+      type: DriftSqlType.string,
+      requiredDuringInsert: true);
   static const VerificationMeta _contentTypeMeta =
       const VerificationMeta('contentType');
   @override
   late final GeneratedColumn<String> contentType = GeneratedColumn<String>(
       'content_type', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _fileUriMeta =
+      const VerificationMeta('fileUri');
+  @override
+  late final GeneratedColumn<String> fileUri = GeneratedColumn<String>(
+      'file_uri', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _fileSizeMeta =
+      const VerificationMeta('fileSize');
+  @override
+  late final GeneratedColumn<int> fileSize = GeneratedColumn<int>(
+      'file_size', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   static const VerificationMeta _datetimeMeta =
       const VerificationMeta('datetime');
   @override
@@ -304,8 +324,17 @@ class $ChatContentTableDataTable extends ChatContentTableData
       requiredDuringInsert: false,
       defaultValue: currentDateAndTime);
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, parentid, title, content, contentType, datetime];
+  List<GeneratedColumn> get $columns => [
+        id,
+        parentid,
+        title,
+        textarea,
+        role,
+        contentType,
+        fileUri,
+        fileSize,
+        datetime
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -332,11 +361,15 @@ class $ChatContentTableDataTable extends ChatContentTableData
     } else if (isInserting) {
       context.missing(_titleMeta);
     }
-    if (data.containsKey('content')) {
-      context.handle(_contentMeta,
-          content.isAcceptableOrUnknown(data['content']!, _contentMeta));
+    if (data.containsKey('textarea')) {
+      context.handle(_textareaMeta,
+          textarea.isAcceptableOrUnknown(data['textarea']!, _textareaMeta));
+    }
+    if (data.containsKey('role')) {
+      context.handle(
+          _roleMeta, role.isAcceptableOrUnknown(data['role']!, _roleMeta));
     } else if (isInserting) {
-      context.missing(_contentMeta);
+      context.missing(_roleMeta);
     }
     if (data.containsKey('content_type')) {
       context.handle(
@@ -345,6 +378,14 @@ class $ChatContentTableDataTable extends ChatContentTableData
               data['content_type']!, _contentTypeMeta));
     } else if (isInserting) {
       context.missing(_contentTypeMeta);
+    }
+    if (data.containsKey('file_uri')) {
+      context.handle(_fileUriMeta,
+          fileUri.isAcceptableOrUnknown(data['file_uri']!, _fileUriMeta));
+    }
+    if (data.containsKey('file_size')) {
+      context.handle(_fileSizeMeta,
+          fileSize.isAcceptableOrUnknown(data['file_size']!, _fileSizeMeta));
     }
     if (data.containsKey('datetime')) {
       context.handle(_datetimeMeta,
@@ -366,10 +407,16 @@ class $ChatContentTableDataTable extends ChatContentTableData
           .read(DriftSqlType.int, data['${effectivePrefix}parentid'])!,
       title: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
-      content: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}content'])!,
+      textarea: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}textarea']),
+      role: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}role'])!,
       contentType: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}content_type'])!,
+      fileUri: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}file_uri']),
+      fileSize: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}file_size']),
       datetime: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}datetime'])!,
     );
@@ -386,15 +433,21 @@ class ChatContentTableDataData extends DataClass
   final int id;
   final int parentid;
   final String title;
-  final String content;
+  final String? textarea;
+  final String role;
   final String contentType;
+  final String? fileUri;
+  final int? fileSize;
   final DateTime datetime;
   const ChatContentTableDataData(
       {required this.id,
       required this.parentid,
       required this.title,
-      required this.content,
+      this.textarea,
+      required this.role,
       required this.contentType,
+      this.fileUri,
+      this.fileSize,
       required this.datetime});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -402,8 +455,17 @@ class ChatContentTableDataData extends DataClass
     map['id'] = Variable<int>(id);
     map['parentid'] = Variable<int>(parentid);
     map['title'] = Variable<String>(title);
-    map['content'] = Variable<String>(content);
+    if (!nullToAbsent || textarea != null) {
+      map['textarea'] = Variable<String>(textarea);
+    }
+    map['role'] = Variable<String>(role);
     map['content_type'] = Variable<String>(contentType);
+    if (!nullToAbsent || fileUri != null) {
+      map['file_uri'] = Variable<String>(fileUri);
+    }
+    if (!nullToAbsent || fileSize != null) {
+      map['file_size'] = Variable<int>(fileSize);
+    }
     map['datetime'] = Variable<DateTime>(datetime);
     return map;
   }
@@ -413,8 +475,17 @@ class ChatContentTableDataData extends DataClass
       id: Value(id),
       parentid: Value(parentid),
       title: Value(title),
-      content: Value(content),
+      textarea: textarea == null && nullToAbsent
+          ? const Value.absent()
+          : Value(textarea),
+      role: Value(role),
       contentType: Value(contentType),
+      fileUri: fileUri == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fileUri),
+      fileSize: fileSize == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fileSize),
       datetime: Value(datetime),
     );
   }
@@ -426,8 +497,11 @@ class ChatContentTableDataData extends DataClass
       id: serializer.fromJson<int>(json['id']),
       parentid: serializer.fromJson<int>(json['parentid']),
       title: serializer.fromJson<String>(json['title']),
-      content: serializer.fromJson<String>(json['content']),
+      textarea: serializer.fromJson<String?>(json['textarea']),
+      role: serializer.fromJson<String>(json['role']),
       contentType: serializer.fromJson<String>(json['contentType']),
+      fileUri: serializer.fromJson<String?>(json['fileUri']),
+      fileSize: serializer.fromJson<int?>(json['fileSize']),
       datetime: serializer.fromJson<DateTime>(json['datetime']),
     );
   }
@@ -438,8 +512,11 @@ class ChatContentTableDataData extends DataClass
       'id': serializer.toJson<int>(id),
       'parentid': serializer.toJson<int>(parentid),
       'title': serializer.toJson<String>(title),
-      'content': serializer.toJson<String>(content),
+      'textarea': serializer.toJson<String?>(textarea),
+      'role': serializer.toJson<String>(role),
       'contentType': serializer.toJson<String>(contentType),
+      'fileUri': serializer.toJson<String?>(fileUri),
+      'fileSize': serializer.toJson<int?>(fileSize),
       'datetime': serializer.toJson<DateTime>(datetime),
     };
   }
@@ -448,15 +525,21 @@ class ChatContentTableDataData extends DataClass
           {int? id,
           int? parentid,
           String? title,
-          String? content,
+          Value<String?> textarea = const Value.absent(),
+          String? role,
           String? contentType,
+          Value<String?> fileUri = const Value.absent(),
+          Value<int?> fileSize = const Value.absent(),
           DateTime? datetime}) =>
       ChatContentTableDataData(
         id: id ?? this.id,
         parentid: parentid ?? this.parentid,
         title: title ?? this.title,
-        content: content ?? this.content,
+        textarea: textarea.present ? textarea.value : this.textarea,
+        role: role ?? this.role,
         contentType: contentType ?? this.contentType,
+        fileUri: fileUri.present ? fileUri.value : this.fileUri,
+        fileSize: fileSize.present ? fileSize.value : this.fileSize,
         datetime: datetime ?? this.datetime,
       );
   @override
@@ -465,16 +548,19 @@ class ChatContentTableDataData extends DataClass
           ..write('id: $id, ')
           ..write('parentid: $parentid, ')
           ..write('title: $title, ')
-          ..write('content: $content, ')
+          ..write('textarea: $textarea, ')
+          ..write('role: $role, ')
           ..write('contentType: $contentType, ')
+          ..write('fileUri: $fileUri, ')
+          ..write('fileSize: $fileSize, ')
           ..write('datetime: $datetime')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, parentid, title, content, contentType, datetime);
+  int get hashCode => Object.hash(id, parentid, title, textarea, role,
+      contentType, fileUri, fileSize, datetime);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -482,8 +568,11 @@ class ChatContentTableDataData extends DataClass
           other.id == this.id &&
           other.parentid == this.parentid &&
           other.title == this.title &&
-          other.content == this.content &&
+          other.textarea == this.textarea &&
+          other.role == this.role &&
           other.contentType == this.contentType &&
+          other.fileUri == this.fileUri &&
+          other.fileSize == this.fileSize &&
           other.datetime == this.datetime);
 }
 
@@ -492,42 +581,57 @@ class ChatContentTableDataCompanion
   final Value<int> id;
   final Value<int> parentid;
   final Value<String> title;
-  final Value<String> content;
+  final Value<String?> textarea;
+  final Value<String> role;
   final Value<String> contentType;
+  final Value<String?> fileUri;
+  final Value<int?> fileSize;
   final Value<DateTime> datetime;
   const ChatContentTableDataCompanion({
     this.id = const Value.absent(),
     this.parentid = const Value.absent(),
     this.title = const Value.absent(),
-    this.content = const Value.absent(),
+    this.textarea = const Value.absent(),
+    this.role = const Value.absent(),
     this.contentType = const Value.absent(),
+    this.fileUri = const Value.absent(),
+    this.fileSize = const Value.absent(),
     this.datetime = const Value.absent(),
   });
   ChatContentTableDataCompanion.insert({
     this.id = const Value.absent(),
     required int parentid,
     required String title,
-    required String content,
+    this.textarea = const Value.absent(),
+    required String role,
     required String contentType,
+    this.fileUri = const Value.absent(),
+    this.fileSize = const Value.absent(),
     this.datetime = const Value.absent(),
   })  : parentid = Value(parentid),
         title = Value(title),
-        content = Value(content),
+        role = Value(role),
         contentType = Value(contentType);
   static Insertable<ChatContentTableDataData> custom({
     Expression<int>? id,
     Expression<int>? parentid,
     Expression<String>? title,
-    Expression<String>? content,
+    Expression<String>? textarea,
+    Expression<String>? role,
     Expression<String>? contentType,
+    Expression<String>? fileUri,
+    Expression<int>? fileSize,
     Expression<DateTime>? datetime,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (parentid != null) 'parentid': parentid,
       if (title != null) 'title': title,
-      if (content != null) 'content': content,
+      if (textarea != null) 'textarea': textarea,
+      if (role != null) 'role': role,
       if (contentType != null) 'content_type': contentType,
+      if (fileUri != null) 'file_uri': fileUri,
+      if (fileSize != null) 'file_size': fileSize,
       if (datetime != null) 'datetime': datetime,
     });
   }
@@ -536,15 +640,21 @@ class ChatContentTableDataCompanion
       {Value<int>? id,
       Value<int>? parentid,
       Value<String>? title,
-      Value<String>? content,
+      Value<String?>? textarea,
+      Value<String>? role,
       Value<String>? contentType,
+      Value<String?>? fileUri,
+      Value<int?>? fileSize,
       Value<DateTime>? datetime}) {
     return ChatContentTableDataCompanion(
       id: id ?? this.id,
       parentid: parentid ?? this.parentid,
       title: title ?? this.title,
-      content: content ?? this.content,
+      textarea: textarea ?? this.textarea,
+      role: role ?? this.role,
       contentType: contentType ?? this.contentType,
+      fileUri: fileUri ?? this.fileUri,
+      fileSize: fileSize ?? this.fileSize,
       datetime: datetime ?? this.datetime,
     );
   }
@@ -561,11 +671,20 @@ class ChatContentTableDataCompanion
     if (title.present) {
       map['title'] = Variable<String>(title.value);
     }
-    if (content.present) {
-      map['content'] = Variable<String>(content.value);
+    if (textarea.present) {
+      map['textarea'] = Variable<String>(textarea.value);
+    }
+    if (role.present) {
+      map['role'] = Variable<String>(role.value);
     }
     if (contentType.present) {
       map['content_type'] = Variable<String>(contentType.value);
+    }
+    if (fileUri.present) {
+      map['file_uri'] = Variable<String>(fileUri.value);
+    }
+    if (fileSize.present) {
+      map['file_size'] = Variable<int>(fileSize.value);
     }
     if (datetime.present) {
       map['datetime'] = Variable<DateTime>(datetime.value);
@@ -579,8 +698,11 @@ class ChatContentTableDataCompanion
           ..write('id: $id, ')
           ..write('parentid: $parentid, ')
           ..write('title: $title, ')
-          ..write('content: $content, ')
+          ..write('textarea: $textarea, ')
+          ..write('role: $role, ')
           ..write('contentType: $contentType, ')
+          ..write('fileUri: $fileUri, ')
+          ..write('fileSize: $fileSize, ')
           ..write('datetime: $datetime')
           ..write(')'))
         .toString();
@@ -727,8 +849,11 @@ typedef $$ChatContentTableDataTableInsertCompanionBuilder
   Value<int> id,
   required int parentid,
   required String title,
-  required String content,
+  Value<String?> textarea,
+  required String role,
   required String contentType,
+  Value<String?> fileUri,
+  Value<int?> fileSize,
   Value<DateTime> datetime,
 });
 typedef $$ChatContentTableDataTableUpdateCompanionBuilder
@@ -736,8 +861,11 @@ typedef $$ChatContentTableDataTableUpdateCompanionBuilder
   Value<int> id,
   Value<int> parentid,
   Value<String> title,
-  Value<String> content,
+  Value<String?> textarea,
+  Value<String> role,
   Value<String> contentType,
+  Value<String?> fileUri,
+  Value<int?> fileSize,
   Value<DateTime> datetime,
 });
 
@@ -765,32 +893,44 @@ class $$ChatContentTableDataTableTableManager extends RootTableManager<
             Value<int> id = const Value.absent(),
             Value<int> parentid = const Value.absent(),
             Value<String> title = const Value.absent(),
-            Value<String> content = const Value.absent(),
+            Value<String?> textarea = const Value.absent(),
+            Value<String> role = const Value.absent(),
             Value<String> contentType = const Value.absent(),
+            Value<String?> fileUri = const Value.absent(),
+            Value<int?> fileSize = const Value.absent(),
             Value<DateTime> datetime = const Value.absent(),
           }) =>
               ChatContentTableDataCompanion(
             id: id,
             parentid: parentid,
             title: title,
-            content: content,
+            textarea: textarea,
+            role: role,
             contentType: contentType,
+            fileUri: fileUri,
+            fileSize: fileSize,
             datetime: datetime,
           ),
           getInsertCompanionBuilder: ({
             Value<int> id = const Value.absent(),
             required int parentid,
             required String title,
-            required String content,
+            Value<String?> textarea = const Value.absent(),
+            required String role,
             required String contentType,
+            Value<String?> fileUri = const Value.absent(),
+            Value<int?> fileSize = const Value.absent(),
             Value<DateTime> datetime = const Value.absent(),
           }) =>
               ChatContentTableDataCompanion.insert(
             id: id,
             parentid: parentid,
             title: title,
-            content: content,
+            textarea: textarea,
+            role: role,
             contentType: contentType,
+            fileUri: fileUri,
+            fileSize: fileSize,
             datetime: datetime,
           ),
         ));
@@ -827,13 +967,28 @@ class $$ChatContentTableDataTableFilterComposer
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
-  ColumnFilters<String> get content => $state.composableBuilder(
-      column: $state.table.content,
+  ColumnFilters<String> get textarea => $state.composableBuilder(
+      column: $state.table.textarea,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get role => $state.composableBuilder(
+      column: $state.table.role,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
   ColumnFilters<String> get contentType => $state.composableBuilder(
       column: $state.table.contentType,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get fileUri => $state.composableBuilder(
+      column: $state.table.fileUri,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<int> get fileSize => $state.composableBuilder(
+      column: $state.table.fileSize,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
@@ -861,13 +1016,28 @@ class $$ChatContentTableDataTableOrderingComposer
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 
-  ColumnOrderings<String> get content => $state.composableBuilder(
-      column: $state.table.content,
+  ColumnOrderings<String> get textarea => $state.composableBuilder(
+      column: $state.table.textarea,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get role => $state.composableBuilder(
+      column: $state.table.role,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 
   ColumnOrderings<String> get contentType => $state.composableBuilder(
       column: $state.table.contentType,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get fileUri => $state.composableBuilder(
+      column: $state.table.fileUri,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get fileSize => $state.composableBuilder(
+      column: $state.table.fileSize,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 

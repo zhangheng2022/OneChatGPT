@@ -1,4 +1,3 @@
-import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -12,7 +11,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  late AppDatabase database;
+  late AppDatabase _database;
   @override
   void initState() {
     super.initState();
@@ -22,7 +21,7 @@ class _HomeState extends State<Home> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    database = Provider.of<AppDatabase>(context); // Initialize database here
+    _database = Provider.of<AppDatabase>(context); // Initialize _database here
   }
 
   @override
@@ -32,7 +31,7 @@ class _HomeState extends State<Home> {
 
   Future<void> _addCardListData() async {
     try {
-      await database.into(database.chatTableData).insertReturning(
+      await _database.into(_database.chatTableData).insertReturning(
             ChatTableDataCompanion.insert(),
           );
       _refreshChatList();
@@ -43,7 +42,7 @@ class _HomeState extends State<Home> {
 
   Future<void> _deleteCardListData(int id) async {
     try {
-      await (database.delete(database.chatTableData)
+      await (_database.delete(_database.chatTableData)
             ..where(
               (row) => row.id.isValue(id),
             ))
@@ -74,7 +73,8 @@ class _HomeState extends State<Home> {
       body: RefreshIndicator(
         onRefresh: _refreshChatList,
         child: FutureBuilder<List<ChatTableDataData>>(
-          future: database.select(database.chatTableData).get(), // 假设的Future方法
+          future:
+              _database.select(_database.chatTableData).get(), // 假设的Future方法
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
