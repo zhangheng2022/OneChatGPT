@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:intl/intl.dart';
 import 'package:mime/mime.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
@@ -12,18 +11,21 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:path/path.dart' as path;
 import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
 
+// 初始化 Supabase 客户端
 final supabase = Supabase.instance.client;
-const uuid = Uuid();
 
+// 定义聊天页面
 class ChatPage extends StatefulWidget {
+  // 构造函数
   const ChatPage({super.key, required this.chatid, this.refreshChatList});
 
+  // 聊天 ID
   final String chatid;
+  // 刷新聊天列表回调函数
   final VoidCallback? refreshChatList;
 
   @override
@@ -31,155 +33,205 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+  // 定义默认标题
   static const String defaultAppBarTitle = "新的对话";
+  // 等待回复状态
   bool _isWaitingForReply = false;
-  bool _isAutoUpdateTitle = true; // 是否自动更新标题
+  // 是否自动更新标题
+  bool _isAutoUpdateTitle = true;
+  // 聊天标题
   String appBarTitle = defaultAppBarTitle;
-  final List<types.Message> _messages = []; // 消息列表
-  late types.User _user; // 当前用户
+  // 聊天消息列表
+  final List<types.Message> _messages = [];
+  // 用户信息
+  late types.User _user;
+  // 模型信息
   final _model = types.User(
-    id: uuid.v4(),
+    id: const Uuid().v4(),
     firstName: "Google",
     lastName: "Gemini Pro",
     imageUrl:
         "https://jkdxuuhjdoxqsjyhlubj.supabase.co/storage/v1/object/public/common/logo.png",
-  ); // 模型用户，用于表示非当前用户的消息
+  );
+  // 数据库实例
   late AppDatabase database;
 
   @override
   void initState() {
     super.initState();
-    _user = types.User(id: widget.chatid); // 初始化当前用户
+    // 初始化用户信息
+    _user = types.User(id: widget.chatid);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    database = Provider.of<AppDatabase>(context); // 初始化数据库
-    _initMessage(); // 初始化消息
+    // 获取数据库实例
+    database = Provider.of<AppDatabase>(context);
+    // 初始化聊天消息
+    _initMessage();
   }
 
-  // 初始化消息
+  // 初始化聊天消息
   Future<void> _initMessage() async {
-    final messages = await _getChatContentTableDatabase(); // 从数据库获取消息
+    // 从数据库获取聊天内容
+    final messages = await _getChatContentTableDatabase();
+    // 如果有聊天记录，则填充聊天消息列表
     if (messages.isNotEmpty) {
-      _populateChatWithMessages(messages); // 如果有消息，则填充到聊天界面
+      _populateChatWithMessages(messages);
     } else {
-      _addWelcomeMessage(); // 如果没有消息，则添加欢迎消息
+      // 否则添加欢迎消息
+      _addWelcomeMessage();
     }
+    // 获取聊天信息
     final chatTable = await _getChatTableDatabase();
+    // 如果有聊天信息，则更新标题和自动更新状态
     if (chatTable != null) {
       _isAutoUpdateTitle = chatTable.isupdate;
+      appBarTitle = chatTable.title ?? defaultAppBarTitle;
     }
   }
 
   // 从数据库获取聊天内容
-  Future _getChatContentTableDatabase() async {
+  Future<List<ChatContentTableDataData>> _getChatContentTableDatabase() async {
+    // 查询所有 parentid 等于用户 ID 的聊天记录
     return (database.select(database.chatContentTableData)
           ..where((tbl) => tbl.parentid.equals(int.parse(_user.id))))
         .get();
   }
 
-  // 从数据库获取聊天表
-  Future _getChatTableDatabase() async {
+  // 从数据库获取聊天信息
+  Future<ChatTableDataData?> _getChatTableDatabase() async {
+    // 查询 ID 等于用户 ID 的聊天信息
     return (database.select(database.chatTableData)
           ..where((tbl) => tbl.id.equals(int.parse(_user.id))))
         .getSingleOrNull();
   }
 
-  // 将消息填充到聊天界面
+  // 填充聊天消息列表
   void _populateChatWithMessages(List<ChatContentTableDataData> messages) {
+    // 循环遍历所有聊天记录并添加到列表中
     for (var message in messages) {
-      if (message.contentType == 'text') {
-        _addMessage(
-          _createTextMessage(
-            content: message.textarea as String,
-            isUserMessage: message.role == 'user',
-          ),
-        );
-      }
-      if (message.contentType == 'file') {
-        _addMessage(
-          _createImageMessage(
-            content: message.fileUri as String,
-            isUserMessage: message.role == 'user',
-            size: message.fileSize as int,
-          ),
-        );
-      }
+      _addMessage(
+        _createMessage(
+          message.textarea ?? '',
+          message.contentType,
+          message.role == 'user',
+          message.fileUri ?? '',
+          message.fileSize ?? 0,
+        ),
+      );
     }
   }
 
   // 添加欢迎消息
   void _addWelcomeMessage() async {
+    // 欢迎文本
     const welcomeText = "你好，有什么可以帮你的吗？";
+    // 创建欢迎消息
     final welcomeMessage = _createTextMessage(
       content: welcomeText,
       isUserMessage: false,
     );
+    // 添加欢迎消息到列表
     _addMessage(welcomeMessage);
+    // 将欢迎消息插入数据库
     await _insertMessageIntoDatabase(
       text: welcomeText,
       role: 'model',
     );
   }
 
-  // 创建文本消息
+  // 创建消息对象
+  types.Message _createMessage(
+    String content,
+    String contentType,
+    bool isUserMessage,
+    String fileUri,
+    int fileSize,
+  ) {
+    // 根据 contentType 创建不同类型的消息
+    if (contentType == 'text') {
+      return _createTextMessage(content: content, isUserMessage: isUserMessage);
+    } else if (contentType == 'file') {
+      return _createImageMessage(
+          content: fileUri, isUserMessage: isUserMessage, size: fileSize);
+    } else {
+      return types.TextMessage(
+        author: isUserMessage ? _user : _model,
+        id: Uuid().v4(),
+        text: '未知消息类型',
+      );
+    }
+  }
+
+  // 创建文本消息对象
   types.TextMessage _createTextMessage(
       {required String content, required bool isUserMessage}) {
+    // 创建文本消息对象
     return types.TextMessage(
       author: isUserMessage ? _user : _model,
-      id: uuid.v4(),
+      id: Uuid().v4(),
       text: content,
     );
   }
 
-  // 创建文本消息
+  // 创建图片消息对象
   types.ImageMessage _createImageMessage({
     required String content,
     required bool isUserMessage,
     required int size,
   }) {
+    // 创建图片消息对象
     return types.ImageMessage(
       author: isUserMessage ? _user : _model,
-      id: uuid.v4(),
+      id: const Uuid().v4(),
       uri: content,
       size: size,
-      name: uuid.v4(),
+      name: const Uuid().v4(),
     );
   }
 
-  // 将消息添加到聊天界面
+  // 添加消息到列表
   Future<void> _addMessage(types.Message message) async {
+    // 将消息插入列表头部
     setState(() => _messages.insert(0, message));
   }
 
   // 发送消息
   Future<void> _sendMessage(types.PartialText message) async {
-    if (_isWaitingForReply) return; // 如果正在等待回复，则不执行发送操作
+    // 如果正在等待回复，则不发送消息
+    if (_isWaitingForReply) return;
 
+    // 设置等待回复状态
     setState(() {
-      _isWaitingForReply = true; // 开始发送消息，设置等待回复状态为true
+      _isWaitingForReply = true;
     });
 
+    // 创建文本消息
     final textMessage = _createTextMessage(
       content: message.text,
       isUserMessage: true,
     );
+    // 添加消息到列表
     await _addMessage(textMessage);
+    // 将消息插入数据库
     await _insertMessageIntoDatabase(
       text: message.text,
       role: 'user',
     );
 
+    // 尝试获取模型回复
     try {
-      await _fetchModelResponse(text: message.text);
+      await _fetchModelResponse();
     } catch (err) {
+      // 处理错误
       Log.e(err);
     } finally {
+      // 设置等待回复状态为 false
       if (mounted) {
         setState(() {
-          _isWaitingForReply = false; // 收到回复或发生错误，设置等待回复状态为false
+          _isWaitingForReply = false;
         });
       }
     }
@@ -192,6 +244,7 @@ class _ChatPageState extends State<ChatPage> {
     String contentType = 'text',
     int fileSize = 0,
   }) async {
+    // 插入消息到数据库
     await database.into(database.chatContentTableData).insert(
           ChatContentTableDataCompanion.insert(
             parentid: int.parse(_user.id),
@@ -206,101 +259,101 @@ class _ChatPageState extends State<ChatPage> {
         );
   }
 
-// 获取历史消息
+  // 获取历史消息
   Future<List<Map<String, Object>>> _getHistoryMessages() async {
-    if (_messages.length <= 2) {
-      return [];
-    } else {
-      return Future.wait(_messages
-          .sublist(1, _messages.length - 1)
-          .reversed
-          .map((message) async {
-        final isUserMessage = message.author.id == _user.id;
-        if (message is types.TextMessage) {
-          return {
-            "role": isUserMessage ? "user" : "model",
-            'parts': [
-              {'text': message.text}
-            ],
-          };
-        } else if (message is types.ImageMessage) {
-          //将message.uri指向的图片转为base64编码
-          final file = File(message.uri);
-          final bytes = await file.readAsBytes();
-          final base64 = base64Encode(bytes);
-          final mimeType = lookupMimeType(file.path); // Get the MIME type
-          return {
-            "role": isUserMessage ? "user" : "model",
-            'parts': [
-              {
-                'inline_data': {
-                  'data': base64,
-                  "mime_type": mimeType,
-                },
-              }
-            ],
-          };
-        } else {
-          return {
-            "role": isUserMessage ? "user" : "model",
-            'parts': [
-              {'unknown': 'Unknown message type'}
-            ],
-          };
-        }
-      }).toList());
-    }
+    // 否则将消息列表转换为 Supabase API 所需的格式
+    return Future.wait(_messages.reversed.map((message) async {
+      final isUserMessage = message.author.id == _user.id;
+      // 根据消息类型进行处理
+      if (message is types.TextMessage) {
+        return {
+          "role": isUserMessage ? "user" : "model",
+          'parts': [
+            {'text': message.text}
+          ],
+        };
+      } else if (message is types.ImageMessage) {
+        final file = File(message.uri);
+        final bytes = await file.readAsBytes();
+        final base64 = base64Encode(bytes);
+        final mimeType = lookupMimeType(file.path) ?? 'image/jpeg';
+        return {
+          "role": isUserMessage ? "user" : "model",
+          'parts': [
+            {
+              'inline_data': {
+                'data': base64,
+                "mime_type": mimeType,
+              },
+            }
+          ],
+        };
+      } else {
+        return {
+          "role": isUserMessage ? "user" : "model",
+          'parts': [
+            {'text': 'Unknown message type'}
+          ],
+        };
+      }
+    }).toList());
   }
 
-  // 获取并显示模型响应
-  Future<void> _fetchModelResponse({
-    required String text,
-    String contentType = 'text',
-  }) async {
-    print(_messages);
-    print(_getHistoryMessages());
+  // 获取模型回复
+  Future<void> _fetchModelResponse() async {
+    final contents = await _getHistoryMessages();
+    // 调用 Supabase 函数
     final response = await supabase.functions.invoke(
       'google/gemini-pro',
-      body: {
-        'message': text,
-        'history': _getHistoryMessages(),
-      },
+      body: {'contents': contents},
     );
-    final messageid = uuid.v4();
+    // 初始化回复消息
     String message = '';
-    var completer = Completer<void>(); // 创建Completer
+    final messageid = const Uuid().v4();
+    var completer = Completer<void>();
+    // 监听回复消息
     response.data.transform(const Utf8Decoder()).listen(
       (val) {
+        // 将回复消息追加到 message 中
         message += val;
+        // 创建文本消息对象
         final modelMessage = types.TextMessage(
           author: _model,
           id: messageid,
           text: message,
         );
+        // 添加或更新消息到列表
         _addOrUpdateMessage(modelMessage);
       },
       onDone: () {
+        // 将回复消息插入数据库
         _insertMessageIntoDatabase(
           text: message,
           role: 'model',
         );
-        completer.complete(); // 在onDone中完成Completer
+        // 结束 Completer
+        completer.complete();
       },
       onError: (e) {
-        completer.completeError(e); // 处理错误
+        // 处理错误
+        completer.completeError(e);
       },
     );
-    return completer.future; // 返回Completer的Future
+    // 返回 Completer 的 Future
+    return completer.future;
   }
 
-  // 更新或添加消息
+  // 添加或更新消息到列表
   void _addOrUpdateMessage(types.TextMessage message) {
+    // 查找列表中是否存在相同的消息
     final index = _messages.indexWhere((m) => m.id == message.id);
+    // 如果存在，则更新消息
     if (index != -1) {
       setState(() {
         _messages[index] = message;
       });
     } else {
+      // 否则添加消息
       _addMessage(message);
     }
   }
@@ -308,70 +361,82 @@ class _ChatPageState extends State<ChatPage> {
   // 更新聊天标题
   Future<void> updateChatTitle(String chatId, String newTitle) async {
     try {
+      // 将聊天 ID 转换为 int
       final int chatIdInt = int.parse(chatId);
+      // 更新数据库中的聊天标题
       await (database.update(database.chatTableData)
             ..where((tbl) => tbl.id.equals(chatIdInt)))
           .write(ChatTableDataCompanion(
               title: Value(newTitle), isupdate: const Value(false)));
     } catch (e) {
+      // 处理错误
       Log.e("Error updating chat title: $e");
     }
   }
 
+  // 处理图片选择
   void _handleImageSelection() async {
-    if (_isWaitingForReply) return; // 如果正在等待回复，则不执行发送操作
-
-    setState(() {
-      _isWaitingForReply = true; // 开始发送消息，设置等待回复状态为true
-    });
-
+    // 如果正在等待回复，则不处理
+    if (_isWaitingForReply) return;
+    // 选择图片
     final XFile? result = await ImagePicker().pickImage(
       source: ImageSource.gallery,
-      imageQuality: 30,
+      imageQuality: 50,
     );
-
-    if (result == null) return; // 如果没有选择图片，则不执行发送操作
-
+    // 如果没有选择图片，则返回
+    if (result == null) return;
     try {
+      // 设置等待回复状态
+      setState(() {
+        _isWaitingForReply = true;
+      });
+      // 读取图片字节流
       final bytes = await result.readAsBytes();
-      String currentDate = DateFormat('yyyyMMdd').format(DateTime.now());
-      final uploadResult = await supabase.storage.from('chat_images').upload(
-          '$currentDate/${uuid.v4()}${path.extension(result.path)}',
-          File(result.path));
-
-      final fullImageUrl =
-          '${dotenv.get('SUPABASE_URL', fallback: null)}/storage/v1/object/public/$uploadResult';
+      // 获取应用程序文档目录
+      final appDocumentsDir = await getApplicationDocumentsDirectory();
+      // 生成图片名称
+      final imageName = '${const Uuid().v4()}${path.extension(result.path)}';
+      // 生成图片路径
+      final imagePath = '${appDocumentsDir.path}/$imageName';
+      // 创建图片文件对象
+      final File imageFile = File(imagePath);
+      // 将图片字节流写入文件
+      await imageFile.writeAsBytes(bytes);
+      // 创建图片消息对象
       final message = types.ImageMessage(
         author: _user,
-        id: uuid.v4(),
+        id: const Uuid().v4(),
         name: result.name,
         size: bytes.length,
-        uri: fullImageUrl,
+        uri: imagePath,
       );
+      // 添加消息到列表
       await _addMessage(message);
+      // 将图片消息插入数据库
       await _insertMessageIntoDatabase(
-        text: fullImageUrl,
+        text: imagePath,
         role: 'user',
         contentType: 'file',
         fileSize: bytes.length,
       );
-      // await _fetchModelResponse(
-      //   text: file.path,
-      //   contentType: 'image',
-      // );
+      // 获取模型回复
+      await _fetchModelResponse();
     } catch (err) {
+      // 处理错误
       Log.e(err);
     } finally {
+      // 设置等待回复状态为 false
       if (mounted) {
         setState(() {
-          _isWaitingForReply = false; // 收到回复或发生错误，设置等待回复状态为false
+          _isWaitingForReply = false;
         });
       }
     }
   }
 
-  // 构建发送按钮图标
+  // 获取发送按钮图标
   Widget _sendButtonIcon() {
+    // 如果正在等待回复，则显示进度指示器
     if (_isWaitingForReply) {
       return const SizedBox(
         width: 20,
@@ -381,13 +446,16 @@ class _ChatPageState extends State<ChatPage> {
         ),
       );
     } else {
+      // 否则显示发送图标
       return const Icon(Icons.send, color: Colors.white);
     }
   }
 
-  // 显示编辑标题对话框
+  // 显示修改标题对话框
   Future<String?> _showEditTitleDialog(BuildContext context) async {
+    // 初始化新标题
     String? newTitle;
+    // 显示对话框
     return showDialog<String>(
       context: context,
       builder: (BuildContext context) {
@@ -397,20 +465,24 @@ class _ChatPageState extends State<ChatPage> {
             autofocus: true,
             maxLength: 10,
             decoration: const InputDecoration(hintText: '输入新的对话标题'),
+            // 监听文本变化
             onChanged: (value) {
               newTitle = value;
             },
           ),
           actions: <Widget>[
+            // 取消按钮
             TextButton(
               child: const Text('取消'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
+            // 确定按钮
             TextButton(
               child: const Text('确定'),
               onPressed: () {
+                // 关闭对话框并返回新标题
                 Navigator.of(context).pop(newTitle);
               },
             ),
@@ -424,13 +496,16 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(appBarTitle), // 设置AppBar标题
+        title: Text(appBarTitle),
         centerTitle: true,
         actions: <Widget>[
+          // 修改标题按钮
           IconButton(
             icon: const Icon(Icons.draw),
             onPressed: () async {
+              // 显示修改标题对话框
               final String? newTitle = await _showEditTitleDialog(context);
+              // 如果有新标题，则更新标题
               if (newTitle != null && newTitle.isNotEmpty) {
                 setState(() {
                   appBarTitle = newTitle;
@@ -442,13 +517,21 @@ class _ChatPageState extends State<ChatPage> {
         ],
       ),
       body: Chat(
-        messages: _messages, // 消息列表
-        onSendPressed: _sendMessage, // 发送消息的回调
+        // 聊天消息列表
+        messages: _messages,
+        // 发送消息回调函数
+        onSendPressed: _sendMessage,
+        // 添加附件回调函数
         onAttachmentPressed: _handleImageSelection,
-        user: _user, // 当前用户
-        showUserAvatars: true, // 显示用户头像
-        showUserNames: true, // 显示用户昵称
-        l10n: const ChatL10nZhCN(), // 设置中文本地化
+        // 用户信息
+        user: _user,
+        // 显示用户头像
+        showUserAvatars: true,
+        // 显示用户昵称
+        showUserNames: true,
+        // 中文本地化
+        l10n: const ChatL10nZhCN(),
+        // 聊天主题
         theme: DefaultChatTheme(
           primaryColor: Theme.of(context).primaryColor,
           sendButtonIcon: _sendButtonIcon(),
@@ -458,6 +541,7 @@ class _ChatPageState extends State<ChatPage> {
           ),
           userAvatarNameColors: [Theme.of(context).primaryColor],
         ),
+        // 输入框配置
         inputOptions: InputOptions(
           sendButtonVisibilityMode: SendButtonVisibilityMode.always,
           enabled: !_isWaitingForReply,
