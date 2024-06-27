@@ -7,13 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 import 'package:path/path.dart' as path;
 import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // 初始化 Supabase 客户端
 final supabase = Supabase.instance.client;
@@ -260,11 +260,11 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   // 获取历史消息
-  Future<List<Map<String, Object>>> _getHistoryMessages() async {
-    // 否则将消息列表转换为 Supabase API 所需的格式
-    return Future.wait(_messages.reversed.map((message) async {
+  List<Map<String, Object>> _getHistoryMessages() {
+    // Convert messages to the required format for Supabase API
+    return _messages.reversed.map((message) {
       final isUserMessage = message.author.id == _user.id;
-      // 根据消息类型进行处理
+      // Handle different message types
       if (message is types.TextMessage) {
         return {
           "role": isUserMessage ? "user" : "model",
@@ -273,17 +273,12 @@ class _ChatPageState extends State<ChatPage> {
           ],
         };
       } else if (message is types.ImageMessage) {
-        final file = File(message.uri);
-        final bytes = await file.readAsBytes();
-        final base64 = base64Encode(bytes);
-        final mimeType = lookupMimeType(file.path) ?? 'image/jpeg';
         return {
           "role": isUserMessage ? "user" : "model",
           'parts': [
             {
               'inline_data': {
-                'data': base64,
-                "mime_type": mimeType,
+                'data': message.uri,
               },
             }
           ],
@@ -296,15 +291,15 @@ class _ChatPageState extends State<ChatPage> {
           ],
         };
       }
-    }).toList());
+    }).toList();
   }
 
   // 获取模型回复
   Future<void> _fetchModelResponse() async {
-    final contents = await _getHistoryMessages();
+    final contents = _getHistoryMessages();
     // 调用 Supabase 函数
     final response = await supabase.functions.invoke(
-      'google/gemini-pro',
+      'google/gemini',
       body: {'contents': contents},
     );
     // 初始化回复消息
@@ -392,16 +387,13 @@ class _ChatPageState extends State<ChatPage> {
       });
       // 读取图片字节流
       final bytes = await result.readAsBytes();
-      // 获取应用程序文档目录
-      final appDocumentsDir = await getApplicationDocumentsDirectory();
       // 生成图片名称
       final imageName = '${const Uuid().v4()}${path.extension(result.path)}';
-      // 生成图片路径
-      final imagePath = '${appDocumentsDir.path}/$imageName';
-      // 创建图片文件对象
-      final File imageFile = File(imagePath);
-      // 将图片字节流写入文件
-      await imageFile.writeAsBytes(bytes);
+      final file = File(result.path);
+      final storageFile =
+          await supabase.storage.from('chat_images').upload(imageName, file);
+      final imagePath =
+          '${dotenv.get('SUPABASE_URL', fallback: null)}/storage/v1/object/public/$storageFile';
       // 创建图片消息对象
       final message = types.ImageMessage(
         author: _user,
