@@ -314,8 +314,7 @@ class _ChatPageState extends State<ChatPage> {
           if (text.endsWith('\n\n') && text.contains('id')) {
             String jsonDataString = text
                 .replaceAll(r'\n\n"', '')
-                .replaceAll(r'\n', '')
-                .replaceAll(r'\', '')
+                .replaceAll(RegExp(r'\\(?!\n)'), '')
                 .trim();
             Map<String, dynamic> jsonData = json.decode(jsonDataString);
             Log.d(jsonData);
@@ -334,9 +333,6 @@ class _ChatPageState extends State<ChatPage> {
             _addOrUpdateMessage(modelMessage);
           }
         }
-
-        // Map<String, dynamic> jsonData = json.decode(jsonDataString);
-        // Log.d(jsonData);
       },
       onDone: () {
         // 将回复消息插入数据库
