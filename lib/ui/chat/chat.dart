@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:one_chatgpt_flutter/models/response/chat_message.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -268,9 +269,7 @@ class _ChatPageState extends State<ChatPage> {
       if (message is types.TextMessage) {
         return {
           "role": isUserMessage ? "user" : "model",
-          'parts': [
-            {'text': message.text}
-          ],
+          'content': message.text
         };
       } else if (message is types.ImageMessage) {
         return {
@@ -286,9 +285,7 @@ class _ChatPageState extends State<ChatPage> {
       } else {
         return {
           "role": isUserMessage ? "user" : "model",
-          'parts': [
-            {'text': 'Unknown message type'}
-          ],
+          'content': 'Unknown message type'
         };
       }
     }).toList();
@@ -299,26 +296,47 @@ class _ChatPageState extends State<ChatPage> {
     final contents = _getHistoryMessages();
     // 调用 Supabase 函数
     final response = await supabase.functions.invoke(
-      'google/gemini',
-      body: {'contents': contents},
+      'oneapi/completions',
+      body: {
+        'contents': contents,
+        'generationConfig': {'model': 'gemini-1.5-pro'}
+      },
     );
     // 初始化回复消息
     String message = '';
     final messageid = const Uuid().v4();
     var completer = Completer<void>();
     // 监听回复消息
-    response.data.transform(const Utf8Decoder()).listen(
-      (val) {
-        // 将回复消息追加到 message 中
-        message += val;
-        // 创建文本消息对象
-        final modelMessage = types.TextMessage(
-          author: _model,
-          id: messageid,
-          text: message,
-        );
-        // 添加或更新消息到列表
-        _addOrUpdateMessage(modelMessage);
+    response.data.transform(const Utf8Decoder(allowMalformed: true)).listen(
+      (String val) {
+        List<String> jsonDataList = val.split('data: "data:');
+        for (var text in jsonDataList) {
+          if (text.endsWith('\n\n') && text.contains('id')) {
+            String jsonDataString = text
+                .replaceAll(r'\n\n"', '')
+                .replaceAll(r'\n', '')
+                .replaceAll(r'\', '')
+                .trim();
+            Map<String, dynamic> jsonData = json.decode(jsonDataString);
+            Log.d(jsonData);
+            // // 将回复消息追加到 message 中
+            String messageStr =
+                ChatMessage.fromJson(jsonData).choices[0].delta.content;
+            Log.d(messageStr);
+            message += messageStr;
+            // 创建文本消息对象
+            final modelMessage = types.TextMessage(
+              author: _model,
+              id: messageid,
+              text: message,
+            );
+            // 添加或更新消息到列表
+            _addOrUpdateMessage(modelMessage);
+          }
+        }
+
+        // Map<String, dynamic> jsonData = json.decode(jsonDataString);
+        // Log.d(jsonData);
       },
       onDone: () {
         // 将回复消息插入数据库
@@ -514,7 +532,7 @@ class _ChatPageState extends State<ChatPage> {
         // 发送消息回调函数
         onSendPressed: _sendMessage,
         // 添加附件回调函数
-        onAttachmentPressed: _handleImageSelection,
+        // onAttachmentPressed: _handleImageSelection,
         // 用户信息
         user: _user,
         // 显示用户头像

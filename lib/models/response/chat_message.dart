@@ -3,14 +3,53 @@ part 'chat_message.g.dart';
 
 @JsonSerializable()
 class ChatMessage {
-  String text;
+  @JsonKey(required: true)
+  String id;
+  String object;
+  int created;
+  String model;
+  List<ChatMessageChoice> choices;
 
-  ChatMessage({required this.text});
+  ChatMessage({
+    required this.id,
+    required this.object,
+    required this.created,
+    required this.model,
+    required this.choices,
+  });
 
-  // 从JSON创建User实例的工厂方法
   factory ChatMessage.fromJson(Map<String, dynamic> json) =>
       _$ChatMessageFromJson(json);
 
-  // 将User实例转换为JSON的方法
   Map<String, dynamic> toJson() => _$ChatMessageToJson(this);
+}
+
+@JsonSerializable()
+class ChatMessageChoice {
+  int index;
+  ChatMessageDelta delta;
+
+  ChatMessageChoice({
+    required this.index,
+    required this.delta,
+  });
+
+  factory ChatMessageChoice.fromJson(Map<String, dynamic> json) =>
+      _$ChatMessageChoiceFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ChatMessageChoiceToJson(this);
+}
+
+@JsonSerializable()
+class ChatMessageDelta {
+  String content;
+
+  ChatMessageDelta({
+    required this.content,
+  });
+
+  factory ChatMessageDelta.fromJson(Map<String, dynamic> json) =>
+      _$ChatMessageDeltaFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ChatMessageDeltaToJson(this);
 }
