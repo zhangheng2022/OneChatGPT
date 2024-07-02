@@ -299,9 +299,10 @@ class _ChatPageState extends State<ChatPage> {
       'oneapi/completions',
       body: {
         'contents': contents,
-        'generationConfig': {'model': 'gemini-1.5-pro'}
+        'generationConfig': {'model': 'gpt-3.5-turbo'}
       },
     );
+    // gpt-3.5-turbo/gemini-1.5-pro
     // 初始化回复消息
     String message = '';
     final messageid = const Uuid().v4();
@@ -309,29 +310,31 @@ class _ChatPageState extends State<ChatPage> {
     // 监听回复消息
     response.data.transform(const Utf8Decoder(allowMalformed: true)).listen(
       (String val) {
-        List<String> jsonDataList = val.split('data: "data:');
-        for (var text in jsonDataList) {
-          if (text.endsWith('\n\n') && text.contains('id')) {
-            String jsonDataString = text
-                .replaceAll(r'\n\n"', '')
-                .replaceAll(RegExp(r'\\(?!\n)'), '')
-                .trim();
-            Map<String, dynamic> jsonData = json.decode(jsonDataString);
-            Log.d(jsonData);
-            // // 将回复消息追加到 message 中
-            String messageStr =
-                ChatMessage.fromJson(jsonData).choices[0].delta.content;
-            Log.d(messageStr);
-            message += messageStr;
-            // 创建文本消息对象
-            final modelMessage = types.TextMessage(
-              author: _model,
-              id: messageid,
-              text: message,
-            );
-            // 添加或更新消息到列表
-            _addOrUpdateMessage(modelMessage);
+        try {
+          List<String> jsonDataList = val.split('data:');
+          for (var text in jsonDataList) {
+            if (text.contains('id')) {
+              String jsonDataString =
+                  text.replaceAll(RegExp(r'\n+'), '\n').trim();
+              Map<String, dynamic> jsonData = json.decode(jsonDataString);
+              Log.d(jsonData);
+              // // 将回复消息追加到 message 中
+              String messageStr =
+                  ChatMessage.fromJson(jsonData).choices[0].delta.content;
+              Log.d(messageStr);
+              message += messageStr;
+              // 创建文本消息对象
+              final modelMessage = types.TextMessage(
+                author: _model,
+                id: messageid,
+                text: message,
+              );
+              // 添加或更新消息到列表
+              _addOrUpdateMessage(modelMessage);
+            }
           }
+        } catch (e) {
+          Log.e(e);
         }
       },
       onDone: () {
