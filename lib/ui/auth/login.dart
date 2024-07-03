@@ -20,7 +20,7 @@ class _LoginPageState extends State<LoginPage> {
     try {
       Log.d('message');
       await supabase.auth.signInWithOAuth(OAuthProvider.github,
-          redirectTo: 'onechat://onechatgpt/');
+          redirectTo: 'onechatgpt://login-callback');
     } catch (e) {
       Log.e(e);
     }
