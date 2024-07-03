@@ -7,11 +7,8 @@ import 'package:one_chatgpt_flutter/ui/chat/chat.dart';
 import 'package:one_chatgpt_flutter/ui/index/scaffold_nav_bar.dart';
 import 'package:one_chatgpt_flutter/ui/index/home.dart';
 import 'package:one_chatgpt_flutter/ui/index/person.dart';
-import 'package:one_chatgpt_flutter/common/log.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
-final GlobalKey<NavigatorState> _shellNavigatorKey =
-    GlobalKey<NavigatorState>();
 
 class AppRoutes {
   static GoRouter router = GoRouter(
