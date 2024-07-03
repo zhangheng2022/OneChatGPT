@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:one_chatgpt_flutter/utils/validator.dart';
+import 'package:one_chatgpt_flutter/widgets/circular_progress.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -24,8 +25,8 @@ class _LoginEmailState extends State<LoginEmail> {
   bool _isLoading = false;
 
   Future<void> _onSubmit() async {
-    if (!(_formKey.currentState as FormState).validate()) return;
     try {
+      if (!(_formKey.currentState as FormState).validate()) return;
       setState(() => _isLoading = true);
       await supabase.auth.signInWithPassword(
         email: _userEmail,
@@ -104,11 +105,9 @@ class _LoginEmailState extends State<LoginEmail> {
               height: 50,
               child: FilledButton.icon(
                 icon: _isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
+                    ? const CircularProgressWidget()
                     : const Icon(Icons.send),
-                label: !_isLoading
-                    ? const Text("登录", style: TextStyle(fontSize: 16))
-                    : const Text(""),
+                label: const Text("登录"),
                 onPressed: _isLoading ? null : _onSubmit,
                 style: FilledButton.styleFrom(
                   shape: RoundedRectangleBorder(

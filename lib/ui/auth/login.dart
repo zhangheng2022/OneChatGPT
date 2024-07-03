@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:one_chatgpt_flutter/widgets/circular_progress.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:one_chatgpt_flutter/ui/auth/widgets/email_login.dart';
@@ -18,11 +20,63 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _githubLogin() async {
     try {
-      Log.d('message');
-      await supabase.auth.signInWithOAuth(OAuthProvider.github,
-          redirectTo: 'onechatgpt://login-callback');
+      await supabase.auth.signInWithOAuth(
+        OAuthProvider.github,
+        redirectTo: 'onechatgpt://login-callback',
+      );
     } catch (e) {
       Log.e(e);
+    }
+  }
+
+  bool _googleLoginLoading = false;
+  Future<void> _googleLogin() async {
+    try {
+      print(111111111111);
+      setState(() => _googleLoginLoading = true);
+
+      /// Web Client ID that you registered with Google Cloud.
+      const webClientId =
+          '343563540047-f595uatd26cd75gjgqhfe6r9p5n6k3ih.apps.googleusercontent.com';
+
+      /// iOS Client ID that you registered with Google Cloud.
+      const iosClientId =
+          '343563540047-m953d32kqfb7r6q7o48bpc8hpeter3cl.apps.googleusercontent.com';
+
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        clientId: iosClientId,
+        serverClientId: webClientId,
+      );
+      final googleUser = await googleSignIn.signIn();
+      final googleAuth = await googleUser!.authentication;
+      String? accessToken = googleAuth.accessToken;
+      String? idToken = googleAuth.idToken;
+
+      if (accessToken == null || idToken == null) {
+        Fluttertoast.showToast(
+          msg: "正在开发中...",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+        );
+        return;
+      }
+
+      await supabase.auth.signInWithIdToken(
+        provider: OAuthProvider.google,
+        idToken: idToken,
+        accessToken: accessToken,
+      );
+      if (!mounted) return;
+      context.goNamed('home');
+    } catch (err) {
+      Log.e("Google授权失败===>$err");
+      Fluttertoast.showToast(
+        msg: "授权失败，请检查网络连接",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+      );
+    } finally {
+      setState(() => _googleLoginLoading = false);
     }
   }
 
@@ -97,19 +151,16 @@ class _LoginPageState extends State<LoginPage> {
                               width: double.infinity,
                               height: 50,
                               child: FilledButton.icon(
-                                icon: Image.asset(
-                                  'assets/icons/google.png',
-                                  width: 20,
-                                  height: 20,
-                                ),
+                                icon: _googleLoginLoading
+                                    ? const CircularProgressWidget()
+                                    : Image.asset(
+                                        'assets/icons/google.png',
+                                        width: 20,
+                                        height: 20,
+                                      ),
                                 label: const Text("Google登录"),
-                                onPressed: () {
-                                  Fluttertoast.showToast(
-                                    msg: "正在开发中...",
-                                    toastLength: Toast.LENGTH_SHORT,
-                                    gravity: ToastGravity.CENTER,
-                                  );
-                                },
+                                onPressed:
+                                    _googleLoginLoading ? null : _googleLogin,
                               ),
                             ),
                             const SizedBox(height: 20),

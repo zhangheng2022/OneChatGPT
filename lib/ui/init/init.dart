@@ -5,7 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
 
 class InitPage extends StatefulWidget {
-  const InitPage({Key? key});
+  const InitPage({super.key});
 
   @override
   State<InitPage> createState() => _InitPageState();
