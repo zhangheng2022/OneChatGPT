@@ -15,7 +15,6 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    print('11111111111111111111111111111111');
   }
 
   @override

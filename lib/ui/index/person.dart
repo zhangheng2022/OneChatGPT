@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:drift/drift.dart' hide Column;
 
 import 'package:go_router/go_router.dart';
+import 'package:one_chatgpt_flutter/state/user.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
 
@@ -34,17 +36,37 @@ class _PersonState extends State<Person> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("我的"),
-        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            color: Theme.of(context).primaryColor,
+            onPressed: () => {},
+          ),
+        ],
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            FilledButton(
-              onPressed: _loginOut,
-              child: const Text('退出登录'),
-            ),
+            Container(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  ClipOval(
+                    child: Image.network(
+                      Provider.of<UserProvider>(context)
+                          .user
+                          .userMetadata?['avatar_url'], // 您的图片URL
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover, // 保持图片的宽高比
+                    ),
+                  ),
+                  SizedBox(width: 20),
+                  Text("zhangsan"),
+                ],
+              ),
+            )
           ],
         ),
       ),

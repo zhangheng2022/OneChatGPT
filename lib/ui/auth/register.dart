@@ -28,12 +28,12 @@ class _RegisterPageState extends State<RegisterPage> {
                 fit: BoxFit.cover, // Maintain the aspect ratio of the image
               ),
               Text(
-                "OneChatGPT",
+                "ONE CHAT GPT",
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.primary,
-                  fontFamily: GoogleFonts.rubik().fontFamily,
+                  fontFamily: GoogleFonts.anton().fontFamily,
                 ),
               ),
               const SizedBox(width: 20),

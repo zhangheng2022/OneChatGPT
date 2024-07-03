@@ -32,7 +32,6 @@ class _LoginPageState extends State<LoginPage> {
   bool _googleLoginLoading = false;
   Future<void> _googleLogin() async {
     try {
-      print(111111111111);
       setState(() => _googleLoginLoading = true);
 
       /// Web Client ID that you registered with Google Cloud.
@@ -129,14 +128,14 @@ class _LoginPageState extends State<LoginPage> {
                                     ),
                                   ),
                                   Text(
-                                    "OneChatGPT",
+                                    "ONE CHAT GPT",
                                     style: TextStyle(
                                       fontSize: 30,
                                       fontWeight: FontWeight.bold,
                                       color:
                                           Theme.of(context).colorScheme.primary,
                                       fontFamily:
-                                          GoogleFonts.rubik().fontFamily,
+                                          GoogleFonts.anton().fontFamily,
                                     ),
                                   ),
                                 ],
