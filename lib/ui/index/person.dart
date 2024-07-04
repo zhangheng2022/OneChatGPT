@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:drift/drift.dart' hide Column;
-
+import 'package:uuid/uuid.dart';
 import 'package:go_router/go_router.dart';
 import 'package:one_chatgpt_flutter/state/user.dart';
 import 'package:provider/provider.dart';
@@ -51,9 +51,10 @@ class _PersonState extends State<Person> {
               child: Consumer<UserProvider>(
                   builder: (context, userProvider, child) {
                 Map<String, dynamic>? userinfo = userProvider.user.userMetadata;
-                String avatarUrl = userinfo?['avatar_url'] ?? '';
+                String avatarUrl = userinfo?['avatar_url'] ??
+                    'https://api.multiavatar.com/${const Uuid().v4()}.png';
                 String preferredUsername =
-                    userinfo?['preferred_username'] ?? '';
+                    userinfo?['preferred_username'] ?? '点击完善信息';
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
