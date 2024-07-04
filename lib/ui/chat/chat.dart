@@ -319,9 +319,13 @@ class _ChatPageState extends State<ChatPage> {
               Map<String, dynamic> jsonData = json.decode(jsonDataString);
               Log.d(jsonData);
               // // 将回复消息追加到 message 中
-              String messageStr =
-                  ChatMessage.fromJson(jsonData).choices[0].delta.content;
-              Log.d(messageStr);
+              String messageStr;
+              if (jsonData['error'] != null) {
+                messageStr = jsonData['error']['message'];
+              } else {
+                messageStr =
+                    ChatMessage.fromJson(jsonData).choices[0].delta.content;
+              }
               message += messageStr;
               // 创建文本消息对象
               final modelMessage = types.TextMessage(

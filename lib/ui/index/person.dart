@@ -38,8 +38,7 @@ class _PersonState extends State<Person> {
       appBar: AppBar(
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings),
-            color: Theme.of(context).primaryColor,
+            icon: const Icon(Icons.logout),
             onPressed: () => {},
           ),
         ],
@@ -48,24 +47,44 @@ class _PersonState extends State<Person> {
         child: Column(
           children: <Widget>[
             Container(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  ClipOval(
-                    child: Image.network(
-                      Provider.of<UserProvider>(context)
-                          .user
-                          .userMetadata?['avatar_url'], // 您的图片URL
-                      width: 80,
-                      height: 80,
-                      fit: BoxFit.cover, // 保持图片的宽高比
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: Consumer<UserProvider>(
+                  builder: (context, userProvider, child) {
+                Map<String, dynamic>? userinfo = userProvider.user.userMetadata;
+                String avatarUrl = userinfo?['avatar_url'] ?? '';
+                String preferredUsername =
+                    userinfo?['preferred_username'] ?? '';
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.grey, // Specify the color of the border
+                          width: 1, // Specify the width of the border
+                        ),
+                      ),
+                      child: ClipOval(
+                        child: Image.network(
+                          avatarUrl,
+                          width: 60,
+                          height: 60,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
-                  ),
-                  SizedBox(width: 20),
-                  Text("zhangsan"),
-                ],
-              ),
+                    const SizedBox(width: 20),
+                    Text(
+                      preferredUsername,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ],
+                );
+              }),
             )
           ],
         ),
@@ -73,3 +92,27 @@ class _PersonState extends State<Person> {
     );
   }
 }
+// Row(
+//                 mainAxisAlignment: MainAxisAlignment.start,
+//                 children: <Widget>[
+//                   Container(
+//                     decoration: BoxDecoration(
+//                       shape: BoxShape.circle,
+//                       border: Border.all(
+//                         color: Colors.grey, // Specify the color of the border
+//                         width: 2, // Specify the width of the border
+//                       ),
+//                     ),
+//                     child: ClipOval(
+//                       child: Image.network(
+//                         avatarUrl,
+//                         width: 80,
+//                         height: 80,
+//                         fit: BoxFit.cover,
+//                       ),
+//                     ),
+//                   ),
+//                   SizedBox(width: 20),
+//                   Text("zhangsan"),
+//                 ],
+//               ),

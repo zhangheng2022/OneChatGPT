@@ -1,31 +1,19 @@
 import 'package:flutter/material.dart';
-// import 'package:one_chatgpt_flutter/models/user.dart';
+import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class UserProvider extends ChangeNotifier {
   final supabase = Supabase.instance.client;
+  User? _user;
 
-  late User _user;
-
-  User get user => _user;
-
-  set user(User newUser) {
-    _user = newUser;
-    notifyListeners();
-  }
-
-  // 更新用户
-  void updateUser(User newUser) {
-    _user = newUser;
-    notifyListeners();
-  }
+  User get user => _user!;
 
   UserProvider() {
+    _user = supabase.auth.currentUser;
     supabase.auth.onAuthStateChange.listen((data) {
-      final User? user = supabase.auth.currentUser;
-      if (user != null) {
-        updateUser(user);
-      }
+      _user = supabase.auth.currentUser;
+      notifyListeners();
+      Log.d('===>更新用户信息$_user');
     });
   }
 }
