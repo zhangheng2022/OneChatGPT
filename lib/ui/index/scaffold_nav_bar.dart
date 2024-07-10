@@ -19,7 +19,7 @@ class _ScaffoldNavBarState extends State<ScaffoldNavBar> {
     return Scaffold(
         body: widget.navigationShell,
         bottomNavigationBar: NavigationBar(
-          backgroundColor: Colors.grey[100],
+          // backgroundColor: Colors.grey[100],
           onDestinationSelected: (int index) => _toPageIndex(context, index),
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
           selectedIndex: widget.navigationShell.currentIndex,

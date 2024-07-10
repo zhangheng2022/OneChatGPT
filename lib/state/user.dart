@@ -9,6 +9,7 @@ class UserProvider extends ChangeNotifier {
   User get user => _user!;
 
   UserProvider() {
+    print('======================================');
     _user = supabase.auth.currentUser;
     supabase.auth.onAuthStateChange.listen((data) {
       _user = supabase.auth.currentUser;

@@ -35,7 +35,9 @@ class _PersonState extends State<Person> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
+        backgroundColor: Colors.grey[50],
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -53,8 +55,7 @@ class _PersonState extends State<Person> {
                 Map<String, dynamic>? userinfo = userProvider.user.userMetadata;
                 String avatarUrl = userinfo?['avatar_url'] ??
                     'https://api.multiavatar.com/${const Uuid().v4()}.png';
-                String preferredUsername =
-                    userinfo?['preferred_username'] ?? '点击完善信息';
+                String fullName = userinfo?['full_name'] ?? '点击完善信息';
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
@@ -77,7 +78,7 @@ class _PersonState extends State<Person> {
                     ),
                     const SizedBox(width: 20),
                     Text(
-                      preferredUsername,
+                      fullName,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
@@ -86,7 +87,57 @@ class _PersonState extends State<Person> {
                   ],
                 );
               }),
-            )
+            ),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              margin: const EdgeInsets.all(20),
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  InkWell(
+                    child: const Column(
+                      children: [
+                        Icon(
+                          Icons.psychology,
+                          size: 30,
+                          color: Colors.grey,
+                        ),
+                        Text("模型设置"),
+                      ],
+                    ),
+                    onTap: () {
+                      context.goNamed('model_setting');
+                    },
+                  ),
+                  Column(
+                    children: [
+                      Icon(
+                        Icons.manage_accounts,
+                        size: 30,
+                        color: Colors.grey,
+                      ),
+                      // SizedBox(height: 4),
+                      Text("个人信息"),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      Icon(
+                        Icons.help_center,
+                        size: 30,
+                        color: Colors.grey,
+                      ),
+                      // SizedBox(height: 4),
+                      Text("常见问题"),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

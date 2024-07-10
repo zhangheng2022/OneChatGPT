@@ -35,7 +35,7 @@ class InitApp extends StatelessWidget {
           dispose: (context, db) => db.close(),
         ),
         ChangeNotifierProvider(create: (_) => UserProvider()),
-        ChangeNotifierProvider(create: (_) => ChatModelProvider()),
+        ChangeNotifierProvider(create: (_) => ModelConfigProvider()),
       ],
       child: MaterialApp.router(
         title: 'OneChatGPT',

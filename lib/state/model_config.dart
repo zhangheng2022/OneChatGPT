@@ -5,7 +5,7 @@ import 'package:one_chatgpt_flutter/models/model_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class ChatModelProvider extends ChangeNotifier {
+class ModelConfigProvider extends ChangeNotifier {
   final supabase = Supabase.instance.client;
 
   late ModelConfig _currentChatModel;
@@ -14,7 +14,7 @@ class ChatModelProvider extends ChangeNotifier {
   ModelConfig get currentChatModel => _currentChatModel;
   String get currentModel => _currentModel!;
 
-  ChatModelProvider() {
+  ModelConfigProvider() {
     _init();
   }
 
@@ -27,6 +27,7 @@ class ChatModelProvider extends ChangeNotifier {
   );
 
   Future<void> _init() async {
+    print('======================================');
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? configResult = prefs.getString('currentModelConfig');
     if (configResult != null) {
@@ -36,7 +37,7 @@ class ChatModelProvider extends ChangeNotifier {
       _currentChatModel = defaultModelConfig;
     }
     final data = await supabase.rpc('get_all_models');
-    Log.d(data.data.toString());
+    Log.d(data);
     // final String? nameResult = prefs.getString('currentModel');
 
     // // if (nameResult != null) {
