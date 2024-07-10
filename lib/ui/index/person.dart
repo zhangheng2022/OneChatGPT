@@ -95,8 +95,10 @@ class _PersonState extends State<Person> {
               ),
               margin: const EdgeInsets.all(20),
               padding: const EdgeInsets.symmetric(vertical: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              child: GridView(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4, // 列数
+                ),
                 children: [
                   InkWell(
                     child: const Column(
@@ -119,7 +121,6 @@ class _PersonState extends State<Person> {
                           Icons.manage_accounts,
                           size: 30,
                         ),
-                        // SizedBox(height: 4),
                         Text("个人信息"),
                       ],
                     ),
@@ -134,7 +135,6 @@ class _PersonState extends State<Person> {
                           Icons.help_center,
                           size: 30,
                         ),
-                        // SizedBox(height: 4),
                         Text("常见问题"),
                       ],
                     ),
