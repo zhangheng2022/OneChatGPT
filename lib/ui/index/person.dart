@@ -104,7 +104,6 @@ class _PersonState extends State<Person> {
                         Icon(
                           Icons.psychology,
                           size: 30,
-                          color: Colors.grey,
                         ),
                         Text("模型设置"),
                       ],
@@ -113,27 +112,35 @@ class _PersonState extends State<Person> {
                       context.goNamed('model_setting');
                     },
                   ),
-                  Column(
-                    children: [
-                      Icon(
-                        Icons.manage_accounts,
-                        size: 30,
-                        color: Colors.grey,
-                      ),
-                      // SizedBox(height: 4),
-                      Text("个人信息"),
-                    ],
+                  InkWell(
+                    child: const Column(
+                      children: [
+                        Icon(
+                          Icons.manage_accounts,
+                          size: 30,
+                        ),
+                        // SizedBox(height: 4),
+                        Text("个人信息"),
+                      ],
+                    ),
+                    onTap: () {
+                      context.goNamed('model_setting');
+                    },
                   ),
-                  Column(
-                    children: [
-                      Icon(
-                        Icons.help_center,
-                        size: 30,
-                        color: Colors.grey,
-                      ),
-                      // SizedBox(height: 4),
-                      Text("常见问题"),
-                    ],
+                  InkWell(
+                    child: const Column(
+                      children: [
+                        Icon(
+                          Icons.help_center,
+                          size: 30,
+                        ),
+                        // SizedBox(height: 4),
+                        Text("常见问题"),
+                      ],
+                    ),
+                    onTap: () {
+                      context.goNamed('model_setting');
+                    },
                   ),
                 ],
               ),

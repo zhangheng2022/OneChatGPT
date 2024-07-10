@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:one_chatgpt_flutter/models/model_config.dart';
 import 'package:one_chatgpt_flutter/state/model_config.dart';
 import 'package:provider/provider.dart';
@@ -23,8 +22,8 @@ class _ModelSettingState extends State<ModelSetting> {
   void initState() {
     super.initState();
     // 初始化用户信息
-    _currentChatModel =
-        Provider.of<ModelConfigProvider>(context).currentChatModel;
+    // _currentChatModel =
+    //     Provider.of<ModelConfigProvider>(context).currentChatModel;
   }
 
   @override

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:mime/mime.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
@@ -18,6 +17,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // 初始化 Supabase 客户端
 final supabase = Supabase.instance.client;
+final SUPABASE_URL = dotenv.get('SUPABASE_URL', fallback: null);
 
 // 定义聊天页面
 class ChatPage extends StatefulWidget {
@@ -51,8 +51,7 @@ class _ChatPageState extends State<ChatPage> {
     id: const Uuid().v4(),
     firstName: "Google",
     lastName: "Gemini Pro",
-    imageUrl:
-        "https://jkdxuuhjdoxqsjyhlubj.supabase.co/storage/v1/object/public/common/logo.png",
+    imageUrl: "$SUPABASE_URL/storage/v1/object/public/common/logo.png",
   );
   // 数据库实例
   late AppDatabase database;
@@ -172,7 +171,7 @@ class _ChatPageState extends State<ChatPage> {
     // 创建文本消息对象
     return types.TextMessage(
       author: isUserMessage ? _user : _model,
-      id: Uuid().v4(),
+      id: const Uuid().v4(),
       text: content,
     );
   }
@@ -299,7 +298,7 @@ class _ChatPageState extends State<ChatPage> {
       'oneapi/completions',
       body: {
         'contents': contents,
-        'generationConfig': {'model': 'gpt-3.5-turbo'}
+        'generationConfig': {},
       },
     );
     // gpt-3.5-turbo/gemini-1.5-pro
