@@ -9,6 +9,7 @@ import 'package:one_chatgpt_flutter/database/database.dart';
 
 class Person extends StatefulWidget {
   const Person({super.key});
+
   @override
   State<Person> createState() => _PersonState();
 }
@@ -16,19 +17,19 @@ class Person extends StatefulWidget {
 class _PersonState extends State<Person> {
   final supabase = Supabase.instance.client;
   final database = AppDatabase();
-  void _loginOut() {
-    supabase.auth
-        .signOut()
-        .then((value) => {context.pushReplacement('/login')});
+
+  void _logout() {
+    supabase.auth.signOut().then((_) => context.pushReplacement('/login'));
   }
 
-  Future<void> test() async {
+  Future<void> _insertChatData() async {
     try {
-      await database
-          .into(database.chatTableData)
-          .insertReturning(ChatTableDataCompanion.insert());
+      await database.into(database.chatTableData).insertReturning(
+          ChatTableDataCompanion
+              .insert()); // Consider adding a meaningful value here
     } catch (e) {
       // Handle errors or show an error message
+      print('Error inserting chat data: $e');
     }
   }
 
@@ -41,137 +42,106 @@ class _PersonState extends State<Person> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () => {},
+            onPressed: _logout,
           ),
         ],
       ),
       body: Center(
         child: Column(
           children: <Widget>[
-            Container(
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30),
               child: Consumer<UserProvider>(
-                  builder: (context, userProvider, child) {
-                Map<String, dynamic>? userinfo = userProvider.user.userMetadata;
-                String avatarUrl = userinfo?['avatar_url'] ??
-                    'https://api.multiavatar.com/${const Uuid().v4()}.png';
-                String fullName = userinfo?['full_name'] ?? '点击完善信息';
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.grey, // Specify the color of the border
-                          width: 1, // Specify the width of the border
+                builder: (context, userProvider, child) {
+                  final userinfo = userProvider.user.userMetadata;
+                  final avatarUrl = userinfo?['avatar_url'];
+                  final fullName = userinfo?['full_name'] ?? '点击完善信息';
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      _buildProfileImage(avatarUrl),
+                      const SizedBox(width: 20),
+                      Text(
+                        fullName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
                         ),
                       ),
-                      child: ClipOval(
-                        child: Image.network(
-                          avatarUrl,
-                          width: 60,
-                          height: 60,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 20),
-                    Text(
-                      fullName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
-                  ],
-                );
-              }),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              margin: const EdgeInsets.all(20),
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: GridView(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4, // 列数
-                ),
-                children: [
-                  InkWell(
-                    child: const Column(
-                      children: [
-                        Icon(
-                          Icons.psychology,
-                          size: 30,
-                        ),
-                        Text("模型设置"),
-                      ],
-                    ),
-                    onTap: () {
-                      context.goNamed('model_setting');
-                    },
-                  ),
-                  InkWell(
-                    child: const Column(
-                      children: [
-                        Icon(
-                          Icons.manage_accounts,
-                          size: 30,
-                        ),
-                        Text("个人信息"),
-                      ],
-                    ),
-                    onTap: () {
-                      context.goNamed('model_setting');
-                    },
-                  ),
-                  InkWell(
-                    child: const Column(
-                      children: [
-                        Icon(
-                          Icons.help_center,
-                          size: 30,
-                        ),
-                        Text("常见问题"),
-                      ],
-                    ),
-                    onTap: () {
-                      context.goNamed('model_setting');
-                    },
-                  ),
-                ],
+                    ],
+                  );
+                },
               ),
             ),
+            _buildFunctionGrid(),
           ],
         ),
       ),
     );
   }
+
+  Widget _buildProfileImage(String avatarUrl) {
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: Colors.grey,
+          width: 1,
+        ),
+      ),
+      child: ClipOval(
+        child: Image.network(
+          avatarUrl,
+          width: 60,
+          height: 60,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => Image.asset(
+            'assets/icons/not_avatar.png', //默认显示图片
+            width: 60,
+            height: 60,
+            fit: BoxFit.cover,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFunctionGrid() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: GridView.count(
+        crossAxisCount: 4,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        children: [
+          _buildGridTile(Icons.psychology, '模型设置', 'model_setting'),
+          _buildGridTile(Icons.manage_accounts, '个人信息', 'personal_info'),
+          _buildGridTile(Icons.help_center, '常见问题', 'faq'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGridTile(IconData icon, String title, String routeName) {
+    return InkWell(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 30,
+          ),
+          Text(title),
+        ],
+      ),
+      onTap: () {
+        context.goNamed(routeName);
+      },
+    );
+  }
 }
-// Row(
-//                 mainAxisAlignment: MainAxisAlignment.start,
-//                 children: <Widget>[
-//                   Container(
-//                     decoration: BoxDecoration(
-//                       shape: BoxShape.circle,
-//                       border: Border.all(
-//                         color: Colors.grey, // Specify the color of the border
-//                         width: 2, // Specify the width of the border
-//                       ),
-//                     ),
-//                     child: ClipOval(
-//                       child: Image.network(
-//                         avatarUrl,
-//                         width: 80,
-//                         height: 80,
-//                         fit: BoxFit.cover,
-//                       ),
-//                     ),
-//                   ),
-//                   SizedBox(width: 20),
-//                   Text("zhangsan"),
-//                 ],
-//               ),
