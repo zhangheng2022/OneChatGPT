@@ -12,11 +12,9 @@ class ModelSetting extends StatefulWidget {
 }
 
 class _ModelSettingState extends State<ModelSetting> {
-  String? _selectedModel;
-  final List<String> _models = ['Option 1', 'Option 2', 'Option 3'];
-
-  late ModelConfig _currentChatModel;
-
+  List<String> _models = [];
+  late ModelConfig _currentModelConfig;
+  String? _currentModelName;
   double _currentSliderValue = 0.0;
 
   @override
@@ -28,7 +26,10 @@ class _ModelSettingState extends State<ModelSetting> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final config = Provider.of<ModelConfigProvider>(context);
-    // Log.d(config.modelList);
+    Log.d(config.modelList);
+    _models = config.modelList;
+    _currentModelConfig = config.currentModelConfig;
+    _currentModelName = config.currentModelName;
   }
 
   @override
@@ -70,18 +71,22 @@ class _ModelSettingState extends State<ModelSetting> {
         ),
       ),
       trailing: FittedBox(
-        alignment: Alignment.center,
         child: DropdownButton<String>(
-          value: _selectedModel,
+          value: _currentModelName,
+          alignment: AlignmentDirectional.center,
           items: _models.map((String value) {
             return DropdownMenuItem<String>(
+              alignment: AlignmentDirectional.center,
               value: value,
               child: Text(value),
             );
           }).toList(),
-          onChanged: (String? newValue) {
+          onChanged: (String? value) {
             setState(() {
-              _selectedModel = newValue;
+              if (value != null) {
+                Provider.of<ModelConfigProvider>(context)
+                    .updateModelName(value);
+              }
             });
           },
           hint: const Text('请选择模型'),
@@ -109,15 +114,22 @@ class _ModelSettingState extends State<ModelSetting> {
       trailing: SizedBox(
         width: 100,
         child: TextField(
-          scrollPadding: EdgeInsets.all(0),
+          controller: TextEditingController(
+              text: _currentModelConfig.maxTokens.toString()),
+          scrollPadding: const EdgeInsets.all(0),
           maxLength: 5,
           decoration: const InputDecoration(
             counter: SizedBox.shrink(), // Use counter instead of counterText
+            hintText: '最大令牌数',
           ),
           textAlign: TextAlign.center,
           keyboardType: TextInputType.number,
-          onChanged: (val) {
-            print(val);
+          onChanged: (String? value) {
+            if (value != null) {
+              Provider.of<ModelConfigProvider>(context).updateModelConfig(
+                maxTokens: int.parse(value),
+              );
+            }
           },
         ),
       ),
@@ -144,11 +156,11 @@ class _ModelSettingState extends State<ModelSetting> {
         alignment: Alignment.centerRight,
         child: Slider(
           inactiveColor: Colors.grey[100],
-          value: _currentSliderValue,
+          value: _currentModelConfig.temperature,
           max: 1.0,
           min: 0.0,
           divisions: 10,
-          label: _currentSliderValue.toString(),
+          label: _currentModelConfig.temperature.toString(),
           onChanged: (double value) {
             setState(() {
               _currentSliderValue = value;
