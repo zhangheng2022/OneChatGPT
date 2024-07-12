@@ -18,18 +18,32 @@ class _PersonState extends State<Person> {
   final supabase = Supabase.instance.client;
   final database = AppDatabase();
 
-  void _logout() {
-    supabase.auth.signOut().then((_) => context.pushReplacement('/login'));
-  }
+  Future<void> _logout() async {
+    // Show a confirmation dialog
+    bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('确认退出？'),
+          content: const Text('确定要退出当前账号吗？'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('取消'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('确定'),
+            ),
+          ],
+        );
+      },
+    );
 
-  Future<void> _insertChatData() async {
-    try {
-      await database.into(database.chatTableData).insertReturning(
-          ChatTableDataCompanion
-              .insert()); // Consider adding a meaningful value here
-    } catch (e) {
-      // Handle errors or show an error message
-      print('Error inserting chat data: $e');
+    if (confirmed == true) {
+      await supabase.auth.signOut();
+      if (!mounted) return;
+      context.pushReplacement('/login');
     }
   }
 
@@ -113,8 +127,9 @@ class _PersonState extends State<Person> {
         borderRadius: BorderRadius.circular(10),
       ),
       margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.symmetric(vertical: 20),
+      // padding: const EdgeInsets.symmetric(vertical: 20),
       child: GridView.count(
+        childAspectRatio: 1.2,
         crossAxisCount: 4,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -129,19 +144,20 @@ class _PersonState extends State<Person> {
 
   Widget _buildGridTile(IconData icon, String title, String routeName) {
     return InkWell(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: 30,
-          ),
-          Text(title),
-        ],
-      ),
       onTap: () {
         context.goNamed(routeName);
       },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center, // 居中对齐
+        children: [
+          Icon(
+            icon,
+            size: 30, // 限制大小
+          ),
+          const SizedBox(height: 6),
+          Text(title),
+        ],
+      ),
     );
   }
 }

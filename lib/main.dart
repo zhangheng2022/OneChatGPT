@@ -12,13 +12,6 @@ import 'package:one_chatgpt_flutter/common/theme.dart';
 Future<void> main() async {
   await Global.init();
   runApp(const InitApp());
-  if (Platform.isAndroid) {
-    SystemUiOverlayStyle systemUiOverlayStyle = const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      systemNavigationBarColor: Colors.blueGrey,
-    );
-    SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
-  }
 }
 
 class InitApp extends StatelessWidget {
