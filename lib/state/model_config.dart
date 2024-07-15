@@ -42,7 +42,6 @@ class ModelConfigProvider extends ChangeNotifier {
     try {
       /// 从 Supabase 获取可用模型列表。
       final data = await _supabase.rpc('select-all-model');
-      Log.d(data);
       final List<String> listData = List<String>.from(data['all_models']);
       _modelList = listData;
 
