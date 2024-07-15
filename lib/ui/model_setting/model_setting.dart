@@ -13,7 +13,7 @@ class ModelSetting extends StatefulWidget {
 
 class _ModelSettingState extends State<ModelSetting> {
   List<String> _models = [];
-  late ModelConfig _currentModelConfig;
+  ModelConfig? _currentModelConfig;
   String? _currentModelName;
   double _currentSliderValue = 0.0;
 
@@ -26,10 +26,9 @@ class _ModelSettingState extends State<ModelSetting> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final config = Provider.of<ModelConfigProvider>(context);
-    Log.d(config.modelList);
+    _currentModelName = config.currentModelName;
     _models = config.modelList;
     _currentModelConfig = config.currentModelConfig;
-    _currentModelName = config.currentModelName;
   }
 
   @override
@@ -115,7 +114,8 @@ class _ModelSettingState extends State<ModelSetting> {
         width: 100,
         child: TextField(
           controller: TextEditingController(
-              text: _currentModelConfig.maxTokens.toString()),
+            text: _currentModelConfig?.maxTokens.toString(),
+          ),
           scrollPadding: const EdgeInsets.all(0),
           maxLength: 5,
           decoration: const InputDecoration(
@@ -156,11 +156,11 @@ class _ModelSettingState extends State<ModelSetting> {
         alignment: Alignment.centerRight,
         child: Slider(
           inactiveColor: Colors.grey[100],
-          value: _currentModelConfig.temperature,
+          value: _currentModelConfig?.temperature ?? 0,
           max: 1.0,
           min: 0.0,
           divisions: 10,
-          label: _currentModelConfig.temperature.toString(),
+          label: _currentModelConfig?.temperature.toString(),
           onChanged: (double value) {
             setState(() {
               _currentSliderValue = value;

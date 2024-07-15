@@ -303,7 +303,7 @@ class $ChatContentTableDataTable extends ChatContentTableData
   late final GeneratedColumn<String> role = GeneratedColumn<String>(
       'role', aliasedName, false,
       additionalChecks:
-          GeneratedColumn.checkTextLength(minTextLength: 4, maxTextLength: 5),
+          GeneratedColumn.checkTextLength(minTextLength: 4, maxTextLength: 10),
       type: DriftSqlType.string,
       requiredDuringInsert: true);
   static const VerificationMeta _contentTypeMeta =

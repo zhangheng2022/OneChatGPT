@@ -12,7 +12,6 @@ class Global {
   static init() async {
     //设置全局异常处理
     WidgetsFlutterBinding.ensureInitialized();
-    await dotenv.load();
     //监听链接
     final appLinks = AppLinks();
     appLinks.uriLinkStream.listen((uri) {
@@ -20,6 +19,7 @@ class Global {
     });
     //设置默认语言
     Intl.defaultLocale = 'zh_CN';
+    await dotenv.load();
     //设置默认日期格式
     await initializeDateFormatting();
     //初始化supabase];

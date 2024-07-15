@@ -1,6 +1,4 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
 import 'package:one_chatgpt_flutter/state/model_config.dart';
 import 'package:provider/provider.dart';
@@ -26,8 +24,11 @@ class InitApp extends StatelessWidget {
           create: (_) => AppDatabase(),
           dispose: (context, db) => db.close(),
         ),
+        ChangeNotifierProvider(
+          create: (_) => ModelConfigProvider(),
+          lazy: false,
+        ),
         ChangeNotifierProvider(create: (_) => UserProvider()),
-        ChangeNotifierProvider(create: (_) => ModelConfigProvider()),
       ],
       child: MaterialApp.router(
         title: 'OneChatGPT',
@@ -40,8 +41,3 @@ class InitApp extends StatelessWidget {
     );
   }
 }
-
-
-
-
-// 主色：#1240ab;

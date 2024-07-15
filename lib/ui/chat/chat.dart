@@ -116,6 +116,7 @@ class _ChatPageState extends State<ChatPage> {
         _createMessage(
           message.textarea ?? '',
           message.contentType,
+          message.role,
           message.role == 'user',
           message.fileUri ?? '',
           message.fileSize ?? 0,
@@ -132,13 +133,14 @@ class _ChatPageState extends State<ChatPage> {
     final welcomeMessage = _createTextMessage(
       content: welcomeText,
       isUserMessage: false,
+      role: "system",
     );
     // 添加欢迎消息到列表
     _addMessage(welcomeMessage);
     // 将欢迎消息插入数据库
     await _insertMessageIntoDatabase(
       text: welcomeText,
-      role: 'model',
+      role: 'system',
     );
   }
 
@@ -146,33 +148,45 @@ class _ChatPageState extends State<ChatPage> {
   types.Message _createMessage(
     String content,
     String contentType,
+    String role,
     bool isUserMessage,
     String fileUri,
     int fileSize,
   ) {
     // 根据 contentType 创建不同类型的消息
     if (contentType == 'text') {
-      return _createTextMessage(content: content, isUserMessage: isUserMessage);
+      return _createTextMessage(
+        content: content,
+        isUserMessage: isUserMessage,
+        role: role,
+      );
     } else if (contentType == 'file') {
       return _createImageMessage(
-          content: fileUri, isUserMessage: isUserMessage, size: fileSize);
+        content: fileUri,
+        isUserMessage: isUserMessage,
+        size: fileSize,
+      );
     } else {
       return types.TextMessage(
         author: isUserMessage ? _user : _model,
-        id: Uuid().v4(),
+        id: const Uuid().v4(),
         text: '未知消息类型',
       );
     }
   }
 
   // 创建文本消息对象
-  types.TextMessage _createTextMessage(
-      {required String content, required bool isUserMessage}) {
+  types.TextMessage _createTextMessage({
+    required String content,
+    required bool isUserMessage,
+    required String role,
+  }) {
     // 创建文本消息对象
     return types.TextMessage(
       author: isUserMessage ? _user : _model,
       id: const Uuid().v4(),
       text: content,
+      metadata: {'role': role},
     );
   }
 
@@ -212,6 +226,7 @@ class _ChatPageState extends State<ChatPage> {
     final textMessage = _createTextMessage(
       content: message.text,
       isUserMessage: true,
+      role: "user",
     );
     // 添加消息到列表
     await _addMessage(textMessage);
@@ -260,19 +275,17 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   // 获取历史消息
-  List<Map<String, Object>> _getHistoryMessages() {
+  List<Map<String, dynamic>> _getHistoryMessages() {
     // Convert messages to the required format for Supabase API
     return _messages.reversed.map((message) {
-      final isUserMessage = message.author.id == _user.id;
-      // Handle different message types
       if (message is types.TextMessage) {
         return {
-          "role": isUserMessage ? "user" : "model",
-          'content': message.text
+          "role": message.metadata?['role'],
+          'content': message.text,
         };
       } else if (message is types.ImageMessage) {
         return {
-          "role": isUserMessage ? "user" : "model",
+          "role": message.metadata?['role'],
           'parts': [
             {
               'inline_data': {
@@ -283,7 +296,7 @@ class _ChatPageState extends State<ChatPage> {
         };
       } else {
         return {
-          "role": isUserMessage ? "user" : "model",
+          "role": message.metadata?['role'],
           'content': 'Unknown message type'
         };
       }
@@ -298,7 +311,7 @@ class _ChatPageState extends State<ChatPage> {
       'oneapi/completions',
       body: {
         'contents': contents,
-        'generationConfig': {},
+        'generationConfig': {"model": "ERNIE-Speed-8K"},
       },
     );
     // gpt-3.5-turbo/gemini-1.5-pro
@@ -331,6 +344,7 @@ class _ChatPageState extends State<ChatPage> {
                 author: _model,
                 id: messageid,
                 text: message,
+                metadata: const {'role': "assistant"},
               );
               // 添加或更新消息到列表
               _addOrUpdateMessage(modelMessage);
@@ -338,13 +352,21 @@ class _ChatPageState extends State<ChatPage> {
           }
         } catch (e) {
           Log.e(e);
+          final modelMessage = types.TextMessage(
+            author: _model,
+            id: messageid,
+            text: "系统错误，请稍后再试",
+            metadata: const {'role': "assistant"},
+          );
+          // 添加或更新消息到列表
+          _addOrUpdateMessage(modelMessage);
         }
       },
       onDone: () {
         // 将回复消息插入数据库
         _insertMessageIntoDatabase(
           text: message,
-          role: 'model',
+          role: 'assistant',
         );
         // 结束 Completer
         completer.complete();
