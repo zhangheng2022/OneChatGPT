@@ -33,7 +33,7 @@ class ModelConfigProvider extends ChangeNotifier {
   /// ModelConfigProvider 类的构造函数。
   /// 通过调用 _init() 方法初始化类。
   ModelConfigProvider() {
-    Log.d("ModelConfigProvider初始化");
+    Log.t("ModelConfigProvider初始化");
     _init();
   }
 

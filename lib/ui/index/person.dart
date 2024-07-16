@@ -40,8 +40,8 @@ class _PersonState extends State<Person> {
 
     if (confirmed == true) {
       await supabase.auth.signOut();
-      if (!mounted) return;
-      context.pushReplacement('/login');
+      // if (!mounted) return;
+      // context.pushReplacement('/login');
     }
   }
 

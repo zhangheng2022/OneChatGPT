@@ -32,8 +32,6 @@ class _LoginEmailState extends State<LoginEmail> {
         email: _userEmail,
         password: _userPassword,
       );
-      if (!mounted) return;
-      context.goNamed('home');
     } catch (err) {
       Log.e("登录错误===>$err");
       Fluttertoast.showToast(

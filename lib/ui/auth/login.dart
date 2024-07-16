@@ -24,8 +24,8 @@ class _LoginPageState extends State<LoginPage> {
         OAuthProvider.github,
         redirectTo: 'onechatgpt://login-callback',
       );
-    } catch (e) {
-      Log.e(e);
+    } catch (err) {
+      Log.e("github授权登录错误：$err");
     }
   }
 
@@ -65,8 +65,6 @@ class _LoginPageState extends State<LoginPage> {
         idToken: idToken,
         accessToken: accessToken,
       );
-      if (!mounted) return;
-      context.goNamed('home');
     } catch (err) {
       Log.e("Google授权失败===>$err");
       Fluttertoast.showToast(
