@@ -1,8 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
-import 'package:one_chatgpt_flutter/state/auth.dart';
-import 'package:provider/provider.dart';
 import 'package:one_chatgpt_flutter/ui/auth/login.dart';
 import 'package:one_chatgpt_flutter/ui/auth/register.dart';
 import 'package:one_chatgpt_flutter/ui/chat/chat.dart';
@@ -10,20 +8,26 @@ import 'package:one_chatgpt_flutter/ui/index/scaffold_nav_bar.dart';
 import 'package:one_chatgpt_flutter/ui/index/home.dart';
 import 'package:one_chatgpt_flutter/ui/index/person.dart';
 import 'package:one_chatgpt_flutter/ui/model_setting/model_setting.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
+
+final supabase = Supabase.instance.client;
 
 class AppRoutes {
   static GoRouter router = GoRouter(
     redirect: (BuildContext context, GoRouterState state) {
-      final userProvider = Provider.of<AuthProvider>(context, listen: false);
+      final supabase = Supabase.instance.client;
+      final session = supabase.auth.currentSession;
+      // Check if the session is valid.
+      final isSessionExpired = session?.isExpired ?? true;
 
       final noSessionPaths = ['/login', '/login/register'];
 
       if (noSessionPaths.contains(state.fullPath)) {
         return null;
       }
-      if (userProvider.sessionExpired) {
+      if (isSessionExpired) {
         return "/login";
       }
       return null;
