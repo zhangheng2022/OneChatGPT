@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:one_chatgpt_flutter/state/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:one_chatgpt_flutter/database/database.dart';
 
 class Person extends StatefulWidget {
   const Person({super.key});
@@ -14,7 +14,11 @@ class Person extends StatefulWidget {
 
 class _PersonState extends State<Person> {
   final supabase = Supabase.instance.client;
-  final database = AppDatabase();
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
 
   Future<void> _logout() async {
     // Show a confirmation dialog
