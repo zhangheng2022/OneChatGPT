@@ -20,7 +20,6 @@ class AppRoutes {
       Log.d(state.fullPath);
       final supabase = Supabase.instance.client;
       final session = supabase.auth.currentSession;
-      // Check if the session is valid.
       final isSessionExpired = session?.isExpired ?? true;
 
       final noSessionPaths = ['/login', '/login/register'];
@@ -38,27 +37,29 @@ class AppRoutes {
     routes: <RouteBase>[
       StatefulShellRoute.indexedStack(
         branches: <StatefulShellBranch>[
-          StatefulShellBranch(routes: <RouteBase>[
-            GoRoute(
-              name: 'home',
-              path: '/home',
-              builder: (BuildContext context, GoRouterState state) =>
-                  const Home(),
-              routes: <RouteBase>[
-                GoRoute(
-                  name: 'chat',
-                  path: 'chat/:chatid',
-                  parentNavigatorKey: _rootNavigatorKey,
-                  builder: (BuildContext context, GoRouterState state) {
-                    final String chatid = state.pathParameters['chatid']!;
-                    return ChatPage(
-                      chatid: chatid,
-                    );
-                  },
-                ),
-              ],
-            ),
-          ]),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                name: 'home',
+                path: '/home',
+                builder: (BuildContext context, GoRouterState state) =>
+                    const Home(),
+                routes: <RouteBase>[
+                  GoRoute(
+                    name: 'chat',
+                    path: 'chat/:chatid',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (BuildContext context, GoRouterState state) {
+                      final String chatid = state.pathParameters['chatid']!;
+                      return ChatPage(
+                        chatid: chatid,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
           StatefulShellBranch(
             routes: <RouteBase>[
               GoRoute(
