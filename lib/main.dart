@@ -3,7 +3,7 @@ import 'package:one_chatgpt_flutter/database/database.dart';
 import 'package:one_chatgpt_flutter/state/model_config.dart';
 import 'package:provider/provider.dart';
 import 'package:one_chatgpt_flutter/router.dart';
-import 'package:one_chatgpt_flutter/state/user.dart';
+import 'package:one_chatgpt_flutter/state/auth.dart';
 import 'package:one_chatgpt_flutter/state/global.dart';
 import 'package:one_chatgpt_flutter/common/theme.dart';
 
@@ -28,7 +28,7 @@ class InitApp extends StatelessWidget {
           create: (_) => ModelConfigProvider(),
           lazy: false,
         ),
-        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
       ],
       child: MaterialApp.router(
         title: 'OneChatGPT',

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:one_chatgpt_flutter/state/user.dart';
+import 'package:one_chatgpt_flutter/state/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
@@ -40,8 +40,6 @@ class _PersonState extends State<Person> {
 
     if (confirmed == true) {
       await supabase.auth.signOut();
-      // if (!mounted) return;
-      // context.pushReplacement('/login');
     }
   }
 
@@ -63,9 +61,9 @@ class _PersonState extends State<Person> {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30),
-              child: Consumer<UserProvider>(
-                builder: (context, userProvider, child) {
-                  final userinfo = userProvider.user.userMetadata;
+              child: Consumer<AuthProvider>(
+                builder: (context, authProvider, child) {
+                  final userinfo = authProvider.user.userMetadata;
                   final avatarUrl = userinfo?['avatar_url'];
                   final fullName = userinfo?['full_name'] ?? '点击完善信息';
                   return Row(

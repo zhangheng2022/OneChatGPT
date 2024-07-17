@@ -6,10 +6,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 final supabase = Supabase.instance.client;
 final router = AppRoutes.router;
 
-class UserProvider extends ChangeNotifier {
+class AuthProvider extends ChangeNotifier {
   Session? _session = supabase.auth.currentSession;
 
-  User? _user;
+  User? _user = supabase.auth.currentUser;
 
   User get user => _user!;
 
@@ -17,8 +17,7 @@ class UserProvider extends ChangeNotifier {
 
   String? get refreshToken => _session?.refreshToken;
 
-  UserProvider() {
-    _user = supabase.auth.currentUser;
+  AuthProvider() {
     supabase.auth.onAuthStateChange.listen((data) {
       final AuthChangeEvent event = data.event;
       final Session? session = data.session;
@@ -44,6 +43,4 @@ class UserProvider extends ChangeNotifier {
       notifyListeners();
     });
   }
-
-  goHome() {}
 }

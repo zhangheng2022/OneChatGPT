@@ -7,36 +7,48 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:app_links/app_links.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 class Global {
-  //获取全局信息
-  //初始化全局信息，会在APP启动时执行
-  static init() async {
-    //设置全局异常处理
-    WidgetsFlutterBinding.ensureInitialized();
+  static Future<void> init() async {
+    // Initialize Flutter framework and preserve native splash screen
+    WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+    FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
+    // Set up platform-specific UI customization (Android)
     if (Platform.isAndroid) {
-      SystemUiOverlayStyle systemUiOverlayStyle = const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
+      SystemChrome.setSystemUIOverlayStyle(
+        const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
       );
-      SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
     }
 
-    //监听链接
+    // Initialize app links listener
     final appLinks = AppLinks();
     appLinks.uriLinkStream.listen((uri) {
       Log.i("uri: $uri");
     });
 
-    //设置默认语言
+    // Set default locale and load environment variables
     Intl.defaultLocale = 'zh_CN';
     await dotenv.load();
-    //设置默认日期格式
+
+    // Initialize date formatting
     await initializeDateFormatting();
-    //初始化supabase];
+
+    // Initialize Supabase client
     await Supabase.initialize(
-      url: dotenv.get('SUPABASE_URL', fallback: null),
-      anonKey: dotenv.get('SUPABASE_ANONKEY', fallback: null),
+      url: dotenv.env['SUPABASE_URL']!,
+      anonKey: dotenv.env['SUPABASE_ANONKEY']!,
     );
+
+    // Refresh session if needed
+    final supabase = Supabase.instance.client;
+    final session = supabase.auth.currentSession;
+    if (session != null && session.refreshToken != null && session.isExpired) {
+      await supabase.auth.refreshSession();
+    }
+
+    // Remove the native splash screen
+    FlutterNativeSplash.remove();
   }
 }

@@ -1,7 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
-import 'package:one_chatgpt_flutter/state/user.dart';
+import 'package:one_chatgpt_flutter/state/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:one_chatgpt_flutter/ui/auth/login.dart';
 import 'package:one_chatgpt_flutter/ui/auth/register.dart';
@@ -10,24 +10,21 @@ import 'package:one_chatgpt_flutter/ui/index/scaffold_nav_bar.dart';
 import 'package:one_chatgpt_flutter/ui/index/home.dart';
 import 'package:one_chatgpt_flutter/ui/index/person.dart';
 import 'package:one_chatgpt_flutter/ui/model_setting/model_setting.dart';
-import 'package:one_chatgpt_flutter/ui/splash_screen/splash_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 class AppRoutes {
   static GoRouter router = GoRouter(
     redirect: (BuildContext context, GoRouterState state) {
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final userProvider = Provider.of<AuthProvider>(context, listen: false);
 
-      final noSessionPaths = ['/splash_screen', '/login', '/login/register'];
+      final noSessionPaths = ['/login', '/login/register'];
 
       if (noSessionPaths.contains(state.fullPath)) {
         return null;
       }
-      if (userProvider.refreshToken == null) {
+      if (userProvider.sessionExpired) {
         return "/login";
-      } else if (userProvider.sessionExpired) {
-        return "/splash_screen";
       }
       return null;
     },
@@ -94,11 +91,6 @@ class AppRoutes {
         ],
         // onExit: (BuildContext context, GoRouterState state) =>
         //     _showDialog(context, state),
-      ),
-      GoRoute(
-        name: 'splash_screen',
-        path: '/splash_screen',
-        builder: (context, state) => const SplashScreen(),
       ),
     ],
   );
