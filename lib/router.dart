@@ -17,7 +17,6 @@ final supabase = Supabase.instance.client;
 class AppRoutes {
   static GoRouter router = GoRouter(
     redirect: (BuildContext context, GoRouterState state) {
-      Log.d(state.fullPath);
       final supabase = Supabase.instance.client;
       final session = supabase.auth.currentSession;
       final isSessionExpired = session?.isExpired ?? true;

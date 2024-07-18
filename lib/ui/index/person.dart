@@ -67,8 +67,8 @@ class _PersonState extends State<Person> {
               padding: const EdgeInsets.symmetric(horizontal: 30),
               child: Consumer<AuthProvider>(
                 builder: (context, authProvider, child) {
-                  final userinfo = authProvider.user.userMetadata;
-                  final avatarUrl = userinfo?['avatar_url'];
+                  final userinfo = authProvider.user?.userMetadata;
+                  final avatarUrl = userinfo?['avatar_url'] ?? '';
                   final fullName = userinfo?['full_name'] ?? '点击完善信息';
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.start,

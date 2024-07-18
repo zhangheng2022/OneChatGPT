@@ -28,7 +28,10 @@ class InitApp extends StatelessWidget {
           create: (_) => ModelConfigProvider(),
           lazy: false,
         ),
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(
+          create: (_) => AuthProvider(),
+          lazy: false,
+        ),
       ],
       child: MaterialApp.router(
         title: 'OneChatGPT',

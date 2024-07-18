@@ -11,13 +11,14 @@ class AuthProvider extends ChangeNotifier {
 
   User? _user = supabase.auth.currentUser;
 
-  User get user => _user!;
+  User? get user => _user;
 
   bool get sessionExpired => _session?.isExpired ?? true;
 
   String? get refreshToken => _session?.refreshToken;
 
   AuthProvider() {
+    Log.t("AuthProvider初始化");
     supabase.auth.onAuthStateChange.listen((data) {
       final AuthChangeEvent event = data.event;
       final Session? session = data.session;

@@ -7,6 +7,7 @@ import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:one_chatgpt_flutter/models/response/chat_message.dart';
+import 'package:one_chatgpt_flutter/utils/util.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -303,6 +304,37 @@ class _ChatPageState extends State<ChatPage> {
     }).toList();
   }
 
+  List<String> extractJsonStrings(String text) {
+    List<String> jsonStrings = [];
+    int braceCount = 0;
+    StringBuffer currentJson = StringBuffer();
+    bool inJson = false;
+
+    for (int i = 0; i < text.length; i++) {
+      if (text[i] == '{') {
+        if (braceCount == 0) {
+          inJson = true;
+        }
+        braceCount++;
+      }
+
+      if (inJson) {
+        currentJson.write(text[i]);
+      }
+
+      if (text[i] == '}') {
+        braceCount--;
+        if (braceCount == 0) {
+          inJson = false;
+          jsonStrings.add(currentJson.toString());
+          currentJson.clear();
+        }
+      }
+    }
+
+    return jsonStrings;
+  }
+
   // 获取模型回复
   Future<void> _fetchModelResponse() async {
     final contents = _getHistoryMessages();
@@ -311,7 +343,7 @@ class _ChatPageState extends State<ChatPage> {
       'oneapi/completions',
       body: {
         'contents': contents,
-        'generationConfig': {"model": "ERNIE-Speed-8K"},
+        'generationConfig': {"model": "gemini-1.5-pro"},
       },
     );
     // gpt-3.5-turbo/gemini-1.5-pro
@@ -323,35 +355,31 @@ class _ChatPageState extends State<ChatPage> {
     response.data.transform(const Utf8Decoder(allowMalformed: true)).listen(
       (String val) {
         try {
-          List<String> jsonDataList = val.split('data:');
-          for (var text in jsonDataList) {
-            if (text.contains('id')) {
-              String jsonDataString =
-                  text.replaceAll(RegExp(r'\n+'), '\n').trim();
-              Map<String, dynamic> jsonData = json.decode(jsonDataString);
-              Log.d(jsonData);
-              // // 将回复消息追加到 message 中
-              String messageStr;
-              if (jsonData['error'] != null) {
-                messageStr = jsonData['error']['message'];
-              } else {
-                messageStr =
-                    ChatMessage.fromJson(jsonData).choices[0].delta.content;
-              }
-              message += messageStr;
-              // 创建文本消息对象
-              final modelMessage = types.TextMessage(
-                author: _model,
-                id: messageid,
-                text: message,
-                metadata: const {'role': "assistant"},
-              );
-              // 添加或更新消息到列表
-              _addOrUpdateMessage(modelMessage);
+          Log.d(val);
+          // 提取 JSON 片段
+          List<Map<String, dynamic>> jsonList = Util.extractJsonObjects(val);
+          Log.t(jsonList);
+          // 解析并打印 JSON 片段
+          for (Map<String, dynamic> jsonData in jsonList) {
+            if (jsonData['error'] != null) {
+              message += jsonData['error']['message'];
+            } else {
+              message +=
+                  ChatMessage.fromJson(jsonData).choices[0].delta.content;
             }
+            // 创建文本消息对象
+            final modelMessage = types.TextMessage(
+              author: _model,
+              id: messageid,
+              text: message,
+              metadata: const {'role': "assistant"},
+            );
+            // 添加或更新消息到列表
+            _addOrUpdateMessage(modelMessage);
+            Log.t('JSON数据：$jsonData');
           }
-        } catch (e) {
-          Log.e(e);
+        } catch (err) {
+          Log.e(err);
           final modelMessage = types.TextMessage(
             author: _model,
             id: messageid,
