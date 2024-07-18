@@ -23,21 +23,20 @@ class AuthProvider extends ChangeNotifier {
       final Session? session = data.session;
 
       Log.t('侦听身份验证事件：event: $event, session: $session');
+
       if (session != null) _session = session;
       _user = supabase.auth.currentUser;
 
-      switch (event) {
-        case AuthChangeEvent.initialSession:
-        case AuthChangeEvent.signedIn:
-          router.goNamed('home');
-        case AuthChangeEvent.signedOut:
-          router.pushReplacementNamed('login');
-        case AuthChangeEvent.passwordRecovery:
-        case AuthChangeEvent.tokenRefreshed:
-          router.pushReplacementNamed('home');
-        case AuthChangeEvent.userUpdated:
-        case AuthChangeEvent.userDeleted:
-        case AuthChangeEvent.mfaChallengeVerified:
+      if (event == AuthChangeEvent.signedIn) {
+        router.goNamed('home');
+      }
+
+      if (event == AuthChangeEvent.signedOut) {
+        router.goNamed('login');
+      }
+
+      if (event == AuthChangeEvent.tokenRefreshed) {
+        router.goNamed('home');
       }
 
       notifyListeners();
