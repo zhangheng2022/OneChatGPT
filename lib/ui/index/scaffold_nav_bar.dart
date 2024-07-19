@@ -44,6 +44,5 @@ class _ScaffoldNavBarState extends State<ScaffoldNavBar> {
       index,
       initialLocation: index == widget.navigationShell.currentIndex,
     );
-    Log.d('$index|${widget.navigationShell.currentIndex}');
   }
 }

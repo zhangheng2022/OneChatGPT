@@ -12,23 +12,15 @@ class ModelSetting extends StatefulWidget {
 }
 
 class _ModelSettingState extends State<ModelSetting> {
-  List<String> _models = [];
-  ModelConfig? _currentModelConfig;
-  String? _currentModelName;
-  double _currentSliderValue = 0.0;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final config = Provider.of<ModelConfigProvider>(context);
-    _currentModelName = config.currentModelName;
-    _models = config.modelList;
-    _currentModelConfig = config.currentModelConfig;
+  List<DropdownMenuItem<String>> createDropdownMenuItems(
+      List<String> modelList) {
+    return modelList.map((String modelName) {
+      return DropdownMenuItem<String>(
+        alignment: AlignmentDirectional.center,
+        value: modelName,
+        child: Text(modelName),
+      );
+    }).toList();
   }
 
   @override
@@ -37,6 +29,21 @@ class _ModelSettingState extends State<ModelSetting> {
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: const Text('模型设置'),
+        actions: <Widget>[
+          // 修改标题按钮
+          TextButton(
+            onPressed: () {
+              Provider.of<ModelConfigProvider>(context, listen: false)
+                  .resetModelConfig();
+            },
+            child: const Text(
+              "重置",
+              style: TextStyle(
+                color: Colors.grey,
+              ),
+            ),
+          )
+        ],
       ),
       body: Column(
         children: <Widget>[
@@ -55,189 +62,213 @@ class _ModelSettingState extends State<ModelSetting> {
   }
 
   Widget _buildModelSettingListTile(BuildContext context) {
-    return ListTile(
-      tileColor: Colors.white,
-      title: const Text(
-        '模型',
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      subtitle: const Text(
-        "当前使用的模型",
-        style: TextStyle(
-          color: Colors.grey,
-        ),
-      ),
-      trailing: FittedBox(
-        child: DropdownButton<String>(
-          value: _currentModelName,
-          alignment: AlignmentDirectional.center,
-          items: _models.map((String value) {
-            return DropdownMenuItem<String>(
+    return Selector<ModelConfigProvider, ModelConfig>(
+      selector: (context, model) => model.currentModelConfig,
+      builder: (context, currentModelConfig, child) {
+        return ListTile(
+          tileColor: Colors.white,
+          title: const Text(
+            '模型',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          subtitle: const Text(
+            "当前使用的模型",
+            style: TextStyle(
+              color: Colors.grey,
+            ),
+          ),
+          trailing: FittedBox(
+            child: DropdownButton<String>(
+              value: currentModelConfig.model,
               alignment: AlignmentDirectional.center,
-              value: value,
-              child: Text(value),
-            );
-          }).toList(),
-          onChanged: (String? value) {
-            setState(() {
-              if (value != null) {
-                Provider.of<ModelConfigProvider>(context)
-                    .updateModelName(value);
-              }
-            });
-          },
-          hint: const Text('请选择模型'),
-        ),
-      ),
+              items: Provider.of<ModelConfigProvider>(context, listen: false)
+                  .modelList
+                  .map((modelName) {
+                return DropdownMenuItem<String>(
+                  alignment: AlignmentDirectional.center,
+                  value: modelName,
+                  child: Text(modelName),
+                );
+              }).toList(),
+              onChanged: (String? value) {
+                if (value != null) {
+                  Provider.of<ModelConfigProvider>(context, listen: false)
+                      .updateModelConfig(model: value);
+                }
+              },
+              hint: const Text('请选择模型'),
+            ),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildMaxTokensListTile(BuildContext context) {
-    return ListTile(
-      tileColor: Colors.white,
-      title: const Text(
-        '最大令牌数',
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      subtitle: const Text(
-        "单次交互所用的最大 Token 数",
-        style: TextStyle(
-          color: Colors.grey,
-        ),
-      ),
-      dense: true,
-      trailing: SizedBox(
-        width: 100,
-        child: TextField(
-          controller: TextEditingController(
-            text: _currentModelConfig?.maxTokens.toString(),
+    return Selector<ModelConfigProvider, ModelConfig>(
+      selector: (context, model) => model.currentModelConfig,
+      builder: (context, currentModelConfig, child) {
+        return ListTile(
+          tileColor: Colors.white,
+          title: const Text(
+            '最大令牌数',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          scrollPadding: const EdgeInsets.all(0),
-          maxLength: 5,
-          decoration: const InputDecoration(
-            counter: SizedBox.shrink(), // Use counter instead of counterText
-            hintText: '最大令牌数',
+          subtitle: const Text(
+            "单次交互所用的最大 Token 数",
+            style: TextStyle(
+              color: Colors.grey,
+            ),
           ),
-          textAlign: TextAlign.center,
-          keyboardType: TextInputType.number,
-          onChanged: (String? value) {
-            if (value != null) {
-              Provider.of<ModelConfigProvider>(context).updateModelConfig(
-                maxTokens: int.parse(value),
-              );
-            }
-          },
-        ),
-      ),
+          dense: true,
+          trailing: SizedBox(
+            width: 100,
+            child: TextField(
+              controller: TextEditingController(
+                text: currentModelConfig.maxTokens.toString(),
+              ),
+              scrollPadding: const EdgeInsets.all(0),
+              maxLength: 5,
+              decoration: const InputDecoration(
+                counter:
+                    SizedBox.shrink(), // Use counter instead of counterText
+                hintText: '最大令牌数',
+              ),
+              textAlign: TextAlign.center,
+              keyboardType: TextInputType.number,
+              onChanged: (String? value) {
+                if (value != null) {
+                  Provider.of<ModelConfigProvider>(context, listen: false)
+                      .updateModelConfig(maxTokens: int.parse(value));
+                }
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildRandomnessListTile(BuildContext context) {
-    return ListTile(
-      tileColor: Colors.white,
-      title: const Text(
-        '随机性',
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      subtitle: const Text(
-        "值越大，回复越随机",
-        style: TextStyle(
-          color: Colors.grey,
-        ),
-      ),
-      dense: true,
-      trailing: FittedBox(
-        alignment: Alignment.centerRight,
-        child: Slider(
-          inactiveColor: Colors.grey[100],
-          value: _currentModelConfig?.temperature ?? 0,
-          max: 1.0,
-          min: 0.0,
-          divisions: 10,
-          label: _currentModelConfig?.temperature.toString(),
-          onChanged: (double value) {
-            setState(() {
-              _currentSliderValue = value;
-            });
-          },
-        ),
-      ),
+    return Selector<ModelConfigProvider, ModelConfig>(
+      selector: (context, model) => model.currentModelConfig,
+      builder: (context, currentModelConfig, child) {
+        return ListTile(
+          tileColor: Colors.white,
+          title: const Text(
+            '随机性',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          subtitle: const Text(
+            "值越大，回复越随机",
+            style: TextStyle(
+              color: Colors.grey,
+            ),
+          ),
+          dense: true,
+          trailing: FittedBox(
+            alignment: Alignment.centerRight,
+            child: Slider(
+              inactiveColor: Colors.grey[100],
+              value: currentModelConfig.temperature ?? 0,
+              max: 1.0,
+              min: 0.0,
+              divisions: 10,
+              label: currentModelConfig.temperature.toString(),
+              onChanged: (double value) {
+                Provider.of<ModelConfigProvider>(context, listen: false)
+                    .updateModelConfig(
+                  temperature: value,
+                );
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildNuclearSamplingListTile(BuildContext context) {
-    return ListTile(
-      tileColor: Colors.white,
-      title: const Text(
-        '核采样',
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      subtitle: const Text(
-        "与随机性类似，但不要和随机性一起更改",
-        style: TextStyle(
-          color: Colors.grey,
-        ),
-      ),
-      dense: true,
-      trailing: FittedBox(
-        alignment: Alignment.centerRight,
-        child: Slider(
-          inactiveColor: Colors.grey[100],
-          value: _currentSliderValue,
-          max: 1.0,
-          min: 0.0,
-          divisions: 10,
-          label: _currentSliderValue.toString(),
-          onChanged: (double value) {
-            setState(() {
-              _currentSliderValue = value;
-            });
-          },
-        ),
-      ),
+    return Selector<ModelConfigProvider, ModelConfig>(
+      selector: (context, model) => model.currentModelConfig,
+      builder: (context, currentModelConfig, child) {
+        return ListTile(
+          tileColor: Colors.white,
+          title: const Text(
+            '核采样',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          subtitle: const Text(
+            "与随机性类似，但不要和随机性一起更改",
+            style: TextStyle(
+              color: Colors.grey,
+            ),
+          ),
+          dense: true,
+          trailing: FittedBox(
+            alignment: Alignment.centerRight,
+            child: Slider(
+              inactiveColor: Colors.grey[100],
+              value: currentModelConfig.topP ?? 0,
+              max: 1.0,
+              min: 0.0,
+              divisions: 10,
+              label: currentModelConfig.topP.toString(),
+              onChanged: (double value) {
+                Provider.of<ModelConfigProvider>(context, listen: false)
+                    .updateModelConfig(topP: value);
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildHistoryMessageCountListTile(BuildContext context) {
-    return ListTile(
-      tileColor: Colors.white,
-      title: const Text(
-        '历史消息数',
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      subtitle: const Text(
-        "每次请求携带的历史消息数",
-        style: TextStyle(
-          color: Colors.grey,
-        ),
-      ),
-      dense: true,
-      trailing: FittedBox(
-        alignment: Alignment.centerRight,
-        child: Slider(
-          inactiveColor: Colors.grey[100],
-          value: _currentSliderValue,
-          max: 1.0,
-          min: 0.0,
-          divisions: 10,
-          label: _currentSliderValue.toString(),
-          onChanged: (double value) {
-            setState(() {
-              _currentSliderValue = value;
-            });
-          },
-        ),
-      ),
+    return Selector<ModelConfigProvider, ModelConfig>(
+      selector: (context, model) => model.currentModelConfig,
+      builder: (context, currentModelConfig, child) {
+        return ListTile(
+          tileColor: Colors.white,
+          title: const Text(
+            '历史消息数',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          subtitle: const Text(
+            "每次请求携带的历史消息数",
+            style: TextStyle(
+              color: Colors.grey,
+            ),
+          ),
+          dense: true,
+          trailing: FittedBox(
+            alignment: Alignment.centerRight,
+            child: Slider(
+              inactiveColor: Colors.grey[100],
+              value: currentModelConfig.historyMessages ?? 0,
+              max: 10.0,
+              min: 0.0,
+              divisions: 10,
+              label: currentModelConfig.historyMessages.toString(),
+              onChanged: (double value) {
+                Provider.of<ModelConfigProvider>(context, listen: false)
+                    .updateModelConfig(historyMessages: value);
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 }

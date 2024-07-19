@@ -6,7 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:one_chatgpt_flutter/models/response/chat_message.dart';
+import 'package:one_chatgpt_flutter/models/model_config.dart';
+import 'package:one_chatgpt_flutter/models/request/function_chat_body.dart';
+import 'package:one_chatgpt_flutter/models/response/stream_chat_message.dart';
+import 'package:one_chatgpt_flutter/state/model_config.dart';
 import 'package:one_chatgpt_flutter/utils/util.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -18,7 +21,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // 初始化 Supabase 客户端
 final supabase = Supabase.instance.client;
-final SUPABASE_URL = dotenv.get('SUPABASE_URL', fallback: null);
+final supabaseUrl = dotenv.get('SUPABASE_URL', fallback: null);
 
 // 定义聊天页面
 class ChatPage extends StatefulWidget {
@@ -48,12 +51,7 @@ class _ChatPageState extends State<ChatPage> {
   // 用户信息
   late types.User _user;
   // 模型信息
-  final _model = types.User(
-    id: const Uuid().v4(),
-    firstName: "Google",
-    lastName: "Gemini Pro",
-    imageUrl: "$SUPABASE_URL/storage/v1/object/public/common/logo.png",
-  );
+  late types.User _model;
   // 数据库实例
   late AppDatabase database;
 
@@ -62,6 +60,15 @@ class _ChatPageState extends State<ChatPage> {
     super.initState();
     // 初始化用户信息
     _user = types.User(id: widget.chatid);
+
+    ModelConfig currentModelConfig =
+        context.read<ModelConfigProvider>().currentModelConfig;
+    _model = types.User(
+      id: const Uuid().v4(),
+      firstName: "",
+      lastName: currentModelConfig.model,
+      imageUrl: "$supabaseUrl/storage/v1/object/public/common/logo.png",
+    );
   }
 
   @override
@@ -276,114 +283,63 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   // 获取历史消息
-  List<Map<String, dynamic>> _getHistoryMessages() {
+  List<FunctionChatBodyMessage> _getHistoryMessages() {
     // Convert messages to the required format for Supabase API
     return _messages.reversed.map((message) {
       if (message is types.TextMessage) {
-        return {
-          "role": message.metadata?['role'],
-          'content': message.text,
-        };
-      } else if (message is types.ImageMessage) {
-        return {
-          "role": message.metadata?['role'],
-          'parts': [
-            {
-              'inline_data': {
-                'data': message.uri,
-              },
-            }
-          ],
-        };
+        return FunctionChatBodyMessage(
+          content: message.text,
+          role: message.metadata?['role'],
+        );
       } else {
-        return {
-          "role": message.metadata?['role'],
-          'content': 'Unknown message type'
-        };
+        return FunctionChatBodyMessage(
+          content: "Unknown message type",
+          role: message.metadata?['role'],
+        );
       }
     }).toList();
   }
 
-  List<String> extractJsonStrings(String text) {
-    List<String> jsonStrings = [];
-    int braceCount = 0;
-    StringBuffer currentJson = StringBuffer();
-    bool inJson = false;
-
-    for (int i = 0; i < text.length; i++) {
-      if (text[i] == '{') {
-        if (braceCount == 0) {
-          inJson = true;
-        }
-        braceCount++;
-      }
-
-      if (inJson) {
-        currentJson.write(text[i]);
-      }
-
-      if (text[i] == '}') {
-        braceCount--;
-        if (braceCount == 0) {
-          inJson = false;
-          jsonStrings.add(currentJson.toString());
-          currentJson.clear();
-        }
-      }
-    }
-
-    return jsonStrings;
-  }
-
   // 获取模型回复
   Future<void> _fetchModelResponse() async {
-    final contents = _getHistoryMessages();
+    ModelConfig currentModelConfig =
+        context.read<ModelConfigProvider>().currentModelConfig;
+
+    final messages = _getHistoryMessages();
     // 调用 Supabase 函数
-    final response = await supabase.functions.invoke(
-      'oneapi/completions',
-      body: {
-        'contents': contents,
-        'generationConfig': {"model": "gemini-1.5-pro"},
-      },
+    final params = FunctionChatBody(
+      messages: messages,
+      model: currentModelConfig.model,
+      maxTokens: currentModelConfig.maxTokens,
+      temperature: currentModelConfig.temperature,
+      topP: currentModelConfig.topP,
     );
-    // gpt-3.5-turbo/gemini-1.5-pro
-    // 初始化回复消息
+    final response = await supabase.functions.invoke(
+      'function-chat/completions',
+      body: params.toJson(),
+    );
     String message = '';
     final messageid = const Uuid().v4();
     var completer = Completer<void>();
     // 监听回复消息
-    response.data.transform(const Utf8Decoder(allowMalformed: true)).listen(
+    response.data.transform(const Utf8Decoder()).listen(
       (String val) {
-        try {
-          Log.d(val);
-          // 提取 JSON 片段
-          List<Map<String, dynamic>> jsonList = Util.extractJsonObjects(val);
-          Log.t(jsonList);
-          // 解析并打印 JSON 片段
-          for (Map<String, dynamic> jsonData in jsonList) {
-            if (jsonData['error'] != null) {
-              message += jsonData['error']['message'];
-            } else {
-              message +=
-                  ChatMessage.fromJson(jsonData).choices[0].delta.content;
-            }
-            // 创建文本消息对象
-            final modelMessage = types.TextMessage(
-              author: _model,
-              id: messageid,
-              text: message,
-              metadata: const {'role': "assistant"},
-            );
-            // 添加或更新消息到列表
-            _addOrUpdateMessage(modelMessage);
-            Log.t('JSON数据：$jsonData');
+        // 提取 JSON 片段
+        List<Map<String, dynamic>> jsonList = Util.extractJsonObjects(val);
+        Log.t('JSON数据：$jsonList');
+        // 解析并打印 JSON 片段
+        for (Map<String, dynamic> jsonData in jsonList) {
+          if (jsonData['error'] != null) {
+            message += jsonData['error']['message'];
+          } else {
+            message +=
+                StreamChatMessage.fromJson(jsonData).choices[0].delta.content;
           }
-        } catch (err) {
-          Log.e(err);
+          // 创建文本消息对象
           final modelMessage = types.TextMessage(
             author: _model,
             id: messageid,
-            text: "系统错误，请稍后再试",
+            text: message,
             metadata: const {'role': "assistant"},
           );
           // 添加或更新消息到列表
@@ -391,6 +347,17 @@ class _ChatPageState extends State<ChatPage> {
         }
       },
       onDone: () {
+        if (message.isEmpty) {
+          message = "系统错误，请稍后再试";
+          final modelMessage = types.TextMessage(
+            author: _model,
+            id: messageid,
+            text: message,
+            metadata: const {'role': "assistant"},
+          );
+          // 添加或更新消息到列表
+          _addOrUpdateMessage(modelMessage);
+        }
         // 将回复消息插入数据库
         _insertMessageIntoDatabase(
           text: message,
@@ -400,6 +367,15 @@ class _ChatPageState extends State<ChatPage> {
         completer.complete();
       },
       onError: (e) {
+        message = "系统错误，请稍后再试";
+        final modelMessage = types.TextMessage(
+          author: _model,
+          id: messageid,
+          text: message,
+          metadata: const {'role': "assistant"},
+        );
+        // 添加或更新消息到列表
+        _addOrUpdateMessage(modelMessage);
         // 处理错误
         completer.completeError(e);
       },

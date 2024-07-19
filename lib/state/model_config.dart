@@ -15,17 +15,11 @@ class ModelConfigProvider extends ChangeNotifier {
   /// 当前模型配置。
   late ModelConfig _currentModelConfig;
 
-  /// 当前选定模型的名称。
-  late String _currentModelName;
-
   /// 可用模型列表。
   late List<String> _modelList;
 
   /// 获取当前模型配置。
   ModelConfig get currentModelConfig => _currentModelConfig;
-
-  /// 获取当前选定模型的名称。
-  String get currentModelName => _currentModelName;
 
   /// 获取可用模型列表。
   List<String> get modelList => _modelList;
@@ -39,14 +33,14 @@ class ModelConfigProvider extends ChangeNotifier {
 
   /// 初始化模型配置并获取可用模型列表。
   Future<void> _init() async {
+    /// 获取 SharedPreferences 实例以存储和检索数据。
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     try {
       /// 从 Supabase 获取可用模型列表。
       final data = await _supabase.rpc('select-all-model');
       final List<String> listData = List<String>.from(data['all_models']);
+      Log.t(listData);
       _modelList = listData;
-
-      /// 获取 SharedPreferences 实例以存储和检索数据。
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
 
       /// 从 SharedPreferences 检索保存的模型配置。
       final String? configResult = prefs.getString('currentModelConfig');
@@ -54,11 +48,20 @@ class ModelConfigProvider extends ChangeNotifier {
       /// 根据检索到的数据设置当前模型配置。
       /// 如果未找到保存的配置，则使用默认配置。
       if (configResult != null) {
-        _currentModelConfig = ModelConfig.fromJson(
-          jsonDecode(configResult) as Map<String, dynamic>,
-        );
+        _currentModelConfig = ModelConfig.fromJson(jsonDecode(configResult));
+        if (!_modelList.contains(_currentModelConfig.model)) {
+          _currentModelConfig = ModelConfig(
+            model: _modelList.first,
+            maxTokens: 1000,
+            temperature: 0.5,
+            topP: 1,
+            historyMessages: 4,
+            autoTitle: false,
+          );
+        }
       } else {
         _currentModelConfig = ModelConfig(
+          model: _modelList.first,
           maxTokens: 1000,
           temperature: 0.5,
           topP: 1,
@@ -67,17 +70,10 @@ class ModelConfigProvider extends ChangeNotifier {
         );
       }
 
-      /// 从 SharedPreferences 检索保存的模型名称。
-      final String? nameResult = prefs.getString('currentModelName');
-
-      /// 根据检索到的数据设置当前模型名称。
-      /// 如果未找到保存的名称，则使用列表中的第一个模型。
-      _currentModelName = nameResult ?? _modelList.first;
-
       /// 通知监听器数据已更改。
       notifyListeners();
     } catch (e) {
-      Log.e(e.toString());
+      Log.e(e);
     }
   }
 
@@ -85,16 +81,18 @@ class ModelConfigProvider extends ChangeNotifier {
   /// 接受可选参数以更新特定配置值。
   /// 如果提供了新的模型配置，则将直接使用它。
   Future<void> updateModelConfig({
+    String? model,
     int? maxTokens,
     double? temperature,
     double? topP,
-    int? historyMessages,
+    double? historyMessages,
     bool? autoTitle,
     ModelConfig? newModelConfig,
   }) async {
     /// 根据提供的参数或新的模型配置设置当前模型配置。
     _currentModelConfig = newModelConfig ??
         _currentModelConfig.copyWith(
+          model: model,
           maxTokens: maxTokens,
           temperature: temperature,
           topP: topP,
@@ -113,19 +111,19 @@ class ModelConfigProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 更新模型名称。
-  /// 接受新的模型名称作为参数。
-  Future<void> updateModelName(String newModelName) async {
-    /// 设置当前模型名称为新名称。
-    _currentModelName = newModelName;
+  Future<void> resetModelConfig() async {
+    _currentModelConfig = ModelConfig(
+      model: _modelList.first,
+      maxTokens: 1000,
+      temperature: 0.5,
+      topP: 1,
+      historyMessages: 4,
+      autoTitle: false,
+    );
 
-    /// 获取 SharedPreferences 实例以存储和检索数据。
     final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove("currentModelConfig");
 
-    /// 将更新后的模型名称保存到 SharedPreferences。
-    await prefs.setString('currentModelName', newModelName);
-
-    /// 通知监听器数据已更改。
     notifyListeners();
   }
 }
