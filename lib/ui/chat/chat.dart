@@ -251,6 +251,21 @@ class _ChatPageState extends State<ChatPage> {
     } catch (err) {
       // 处理错误
       Log.e(err);
+      final messageid = const Uuid().v4();
+      const message = "系统错误，请稍后再试";
+      final modelMessage = types.TextMessage(
+        author: _model,
+        id: messageid,
+        text: message,
+        metadata: const {'role': "assistant"},
+      );
+      // 添加或更新消息到列表
+      _addOrUpdateMessage(modelMessage);
+      // 将回复消息插入数据库
+      _insertMessageIntoDatabase(
+        text: message,
+        role: 'assistant',
+      );
     } finally {
       // 设置等待回复状态为 false
       if (mounted) {
@@ -303,6 +318,8 @@ class _ChatPageState extends State<ChatPage> {
 
   // 获取模型回复
   Future<void> _fetchModelResponse() async {
+    final completer = Completer<void>();
+
     ModelConfig currentModelConfig =
         context.read<ModelConfigProvider>().currentModelConfig;
     ChannelModel currentModel =
@@ -317,13 +334,13 @@ class _ChatPageState extends State<ChatPage> {
       temperature: currentModelConfig.temperature,
       topP: currentModelConfig.topP,
     );
-    final response = await supabase.functions.invoke(
+    FunctionResponse response = await supabase.functions.invoke(
       'function-chat/completions',
       body: params.toJson(),
     );
+
     String message = '';
     final messageid = const Uuid().v4();
-    var completer = Completer<void>();
     // 监听回复消息
     response.data.transform(const Utf8Decoder()).listen(
       (String val) {
@@ -351,7 +368,7 @@ class _ChatPageState extends State<ChatPage> {
       },
       onDone: () {
         if (message.isEmpty) {
-          message = "系统错误，请稍后再试";
+          message = "获取消息错误，请稍后再试";
           final modelMessage = types.TextMessage(
             author: _model,
             id: messageid,
@@ -370,7 +387,7 @@ class _ChatPageState extends State<ChatPage> {
         completer.complete();
       },
       onError: (e) {
-        message = "系统错误，请稍后再试";
+        message = "获取消息错误，请稍后再试";
         final modelMessage = types.TextMessage(
           author: _model,
           id: messageid,
