@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:one_chatgpt_flutter/utils/validator.dart';
+import 'package:one_chatgpt_flutter/widgets/circular_progress.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class RegisterEmail extends StatefulWidget {
@@ -147,7 +148,7 @@ class _RegisterEmailState extends State<RegisterEmail> {
               height: 50,
               child: FilledButton.icon(
                 icon: _isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
+                    ? const CircularProgressWidget()
                     : const Icon(Icons.app_registration),
                 label: const Text("注册账户", style: TextStyle(fontSize: 16)),
                 style: FilledButton.styleFrom(
