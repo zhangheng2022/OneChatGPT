@@ -9,7 +9,7 @@ part of 'function_chat_body.dart';
 FunctionChatBody _$FunctionChatBodyFromJson(Map<String, dynamic> json) {
   $checkKeys(
     json,
-    requiredKeys: const ['messages'],
+    requiredKeys: const ['model'],
   );
   return FunctionChatBody(
     messages: (json['messages'] as List<dynamic>)
@@ -26,12 +26,12 @@ FunctionChatBody _$FunctionChatBodyFromJson(Map<String, dynamic> json) {
 
 Map<String, dynamic> _$FunctionChatBodyToJson(FunctionChatBody instance) =>
     <String, dynamic>{
-      'model': instance.model,
       'maxTokens': instance.maxTokens,
       'temperature': instance.temperature,
       'topP': instance.topP,
       'historyMessages': instance.historyMessages,
       'autoTitle': instance.autoTitle,
+      'model': instance.model,
       'messages': instance.messages,
     };
 

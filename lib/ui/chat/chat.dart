@@ -8,6 +8,7 @@ import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:one_chatgpt_flutter/models/model_config.dart';
 import 'package:one_chatgpt_flutter/models/request/function_chat_body.dart';
+import 'package:one_chatgpt_flutter/models/response/channel_model.dart';
 import 'package:one_chatgpt_flutter/models/response/stream_chat_message.dart';
 import 'package:one_chatgpt_flutter/state/model_config.dart';
 import 'package:one_chatgpt_flutter/utils/util.dart';
@@ -61,12 +62,12 @@ class _ChatPageState extends State<ChatPage> {
     // 初始化用户信息
     _user = types.User(id: widget.chatid);
 
-    ModelConfig currentModelConfig =
-        context.read<ModelConfigProvider>().currentModelConfig;
+    ChannelModel currentModel =
+        context.read<ModelConfigProvider>().currentModel;
     _model = types.User(
       id: const Uuid().v4(),
-      firstName: "",
-      lastName: currentModelConfig.model,
+      firstName: currentModel.label,
+      lastName: currentModel.model,
       imageUrl: "$supabaseUrl/storage/v1/object/public/common/logo.png",
     );
   }
@@ -304,12 +305,14 @@ class _ChatPageState extends State<ChatPage> {
   Future<void> _fetchModelResponse() async {
     ModelConfig currentModelConfig =
         context.read<ModelConfigProvider>().currentModelConfig;
+    ChannelModel currentModel =
+        context.read<ModelConfigProvider>().currentModel;
 
     final messages = _getHistoryMessages();
     // 调用 Supabase 函数
     final params = FunctionChatBody(
       messages: messages,
-      model: currentModelConfig.model,
+      model: currentModel.model,
       maxTokens: currentModelConfig.maxTokens,
       temperature: currentModelConfig.temperature,
       topP: currentModelConfig.topP,

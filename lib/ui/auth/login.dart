@@ -88,10 +88,14 @@ class _LoginPageState extends State<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Image.network(
-                  "https://api.miaomc.cn/image/other/bing", // 您的图片URL
-                  height:
-                      MediaQuery.of(context).size.height * 0.5, // 可选，根据需要调整高度
+                  "https://api.miaomc.cn/image/other/bing",
+                  height: MediaQuery.of(context).size.height * 0.5,
                   fit: BoxFit.cover, // 保持图片的宽高比
+                  errorBuilder: (context, error, stackTrace) => Image.asset(
+                    'assets/images/login_header_default.jpg', //默认显示图片
+                    height: MediaQuery.of(context).size.height * 0.5,
+                    fit: BoxFit.cover,
+                  ),
                 ),
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.5,

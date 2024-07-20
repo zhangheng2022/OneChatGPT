@@ -5,11 +5,12 @@ part 'function_chat_body.g.dart';
 @JsonSerializable()
 class FunctionChatBody extends ModelConfig {
   @JsonKey(required: true)
+  String model;
   List<FunctionChatBodyMessage> messages;
 
   FunctionChatBody({
     required this.messages,
-    required super.model,
+    required this.model,
     super.maxTokens,
     super.temperature,
     super.topP,

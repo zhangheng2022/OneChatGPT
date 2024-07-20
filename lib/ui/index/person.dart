@@ -136,6 +136,7 @@ class _PersonState extends State<Person> {
         children: [
           _buildGridTile(Icons.psychology, '模型设置', 'model_setting'),
           _buildGridTile(Icons.manage_accounts, '个人信息', 'personal_info'),
+          _buildGridTile(Icons.settings, '其它设置', 'personal_info'),
           _buildGridTile(Icons.help_center, '常见问题', 'faq'),
         ],
       ),

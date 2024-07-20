@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:one_chatgpt_flutter/models/model_config.dart';
+import 'package:one_chatgpt_flutter/models/response/channel_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -15,14 +16,20 @@ class ModelConfigProvider extends ChangeNotifier {
   /// 当前模型配置。
   late ModelConfig _currentModelConfig;
 
+  /// 当前模型。
+  late ChannelModel _currentModel;
+
   /// 可用模型列表。
-  late List<String> _modelList;
+  late List<ChannelModel> _channelModels;
 
   /// 获取当前模型配置。
   ModelConfig get currentModelConfig => _currentModelConfig;
 
+  /// 获取当前模型。
+  ChannelModel get currentModel => _currentModel;
+
   /// 获取可用模型列表。
-  List<String> get modelList => _modelList;
+  List<ChannelModel> get channelModels => _channelModels;
 
   /// ModelConfigProvider 类的构造函数。
   /// 通过调用 _init() 方法初始化类。
@@ -37,10 +44,11 @@ class ModelConfigProvider extends ChangeNotifier {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     try {
       /// 从 Supabase 获取可用模型列表。
-      final data = await _supabase.rpc('select-all-model');
-      final List<String> listData = List<String>.from(data['all_models']);
-      Log.t(listData);
-      _modelList = listData;
+      final data = await _supabase.rpc('select-channels');
+      final List<ChannelModel> listData = (data['result'] as List<dynamic>)
+          .map((item) => ChannelModel.fromJson(item))
+          .toList();
+      _channelModels = listData;
 
       /// 从 SharedPreferences 检索保存的模型配置。
       final String? configResult = prefs.getString('currentModelConfig');
@@ -49,25 +57,21 @@ class ModelConfigProvider extends ChangeNotifier {
       /// 如果未找到保存的配置，则使用默认配置。
       if (configResult != null) {
         _currentModelConfig = ModelConfig.fromJson(jsonDecode(configResult));
-        if (!_modelList.contains(_currentModelConfig.model)) {
-          _currentModelConfig = ModelConfig(
-            model: _modelList.first,
-            maxTokens: 1000,
-            temperature: 0.5,
-            topP: 1,
-            historyMessages: 4,
-            autoTitle: false,
-          );
-        }
       } else {
         _currentModelConfig = ModelConfig(
-          model: _modelList.first,
           maxTokens: 1000,
           temperature: 0.5,
           topP: 1,
           historyMessages: 4,
           autoTitle: false,
         );
+      }
+
+      final String? modelResult = prefs.getString('currentModel');
+      if (modelResult != null) {
+        _currentModel = ChannelModel.fromJson(jsonDecode(modelResult));
+      } else {
+        _currentModel = _channelModels.first;
       }
 
       /// 通知监听器数据已更改。
@@ -111,9 +115,19 @@ class ModelConfigProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> resetModelConfig() async {
+  Future<void> updateModel({required String model}) async {
+    _currentModel = _channelModels.firstWhere((data) => data.model == model);
+
+    /// 获取 SharedPreferences 实例以存储和检索数据。
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('currentModel', jsonEncode(_currentModel.toJson()));
+
+    /// 通知监听器数据已更改。
+    notifyListeners();
+  }
+
+  Future<void> reset() async {
     _currentModelConfig = ModelConfig(
-      model: _modelList.first,
       maxTokens: 1000,
       temperature: 0.5,
       topP: 1,
@@ -123,6 +137,9 @@ class ModelConfigProvider extends ChangeNotifier {
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove("currentModelConfig");
+
+    _currentModel = _channelModels.first;
+    await prefs.remove("currentModel");
 
     notifyListeners();
   }

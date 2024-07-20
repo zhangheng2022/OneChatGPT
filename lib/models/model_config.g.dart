@@ -7,7 +7,6 @@ part of 'model_config.dart';
 // **************************************************************************
 
 ModelConfig _$ModelConfigFromJson(Map<String, dynamic> json) => ModelConfig(
-      model: json['model'] as String,
       maxTokens: (json['maxTokens'] as num?)?.toInt(),
       temperature: (json['temperature'] as num?)?.toDouble(),
       topP: (json['topP'] as num?)?.toDouble(),
@@ -17,7 +16,6 @@ ModelConfig _$ModelConfigFromJson(Map<String, dynamic> json) => ModelConfig(
 
 Map<String, dynamic> _$ModelConfigToJson(ModelConfig instance) =>
     <String, dynamic>{
-      'model': instance.model,
       'maxTokens': instance.maxTokens,
       'temperature': instance.temperature,
       'topP': instance.topP,

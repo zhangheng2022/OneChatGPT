@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:one_chatgpt_flutter/common/channel_color.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:one_chatgpt_flutter/models/model_config.dart';
+import 'package:one_chatgpt_flutter/models/response/channel_model.dart';
 import 'package:one_chatgpt_flutter/state/model_config.dart';
 import 'package:provider/provider.dart';
 
@@ -33,8 +35,7 @@ class _ModelSettingState extends State<ModelSetting> {
           // 修改标题按钮
           TextButton(
             onPressed: () {
-              Provider.of<ModelConfigProvider>(context, listen: false)
-                  .resetModelConfig();
+              Provider.of<ModelConfigProvider>(context, listen: false).reset();
             },
             child: const Text(
               "重置",
@@ -62,9 +63,9 @@ class _ModelSettingState extends State<ModelSetting> {
   }
 
   Widget _buildModelSettingListTile(BuildContext context) {
-    return Selector<ModelConfigProvider, ModelConfig>(
-      selector: (context, model) => model.currentModelConfig,
-      builder: (context, currentModelConfig, child) {
+    return Selector<ModelConfigProvider, ChannelModel>(
+      selector: (context, model) => model.currentModel,
+      builder: (context, currentModel, child) {
         return ListTile(
           tileColor: Colors.white,
           title: const Text(
@@ -81,21 +82,38 @@ class _ModelSettingState extends State<ModelSetting> {
           ),
           trailing: FittedBox(
             child: DropdownButton<String>(
-              value: currentModelConfig.model,
+              value: currentModel.model,
+              underline: Container(
+                height: 0, // 隐藏下划线
+              ),
               alignment: AlignmentDirectional.center,
               items: Provider.of<ModelConfigProvider>(context, listen: false)
-                  .modelList
-                  .map((modelName) {
+                  .channelModels
+                  .map((data) {
                 return DropdownMenuItem<String>(
                   alignment: AlignmentDirectional.center,
-                  value: modelName,
-                  child: Text(modelName),
+                  value: data.model,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '（${data.label}）',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: ChannelColor.getColorFromName(data.color),
+                        ),
+                      ),
+                      Text(
+                        data.model,
+                      ),
+                    ],
+                  ),
                 );
               }).toList(),
               onChanged: (String? value) {
                 if (value != null) {
                   Provider.of<ModelConfigProvider>(context, listen: false)
-                      .updateModelConfig(model: value);
+                      .updateModel(model: value);
                 }
               },
               hint: const Text('请选择模型'),
