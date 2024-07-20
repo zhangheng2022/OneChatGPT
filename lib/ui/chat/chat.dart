@@ -352,8 +352,11 @@ class _ChatPageState extends State<ChatPage> {
           if (jsonData['error'] != null) {
             message += jsonData['error']['message'];
           } else {
-            message +=
-                StreamChatMessage.fromJson(jsonData).choices[0].delta.content;
+            try {
+              final messageContent =
+                  StreamChatMessage.fromJson(jsonData).choices[0].delta.content;
+              message += messageContent;
+            } catch (e) {}
           }
           // 创建文本消息对象
           final modelMessage = types.TextMessage(
