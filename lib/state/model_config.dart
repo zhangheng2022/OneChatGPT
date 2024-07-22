@@ -44,11 +44,11 @@ class ModelConfigProvider extends ChangeNotifier {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     try {
       /// 从 Supabase 获取可用模型列表。
-      final data = await _supabase.rpc('select-channels');
-      final List<ChannelModel> listData = (data['result'] as List<dynamic>)
+      final data = await _supabase.rpc('get_channels');
+      final List<ChannelModel> oneapiData = (data['result'] as List<dynamic>)
           .map((item) => ChannelModel.fromJson(item))
           .toList();
-      _channelModels = listData;
+      _channelModels = oneapiData;
 
       /// 从 SharedPreferences 检索保存的模型配置。
       final String? configResult = prefs.getString('currentModelConfig');
