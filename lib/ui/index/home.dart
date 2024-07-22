@@ -73,13 +73,13 @@ class _HomeState extends State<Home> {
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: const Text("对话"),
-        centerTitle: true,
         backgroundColor: Colors.grey[50],
+        leading: const Icon(Icons.model_training),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addCardListData,
         tooltip: '新增对话',
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add_comment),
       ),
       body: _chatList.isEmpty
           ? _buildEmptyState()

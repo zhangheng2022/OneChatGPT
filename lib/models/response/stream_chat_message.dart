@@ -5,14 +5,14 @@ part 'stream_chat_message.g.dart';
 class StreamChatMessage {
   @JsonKey(required: true)
   String id;
-  String object;
+  String? object;
   int created;
   String model;
   List<StreamChatMessageChoice> choices;
 
   StreamChatMessage({
     required this.id,
-    required this.object,
+    this.object,
     required this.created,
     required this.model,
     required this.choices,
@@ -43,9 +43,11 @@ class StreamChatMessageChoice {
 @JsonSerializable()
 class StreamChatMessageDelta {
   String content;
+  String? role;
 
   StreamChatMessageDelta({
     required this.content,
+    this.role,
   });
 
   factory StreamChatMessageDelta.fromJson(Map<String, dynamic> json) =>

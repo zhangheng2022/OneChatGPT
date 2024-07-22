@@ -356,7 +356,9 @@ class _ChatPageState extends State<ChatPage> {
               final messageContent =
                   StreamChatMessage.fromJson(jsonData).choices[0].delta.content;
               message += messageContent;
-            } catch (e) {}
+            } catch (e) {
+              Log.e(e);
+            }
           }
           // 创建文本消息对象
           final modelMessage = types.TextMessage(

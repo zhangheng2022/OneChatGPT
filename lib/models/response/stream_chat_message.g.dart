@@ -13,7 +13,7 @@ StreamChatMessage _$StreamChatMessageFromJson(Map<String, dynamic> json) {
   );
   return StreamChatMessage(
     id: json['id'] as String,
-    object: json['object'] as String,
+    object: json['object'] as String?,
     created: (json['created'] as num).toInt(),
     model: json['model'] as String,
     choices: (json['choices'] as List<dynamic>)
@@ -50,10 +50,12 @@ StreamChatMessageDelta _$StreamChatMessageDeltaFromJson(
         Map<String, dynamic> json) =>
     StreamChatMessageDelta(
       content: json['content'] as String,
+      role: json['role'] as String?,
     );
 
 Map<String, dynamic> _$StreamChatMessageDeltaToJson(
         StreamChatMessageDelta instance) =>
     <String, dynamic>{
       'content': instance.content,
+      'role': instance.role,
     };

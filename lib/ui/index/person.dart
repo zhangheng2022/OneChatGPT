@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:one_chatgpt_flutter/state/auth.dart';
@@ -49,6 +50,8 @@ class _PersonState extends State<Person> {
 
   @override
   Widget build(BuildContext context) {
+    final defaultAvatar =
+        '${dotenv.env['SUPABASE_URL']!}/storage/v1/object/public/common/default_avatar.png';
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -68,7 +71,7 @@ class _PersonState extends State<Person> {
               child: Consumer<AuthProvider>(
                 builder: (context, authProvider, child) {
                   final userinfo = authProvider.user?.userMetadata;
-                  final avatarUrl = userinfo?['avatar_url'] ?? '';
+                  final avatarUrl = userinfo?['avatar_url'] ?? defaultAvatar;
                   final fullName = userinfo?['full_name'] ?? '点击完善信息';
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -109,12 +112,6 @@ class _PersonState extends State<Person> {
           width: 60,
           height: 60,
           fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) => Image.asset(
-            'assets/icons/not_avatar.png', //默认显示图片
-            width: 60,
-            height: 60,
-            fit: BoxFit.cover,
-          ),
         ),
       ),
     );
