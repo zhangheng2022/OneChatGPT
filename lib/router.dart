@@ -8,6 +8,7 @@ import 'package:one_chatgpt_flutter/ui/index/scaffold_nav_bar.dart';
 import 'package:one_chatgpt_flutter/ui/index/home.dart';
 import 'package:one_chatgpt_flutter/ui/index/person.dart';
 import 'package:one_chatgpt_flutter/ui/model_setting/model_setting.dart';
+import 'package:one_chatgpt_flutter/ui/userinfo/userinfo.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -72,6 +73,12 @@ class AppRoutes {
                     path: 'model_setting',
                     parentNavigatorKey: _rootNavigatorKey,
                     builder: (context, state) => const ModelSetting(),
+                  ),
+                  GoRoute(
+                    name: 'userinfo',
+                    path: 'userinfo',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (context, state) => const Userinfo(),
                   ),
                 ],
               ),
