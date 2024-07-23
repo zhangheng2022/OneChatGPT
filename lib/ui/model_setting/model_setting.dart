@@ -112,25 +112,26 @@ class _ModelSettingState extends State<ModelSetting> {
                 underline: Container(
                   height: 0, // 隐藏下划线
                 ),
-                alignment: AlignmentDirectional.center,
+                alignment: AlignmentDirectional.centerStart,
                 items: Provider.of<ModelConfigProvider>(context, listen: false)
                     .channelModels
                     .map((data) {
                   return DropdownMenuItem<String>(
-                    alignment: AlignmentDirectional.center,
                     value: data.model,
                     child: Row(
-                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '（${data.label}）',
+                          '${data.label}：',
                           style: TextStyle(
-                              color: ChannelColor.getColorFromName(data.color),
-                              fontWeight: FontWeight.bold),
+                            color: ChannelColor.getColorFromName(data.color),
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         Text(
                           data.model,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
