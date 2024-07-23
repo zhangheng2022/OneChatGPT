@@ -49,7 +49,7 @@ Map<String, dynamic> _$StreamChatMessageChoiceToJson(
 StreamChatMessageDelta _$StreamChatMessageDeltaFromJson(
         Map<String, dynamic> json) =>
     StreamChatMessageDelta(
-      content: json['content'] as String,
+      content: json['content'] as String?,
       role: json['role'] as String?,
     );
 

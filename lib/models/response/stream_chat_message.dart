@@ -42,11 +42,11 @@ class StreamChatMessageChoice {
 
 @JsonSerializable()
 class StreamChatMessageDelta {
-  String content;
+  String? content;
   String? role;
 
   StreamChatMessageDelta({
-    required this.content,
+    this.content,
     this.role,
   });
 

@@ -345,6 +345,7 @@ class _ChatPageState extends State<ChatPage> {
     response.data.transform(const Utf8Decoder()).listen(
       (String val) {
         // 提取 JSON 片段
+        Log.d('原始字符串：$val');
         List<Map<String, dynamic>> jsonList = Util.extractJsonObjects(val);
         Log.t('JSON数据：$jsonList');
         // 解析并打印 JSON 片段
@@ -353,8 +354,11 @@ class _ChatPageState extends State<ChatPage> {
             message += jsonData['error']['message'];
           } else {
             try {
-              final messageContent =
-                  StreamChatMessage.fromJson(jsonData).choices[0].delta.content;
+              final messageContent = StreamChatMessage.fromJson(jsonData)
+                      .choices[0]
+                      .delta
+                      .content ??
+                  '';
               message += messageContent;
             } catch (e) {
               Log.e(e);
