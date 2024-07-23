@@ -83,6 +83,7 @@ class _ModelSettingState extends State<ModelSetting> {
       selector: (context, model) => model.currentModel,
       builder: (context, currentModel, child) {
         return Container(
+          width: double.infinity,
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -105,47 +106,43 @@ class _ModelSettingState extends State<ModelSetting> {
                   fontSize: 12,
                 ),
               ),
-              SizedBox(
-                width: double.infinity,
-                child: DropdownButton<String>(
-                  value: currentModel.model,
-                  underline: Container(
-                    height: 0, // 隐藏下划线
-                  ),
-                  alignment: AlignmentDirectional.center,
-                  items:
-                      Provider.of<ModelConfigProvider>(context, listen: false)
-                          .channelModels
-                          .map((data) {
-                    return DropdownMenuItem<String>(
-                      alignment: AlignmentDirectional.center,
-                      value: data.model,
-                      child: Row(
-                        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            '（${data.label}）',
-                            style: TextStyle(
-                                color:
-                                    ChannelColor.getColorFromName(data.color),
-                                fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            data.model,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (String? value) {
-                    if (value != null) {
-                      Provider.of<ModelConfigProvider>(context, listen: false)
-                          .updateModel(model: value);
-                    }
-                  },
-                  hint: const Text('请选择模型'),
+              DropdownButton<String>(
+                value: currentModel.model,
+                borderRadius: BorderRadius.circular(10),
+                underline: Container(
+                  height: 0, // 隐藏下划线
                 ),
+                alignment: AlignmentDirectional.center,
+                items: Provider.of<ModelConfigProvider>(context, listen: false)
+                    .channelModels
+                    .map((data) {
+                  return DropdownMenuItem<String>(
+                    alignment: AlignmentDirectional.center,
+                    value: data.model,
+                    child: Row(
+                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '（${data.label}）',
+                          style: TextStyle(
+                              color: ChannelColor.getColorFromName(data.color),
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          data.model,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+                onChanged: (String? value) {
+                  if (value != null) {
+                    Provider.of<ModelConfigProvider>(context, listen: false)
+                        .updateModel(model: value);
+                  }
+                },
+                hint: const Text('请选择模型'),
               ),
             ],
           ),

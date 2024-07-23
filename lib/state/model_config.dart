@@ -41,7 +41,7 @@ class ModelConfigProvider extends ChangeNotifier {
   /// 初始化模型配置并获取可用模型列表。
   Future<void> _init() async {
     /// 获取 SharedPreferences 实例以存储和检索数据。
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     try {
       /// 从 Supabase 获取可用模型列表。
       List<dynamic> data = await _supabase.rpc('get_channels');
@@ -69,6 +69,9 @@ class ModelConfigProvider extends ChangeNotifier {
       final String? modelResult = prefs.getString('currentModel');
       if (modelResult != null) {
         _currentModel = ChannelModel.fromJson(jsonDecode(modelResult));
+        if (!_channelModels.contains(_currentModel)) {
+          _currentModel = _channelModels.first;
+        }
       } else {
         _currentModel = _channelModels.first;
       }

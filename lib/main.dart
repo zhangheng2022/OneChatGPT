@@ -4,7 +4,7 @@ import 'package:one_chatgpt_flutter/state/model_config.dart';
 import 'package:provider/provider.dart';
 import 'package:one_chatgpt_flutter/router.dart';
 import 'package:one_chatgpt_flutter/state/auth.dart';
-import 'package:one_chatgpt_flutter/state/global.dart';
+import 'package:one_chatgpt_flutter/common/global.dart';
 import 'package:one_chatgpt_flutter/common/theme.dart';
 
 Future<void> main() async {
