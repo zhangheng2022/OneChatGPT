@@ -157,6 +157,15 @@ class ChatTableDataData extends DataClass
         isupdate: isupdate ?? this.isupdate,
         datetime: datetime ?? this.datetime,
       );
+  ChatTableDataData copyWithCompanion(ChatTableDataCompanion data) {
+    return ChatTableDataData(
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      isupdate: data.isupdate.present ? data.isupdate.value : this.isupdate,
+      datetime: data.datetime.present ? data.datetime.value : this.datetime,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('ChatTableDataData(')
@@ -542,6 +551,22 @@ class ChatContentTableDataData extends DataClass
         fileSize: fileSize.present ? fileSize.value : this.fileSize,
         datetime: datetime ?? this.datetime,
       );
+  ChatContentTableDataData copyWithCompanion(
+      ChatContentTableDataCompanion data) {
+    return ChatContentTableDataData(
+      id: data.id.present ? data.id.value : this.id,
+      parentid: data.parentid.present ? data.parentid.value : this.parentid,
+      title: data.title.present ? data.title.value : this.title,
+      textarea: data.textarea.present ? data.textarea.value : this.textarea,
+      role: data.role.present ? data.role.value : this.role,
+      contentType:
+          data.contentType.present ? data.contentType.value : this.contentType,
+      fileUri: data.fileUri.present ? data.fileUri.value : this.fileUri,
+      fileSize: data.fileSize.present ? data.fileSize.value : this.fileSize,
+      datetime: data.datetime.present ? data.datetime.value : this.datetime,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('ChatContentTableDataData(')
@@ -711,7 +736,7 @@ class ChatContentTableDataCompanion
 
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
-  _$AppDatabaseManager get managers => _$AppDatabaseManager(this);
+  $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $ChatTableDataTable chatTableData = $ChatTableDataTable(this);
   late final $ChatContentTableDataTable chatContentTableData =
       $ChatContentTableDataTable(this);
@@ -723,7 +748,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       [chatTableData, chatContentTableData];
 }
 
-typedef $$ChatTableDataTableInsertCompanionBuilder = ChatTableDataCompanion
+typedef $$ChatTableDataTableCreateCompanionBuilder = ChatTableDataCompanion
     Function({
   Value<int> id,
   Value<String> title,
@@ -744,8 +769,7 @@ class $$ChatTableDataTableTableManager extends RootTableManager<
     ChatTableDataData,
     $$ChatTableDataTableFilterComposer,
     $$ChatTableDataTableOrderingComposer,
-    $$ChatTableDataTableProcessedTableManager,
-    $$ChatTableDataTableInsertCompanionBuilder,
+    $$ChatTableDataTableCreateCompanionBuilder,
     $$ChatTableDataTableUpdateCompanionBuilder> {
   $$ChatTableDataTableTableManager(_$AppDatabase db, $ChatTableDataTable table)
       : super(TableManagerState(
@@ -755,9 +779,7 @@ class $$ChatTableDataTableTableManager extends RootTableManager<
               $$ChatTableDataTableFilterComposer(ComposerState(db, table)),
           orderingComposer:
               $$ChatTableDataTableOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) =>
-              $$ChatTableDataTableProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
+          updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String> title = const Value.absent(),
             Value<bool> isupdate = const Value.absent(),
@@ -769,7 +791,7 @@ class $$ChatTableDataTableTableManager extends RootTableManager<
             isupdate: isupdate,
             datetime: datetime,
           ),
-          getInsertCompanionBuilder: ({
+          createCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String> title = const Value.absent(),
             Value<bool> isupdate = const Value.absent(),
@@ -782,18 +804,6 @@ class $$ChatTableDataTableTableManager extends RootTableManager<
             datetime: datetime,
           ),
         ));
-}
-
-class $$ChatTableDataTableProcessedTableManager extends ProcessedTableManager<
-    _$AppDatabase,
-    $ChatTableDataTable,
-    ChatTableDataData,
-    $$ChatTableDataTableFilterComposer,
-    $$ChatTableDataTableOrderingComposer,
-    $$ChatTableDataTableProcessedTableManager,
-    $$ChatTableDataTableInsertCompanionBuilder,
-    $$ChatTableDataTableUpdateCompanionBuilder> {
-  $$ChatTableDataTableProcessedTableManager(super.$state);
 }
 
 class $$ChatTableDataTableFilterComposer
@@ -844,7 +854,7 @@ class $$ChatTableDataTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-typedef $$ChatContentTableDataTableInsertCompanionBuilder
+typedef $$ChatContentTableDataTableCreateCompanionBuilder
     = ChatContentTableDataCompanion Function({
   Value<int> id,
   required int parentid,
@@ -875,8 +885,7 @@ class $$ChatContentTableDataTableTableManager extends RootTableManager<
     ChatContentTableDataData,
     $$ChatContentTableDataTableFilterComposer,
     $$ChatContentTableDataTableOrderingComposer,
-    $$ChatContentTableDataTableProcessedTableManager,
-    $$ChatContentTableDataTableInsertCompanionBuilder,
+    $$ChatContentTableDataTableCreateCompanionBuilder,
     $$ChatContentTableDataTableUpdateCompanionBuilder> {
   $$ChatContentTableDataTableTableManager(
       _$AppDatabase db, $ChatContentTableDataTable table)
@@ -887,9 +896,7 @@ class $$ChatContentTableDataTableTableManager extends RootTableManager<
               ComposerState(db, table)),
           orderingComposer: $$ChatContentTableDataTableOrderingComposer(
               ComposerState(db, table)),
-          getChildManagerBuilder: (p) =>
-              $$ChatContentTableDataTableProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
+          updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<int> parentid = const Value.absent(),
             Value<String> title = const Value.absent(),
@@ -911,7 +918,7 @@ class $$ChatContentTableDataTableTableManager extends RootTableManager<
             fileSize: fileSize,
             datetime: datetime,
           ),
-          getInsertCompanionBuilder: ({
+          createCompanionCallback: ({
             Value<int> id = const Value.absent(),
             required int parentid,
             required String title,
@@ -934,19 +941,6 @@ class $$ChatContentTableDataTableTableManager extends RootTableManager<
             datetime: datetime,
           ),
         ));
-}
-
-class $$ChatContentTableDataTableProcessedTableManager
-    extends ProcessedTableManager<
-        _$AppDatabase,
-        $ChatContentTableDataTable,
-        ChatContentTableDataData,
-        $$ChatContentTableDataTableFilterComposer,
-        $$ChatContentTableDataTableOrderingComposer,
-        $$ChatContentTableDataTableProcessedTableManager,
-        $$ChatContentTableDataTableInsertCompanionBuilder,
-        $$ChatContentTableDataTableUpdateCompanionBuilder> {
-  $$ChatContentTableDataTableProcessedTableManager(super.$state);
 }
 
 class $$ChatContentTableDataTableFilterComposer
@@ -1047,9 +1041,9 @@ class $$ChatContentTableDataTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-class _$AppDatabaseManager {
+class $AppDatabaseManager {
   final _$AppDatabase _db;
-  _$AppDatabaseManager(this._db);
+  $AppDatabaseManager(this._db);
   $$ChatTableDataTableTableManager get chatTableData =>
       $$ChatTableDataTableTableManager(_db, _db.chatTableData);
   $$ChatContentTableDataTableTableManager get chatContentTableData =>
