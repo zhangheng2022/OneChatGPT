@@ -18,6 +18,13 @@ class GlobalTheme {
       scaffoldBackgroundColor: colorScheme.surface,
       highlightColor: Colors.transparent,
       focusColor: focusColor,
+      // appBarTheme: const AppBarTheme(
+      //   titleTextStyle: TextStyle(
+      //     fontSize: 16,
+      //     color: Colors.black,
+      //     fontWeight: FontWeight.bold,
+      //   ),
+      // ),
     );
   }
 

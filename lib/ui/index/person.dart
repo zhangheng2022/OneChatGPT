@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:one_chatgpt_flutter/state/auth.dart';
+import 'package:one_chatgpt_flutter/widgets/network_image_with_loading.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -21,33 +22,6 @@ class _PersonState extends State<Person> {
     super.didChangeDependencies();
   }
 
-  Future<void> _logout() async {
-    // Show a confirmation dialog
-    bool? confirmed = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('确认退出？'),
-          content: const Text('确定要退出当前账号吗？'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('取消'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('确定'),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (confirmed == true) {
-      await supabase.auth.signOut();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final defaultAvatar =
@@ -56,18 +30,15 @@ class _PersonState extends State<Person> {
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         backgroundColor: Colors.grey[50],
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _logout,
-          ),
-        ],
       ),
-      body: Center(
+      body: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
+            InkWell(
+              onTap: () {
+                context.goNamed("userinfo");
+              },
               child: Consumer<AuthProvider>(
                 builder: (context, authProvider, child) {
                   final userinfo = authProvider.user?.userMetadata;
@@ -76,7 +47,14 @@ class _PersonState extends State<Person> {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
-                      _buildProfileImage(avatarUrl),
+                      ClipOval(
+                        child: NetworkImageWithLoading(
+                          imageUrl:
+                              '$avatarUrl?v=${authProvider.user?.updatedAt}',
+                          width: 60,
+                          height: 60,
+                        ),
+                      ),
                       const SizedBox(width: 20),
                       Text(
                         fullName,
@@ -90,28 +68,9 @@ class _PersonState extends State<Person> {
                 },
               ),
             ),
+            const SizedBox(height: 20),
             _buildFunctionGrid(),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProfileImage(String avatarUrl) {
-    return Container(
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: Colors.grey,
-          width: 1,
-        ),
-      ),
-      child: ClipOval(
-        child: Image.network(
-          avatarUrl,
-          width: 60,
-          height: 60,
-          fit: BoxFit.cover,
         ),
       ),
     );
@@ -123,8 +82,6 @@ class _PersonState extends State<Person> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
       ),
-      margin: const EdgeInsets.all(20),
-      // padding: const EdgeInsets.symmetric(vertical: 20),
       child: GridView.count(
         childAspectRatio: 1.2,
         crossAxisCount: 4,

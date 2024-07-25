@@ -1,26 +1,26 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:one_chatgpt_flutter/state/auth.dart';
-import 'package:one_chatgpt_flutter/widgets/circular_progress.dart';
+import 'package:one_chatgpt_flutter/widgets/network_image_with_loading.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:uuid/uuid.dart';
 import 'package:path/path.dart' as path;
 
-class AvatarItem extends StatelessWidget {
+class AvatarItem extends StatefulWidget {
   const AvatarItem({super.key});
+  @override
+  State<AvatarItem> createState() => _AvatarItem();
+}
 
+class _AvatarItem extends State<AvatarItem> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      onTap: () {
-        _handleImageSelection(context);
-      },
+      onTap: _handleImageSelection,
       title: const Text(
         "头像",
         style: TextStyle(
@@ -46,9 +46,9 @@ class AvatarItem extends StatelessWidget {
               return SizedBox(
                 height: 60,
                 child: ClipOval(
-                  child: Image.network(
-                    avatarUrl,
-                    fit: BoxFit.cover,
+                  child: NetworkImageWithLoading(
+                    imageUrl: '$avatarUrl?v=${data?.updatedAt}',
+                    height: 60,
                   ),
                 ),
               );
@@ -64,23 +64,26 @@ class AvatarItem extends StatelessWidget {
   }
 
   // 处理图片选择
-  void _handleImageSelection(BuildContext context) async {
+  void _handleImageSelection() async {
     // 选择图片
     final XFile? file =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     // 如果没有选择图片，则返回
     if (file == null) return;
-    if (mounted) return;
-    final CroppedFile? result = await _cropImage(File(file.path), context);
+
+    final CroppedFile? result = await _cropImage(File(file.path));
     if (result == null) return;
 
     try {
       // 生成图片名称
-      String? userID = context.read<AuthProvider>().user?.id ?? '';
-      String imageName = '$userID${path.extension(result.path)}';
-      String storageFile = await supabase.storage
-          .from('user_avatar')
-          .upload(imageName, File(result.path));
+      if (!mounted) return;
+      User? user = context.read<AuthProvider>().user;
+      String imageName = '${user?.id}${path.extension(result.path)}';
+      String storageFile = await supabase.storage.from('user_avatar').upload(
+            imageName,
+            File(result.path),
+            fileOptions: const FileOptions(upsert: true),
+          );
 
       String imagePath =
           '${dotenv.get('SUPABASE_URL', fallback: null)}/storage/v1/object/public/$storageFile';
@@ -96,7 +99,7 @@ class AvatarItem extends StatelessWidget {
     }
   }
 
-  Future<CroppedFile?> _cropImage(File imageFile, BuildContext context) async {
+  Future<CroppedFile?> _cropImage(File imageFile) async {
     CroppedFile? croppedImage = await ImageCropper().cropImage(
       sourcePath: imageFile.path,
       aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
