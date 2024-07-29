@@ -5,17 +5,17 @@ import 'package:one_chatgpt_flutter/state/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class UpdateName extends StatefulWidget {
-  const UpdateName({super.key});
+class UpdateMail extends StatefulWidget {
+  const UpdateMail({super.key});
   @override
-  State<UpdateName> createState() => _UpdateName();
+  State<UpdateMail> createState() => _UpdateMail();
 }
 
-class _UpdateName extends State<UpdateName> {
+class _UpdateMail extends State<UpdateMail> {
   final supabase = Supabase.instance.client;
   final GlobalKey _formKey = GlobalKey<FormState>();
 
-  TextEditingController userNameController = TextEditingController();
+  TextEditingController userMailController = TextEditingController();
 
   Future<void> _onSubmit() async {
     try {
@@ -24,10 +24,10 @@ class _UpdateName extends State<UpdateName> {
       FocusScope.of(context).unfocus();
       await supabase.auth.updateUser(
         UserAttributes(
-          data: {'full_name': userNameController.text},
+          email: userMailController.text,
         ),
       );
-      SmartDialog.showToast("修改成功");
+      SmartDialog.showToast("修改成功，请到新邮箱验证");
     } catch (err) {
       Log.e("updateUser错误===>$err");
       SmartDialog.showToast("系统错误，请稍候再试");
@@ -42,7 +42,7 @@ class _UpdateName extends State<UpdateName> {
     User? user = context.read<AuthProvider>().user;
     if (user != null) {
       setState(() {
-        userNameController.text = user.userMetadata?['full_name'] ?? '';
+        userMailController.text = user.email ?? "";
       });
     }
   }
@@ -51,7 +51,7 @@ class _UpdateName extends State<UpdateName> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("修改用户名"),
+        title: const Text("修改邮箱"),
       ),
       body: Container(
         padding: const EdgeInsets.all(20.0), // 增加边距
@@ -63,34 +63,31 @@ class _UpdateName extends State<UpdateName> {
             children: <Widget>[
               TextFormField(
                 autofocus: true,
-                maxLength: 10,
-                controller: userNameController,
-                keyboardType: TextInputType.name,
+                controller: userMailController,
+                keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  hintText: "请输入用户名",
+                  hintText: "请输入新邮箱地址",
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10), // 圆角边框
                   ),
-                  suffixIcon: userNameController.text.isNotEmpty
+                  suffixIcon: userMailController.text.isNotEmpty
                       ? IconButton(
                           icon: const Icon(Icons.cancel),
                           onPressed: () {
                             setState(() {
-                              userNameController.clear();
+                              userMailController.clear();
                             });
                           },
                         )
                       : const SizedBox.shrink(),
                 ),
                 validator: (value) {
-                  if (value!.isEmpty) return "请输入用户名";
+                  if (value!.isEmpty) return "请输入新邮箱地址";
                   return null;
                 },
                 onChanged: (val) {
                   setState(() {
-                    userNameController.text = val;
+                    userMailController.text = val;
                   });
                 },
               ),

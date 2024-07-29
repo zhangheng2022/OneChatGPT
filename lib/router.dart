@@ -9,7 +9,9 @@ import 'package:one_chatgpt_flutter/ui/index/scaffold_nav_bar.dart';
 import 'package:one_chatgpt_flutter/ui/index/home.dart';
 import 'package:one_chatgpt_flutter/ui/index/person.dart';
 import 'package:one_chatgpt_flutter/ui/model_setting/model_setting.dart';
+import 'package:one_chatgpt_flutter/ui/userinfo/update_mail.dart';
 import 'package:one_chatgpt_flutter/ui/userinfo/update_name.dart';
+import 'package:one_chatgpt_flutter/ui/userinfo/update_password.dart';
 import 'package:one_chatgpt_flutter/ui/userinfo/userinfo.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -88,6 +90,18 @@ class AppRoutes {
                         path: 'update_name',
                         parentNavigatorKey: _rootNavigatorKey,
                         builder: (context, state) => const UpdateName(),
+                      ),
+                      GoRoute(
+                        name: 'update_mail',
+                        path: 'update_mail',
+                        parentNavigatorKey: _rootNavigatorKey,
+                        builder: (context, state) => const UpdateMail(),
+                      ),
+                      GoRoute(
+                        name: 'update_password',
+                        path: 'update_password',
+                        parentNavigatorKey: _rootNavigatorKey,
+                        builder: (context, state) => const UpdatePassword(),
                       ),
                     ],
                   ),

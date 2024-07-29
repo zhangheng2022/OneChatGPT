@@ -71,6 +71,9 @@ class _Userinfo extends State<Userinfo> {
                   ),
                 ),
                 ListTile(
+                  onTap: () {
+                    context.goNamed("update_mail");
+                  },
                   enableFeedback: true,
                   title: const Text(
                     "邮箱",
@@ -106,20 +109,23 @@ class _Userinfo extends State<Userinfo> {
                     ],
                   ),
                 ),
-                const ListTile(
+                ListTile(
+                  onTap: () {
+                    context.goNamed("update_password");
+                  },
                   enableFeedback: true,
-                  title: Text(
+                  title: const Text(
                     "密码修改",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  contentPadding: EdgeInsets.symmetric(
+                  contentPadding: const EdgeInsets.symmetric(
                     horizontal: 20,
                     vertical: 10,
                   ),
-                  trailing: Row(
+                  trailing: const Row(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -145,7 +151,7 @@ class _Userinfo extends State<Userinfo> {
             style: TextButton.styleFrom(
               foregroundColor: Theme.of(context).colorScheme.error,
             ),
-            label: const Text("注销登录"),
+            label: const Text("退出登录"),
             icon: const Icon(Icons.logout_rounded),
           )
         ],
