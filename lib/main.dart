@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
 import 'package:one_chatgpt_flutter/state/model_config.dart';
 import 'package:provider/provider.dart';
@@ -40,6 +41,7 @@ class InitApp extends StatelessWidget {
         darkTheme: GlobalTheme.darkThemeData,
         debugShowCheckedModeBanner: false,
         routerConfig: AppRoutes.router,
+        builder: FlutterSmartDialog.init(),
       ),
     );
   }

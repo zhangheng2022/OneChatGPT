@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
@@ -43,13 +44,11 @@ class _AvatarItem extends State<AvatarItem> {
                   '${dotenv.env['SUPABASE_URL']!}/storage/v1/object/public/common/default_avatar.png';
               final avatarUrl =
                   data?.userMetadata?['avatar_url'] ?? defaultAvatar;
-              return SizedBox(
-                height: 60,
-                child: ClipOval(
-                  child: NetworkImageWithLoading(
-                    imageUrl: '$avatarUrl?v=${data?.updatedAt}',
-                    height: 60,
-                  ),
+              return ClipOval(
+                child: NetworkImageWithLoading(
+                  imageUrl: '$avatarUrl?v=${data?.updatedAt}',
+                  height: 50,
+                  width: 50,
                 ),
               );
             },
@@ -77,6 +76,7 @@ class _AvatarItem extends State<AvatarItem> {
     try {
       // 生成图片名称
       if (!mounted) return;
+      SmartDialog.showLoading(msg: "请稍候...");
       User? user = context.read<AuthProvider>().user;
       String imageName = '${user?.id}${path.extension(result.path)}';
       String storageFile = await supabase.storage.from('user_avatar').upload(
@@ -93,6 +93,8 @@ class _AvatarItem extends State<AvatarItem> {
           data: {'avatar_url': imagePath},
         ),
       );
+      SmartDialog.dismiss(status: SmartStatus.loading);
+      SmartDialog.showToast("修改成功");
     } catch (err) {
       // 处理错误
       Log.e(err);

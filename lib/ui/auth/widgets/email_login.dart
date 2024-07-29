@@ -1,10 +1,10 @@
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:one_chatgpt_flutter/utils/validator.dart';
 import 'package:one_chatgpt_flutter/widgets/circular_progress.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginEmail extends StatefulWidget {
   const LoginEmail({super.key});
@@ -34,11 +34,7 @@ class _LoginEmailState extends State<LoginEmail> {
       );
     } catch (err) {
       Log.e("登录错误===>$err");
-      Fluttertoast.showToast(
-        msg: "邮箱或密码不正确，请检查",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-      );
+      SmartDialog.showToast('邮箱或密码不正确，请检查');
     } finally {
       setState(() => _isLoading = false);
     }

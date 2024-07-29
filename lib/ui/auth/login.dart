@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:one_chatgpt_flutter/widgets/circular_progress.dart';
@@ -6,7 +7,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:one_chatgpt_flutter/ui/auth/widgets/email_login.dart';
 import 'package:go_router/go_router.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -52,11 +52,7 @@ class _LoginPageState extends State<LoginPage> {
       String? idToken = googleAuth.idToken;
 
       if (accessToken == null || idToken == null) {
-        Fluttertoast.showToast(
-          msg: "授权错误",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-        );
+        SmartDialog.showToast('授权错误，请检查');
         return;
       }
 
@@ -67,11 +63,7 @@ class _LoginPageState extends State<LoginPage> {
       );
     } catch (err) {
       Log.e("Google授权失败===>$err");
-      Fluttertoast.showToast(
-        msg: "授权失败，请检查网络连接",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-      );
+      SmartDialog.showToast('授权失败，请检查网络连接');
     } finally {
       setState(() => _googleLoginLoading = false);
     }

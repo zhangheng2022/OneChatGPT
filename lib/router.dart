@@ -1,3 +1,4 @@
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
@@ -35,6 +36,7 @@ class AppRoutes {
     },
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/home',
+    observers: [FlutterSmartDialog.observer],
     routes: <RouteBase>[
       StatefulShellRoute.indexedStack(
         branches: <StatefulShellBranch>[
