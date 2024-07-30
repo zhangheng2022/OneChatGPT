@@ -8,9 +8,10 @@ import 'package:app_links/app_links.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:window_manager/window_manager.dart';
 
-class Global {
-  static Future<void> init() async {
+class Screen {
+  static Future<void> initialize() async {
     // Initialize Flutter framework and preserve native splash screen
     WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
@@ -21,6 +22,20 @@ class Global {
         const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
       );
     }
+    if (Platform.isWindows) {
+      await windowManager.ensureInitialized();
+      WindowOptions windowOptions = const WindowOptions(
+        size: Size(800, 600),
+        center: true,
+        backgroundColor: Colors.transparent,
+        skipTaskbar: false,
+        titleBarStyle: TitleBarStyle.normal,
+      );
+      windowManager.waitUntilReadyToShow(windowOptions, () async {
+        await windowManager.show();
+        await windowManager.focus();
+      });
+    }
 
     // Initialize app links listener
     final appLinks = AppLinks();
@@ -28,10 +43,10 @@ class Global {
       Log.i("uri: $uri");
     });
 
-    // Set default locale and load environment variables
-    Intl.defaultLocale = 'zh_CN';
     await dotenv.load();
 
+    // Set default locale and load environment variables
+    Intl.defaultLocale = 'zh_CN';
     // Initialize date formatting
     await initializeDateFormatting();
 

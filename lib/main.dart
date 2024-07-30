@@ -5,11 +5,12 @@ import 'package:one_chatgpt_flutter/state/model_config.dart';
 import 'package:provider/provider.dart';
 import 'package:one_chatgpt_flutter/router.dart';
 import 'package:one_chatgpt_flutter/state/auth.dart';
-import 'package:one_chatgpt_flutter/common/global.dart';
+import 'package:one_chatgpt_flutter/screen.dart';
 import 'package:one_chatgpt_flutter/common/theme.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 Future<void> main() async {
-  await Global.init();
+  await Screen.initialize();
   runApp(const InitApp());
 }
 
@@ -42,6 +43,20 @@ class InitApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         routerConfig: AppRoutes.router,
         builder: FlutterSmartDialog.init(),
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale.fromSubtags(languageCode: 'zh'),
+        ],
+        localeResolutionCallback: (
+          locale,
+          supportedLocales,
+        ) {
+          return locale;
+        },
       ),
     );
   }

@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class GlobalTheme {
   static final Color _lightFocusColor = Colors.black.withOpacity(0.12);
@@ -18,13 +21,6 @@ class GlobalTheme {
       scaffoldBackgroundColor: colorScheme.surface,
       highlightColor: Colors.transparent,
       focusColor: focusColor,
-      // appBarTheme: const AppBarTheme(
-      //   titleTextStyle: TextStyle(
-      //     fontSize: 16,
-      //     color: Colors.black,
-      //     fontWeight: FontWeight.bold,
-      //   ),
-      // ),
     );
   }
 
