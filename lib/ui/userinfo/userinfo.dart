@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:one_chatgpt_flutter/state/auth.dart';
 import 'package:one_chatgpt_flutter/ui/userinfo/widgets/avatar_item.dart';
 import 'package:provider/provider.dart';
@@ -185,7 +186,11 @@ class _Userinfo extends State<Userinfo> {
     );
 
     if (confirmed == true) {
-      await supabase.auth.signOut();
+      try {
+        await supabase.auth.signOut();
+      } catch (e) {
+        Log.e(e);
+      }
     }
   }
 }
