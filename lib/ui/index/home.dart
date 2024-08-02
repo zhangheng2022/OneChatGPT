@@ -117,6 +117,7 @@ class _HomeState extends State<Home> {
     return SizeTransition(
       sizeFactor: animation,
       child: Card(
+        elevation: 0,
         color: Theme.of(context).colorScheme.tertiary,
         margin: const EdgeInsets.only(bottom: 20),
         child: ListTile(

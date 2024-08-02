@@ -607,6 +607,11 @@ class _ChatPageState extends State<ChatPage> {
             color: Colors.white,
           ),
           userAvatarNameColors: [Theme.of(context).primaryColor],
+          receivedMessageBodyTextStyle: const TextStyle(fontSize: 14),
+          sentMessageBodyTextStyle: const TextStyle(
+            fontSize: 14,
+            color: neutral7,
+          ),
         ),
         // 输入框配置
         inputOptions: InputOptions(
