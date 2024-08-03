@@ -11,7 +11,6 @@ import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:window_manager/window_manager.dart';
-import 'package:win32_registry/win32_registry.dart';
 
 class Screen {
   static Future<void> initialize() async {

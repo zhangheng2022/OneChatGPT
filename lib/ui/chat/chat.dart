@@ -343,7 +343,7 @@ class _ChatPageState extends State<ChatPage> {
     final messageid = const Uuid().v4();
     // 监听回复消息
     response.data.transform(const Utf8Decoder()).listen(
-      (String val) {
+      (val) {
         // 提取 JSON 片段
         Log.d('原始字符串：$val');
         List<Map<String, dynamic>> jsonList = Util.extractJsonObjects(val);

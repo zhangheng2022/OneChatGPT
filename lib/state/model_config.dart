@@ -69,7 +69,9 @@ class ModelConfigProvider extends ChangeNotifier {
       final String? modelResult = prefs.getString('currentModel');
       if (modelResult != null) {
         _currentModel = ChannelModel.fromJson(jsonDecode(modelResult));
-        if (!_channelModels.contains(_currentModel)) {
+        int index = _channelModels
+            .indexWhere((data) => data.model == _currentModel.model);
+        if (index == -1) {
           _currentModel = _channelModels.first;
         }
       } else {

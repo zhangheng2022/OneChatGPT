@@ -60,33 +60,3 @@ class Util {
     return jsonObjects;
   }
 }
-  // List<String> extractJsonStrings(String text) {
-  //   List<String> jsonStrings = [];
-  //   int braceCount = 0;
-  //   StringBuffer currentJson = StringBuffer();
-  //   bool inJson = false;
-
-  //   for (int i = 0; i < text.length; i++) {
-  //     if (text[i] == '{') {
-  //       if (braceCount == 0) {
-  //         inJson = true;
-  //       }
-  //       braceCount++;
-  //     }
-
-  //     if (inJson) {
-  //       currentJson.write(text[i]);
-  //     }
-
-  //     if (text[i] == '}') {
-  //       braceCount--;
-  //       if (braceCount == 0) {
-  //         inJson = false;
-  //         jsonStrings.add(currentJson.toString());
-  //         currentJson.clear();
-  //       }
-  //     }
-  //   }
-
-  //   return jsonStrings;
-  // }
