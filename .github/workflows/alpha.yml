@@ -10,11 +10,12 @@ on:
     types: [closed]
 
 jobs:
-  build-and-release:
+  build-android:
     name: Build and Release APK
     runs-on: ubuntu-latest
     permissions:
       contents: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -26,17 +27,20 @@ jobs:
 
       - name: Decode keystore
         run: |
-          echo ${{ secrets.KEYSTORE }} | base64 --decode > ${{ github.workspace }}/android/app/keystore.jks
+          echo "${{ secrets.KEYSTORE }}" | base64 --decode > ${{ github.workspace }}/android/app/keystore.jks
 
       - name: Extract version
+        id: extract_version
         run: |
-          echo "VERSION=$(grep 'version:' pubspec.yaml | sed 's/version: //')" >> $GITHUB_ENV
+          VERSION=$(grep 'version:' pubspec.yaml | sed 's/version: //')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Build APKs
         run: |
           flutter pub get
           flutter build apk --release
           flutter build apk --release --split-per-abi
+
         env:
           KEYALIAS: ${{ secrets.KEYALIAS }}
           KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
@@ -48,7 +52,7 @@ jobs:
           for apk in build/app/outputs/flutter-apk/*-release.apk; do
             abi=$(echo "$apk" | sed -n 's/.*app-\(.*\)-release.apk/\1/p')
             newname="OneChatGPT-${{ env.VERSION }}-${abi}.apk"
-            mv "$apk" "build/app/outputs/flutter-apk/$newname"
+            mvapk" "build/app/outputs/flutter-apk/$newname"
           done
 
       - name: Upload APKs to Artifacts
@@ -65,7 +69,7 @@ jobs:
         with:
           allowUpdates: true
           removeArtifacts: true
-          artifacts: "build/app/outputs/flutter-apk/*.apk"
+          artifacts: "build/outputs/flutter-apk/*.apk"
           tag: Alpha
           name: OneChatGPT Alpha
           body: |
@@ -77,7 +81,7 @@ jobs:
             ### 针对特定架构的 APKs
             - 对于 ARM 64位设备：OneChatGPT-***-arm64-v8a.apk
             - 对于 ARM 32位设备：OneChatGPT-***-armeabi-v7a.apk
-            - 对于 x86_64 设备：OneChatGPT-***-x86_64.apk
+            - 对于 x86_64 设备：OneChatGPT-***x86_64.apk
 
             更新时间：${{ env.CURRENT_TIME }}
           draft: false
