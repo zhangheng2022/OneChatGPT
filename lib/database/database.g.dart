@@ -763,49 +763,6 @@ typedef $$ChatTableDataTableUpdateCompanionBuilder = ChatTableDataCompanion
   Value<DateTime> datetime,
 });
 
-class $$ChatTableDataTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $ChatTableDataTable,
-    ChatTableDataData,
-    $$ChatTableDataTableFilterComposer,
-    $$ChatTableDataTableOrderingComposer,
-    $$ChatTableDataTableCreateCompanionBuilder,
-    $$ChatTableDataTableUpdateCompanionBuilder> {
-  $$ChatTableDataTableTableManager(_$AppDatabase db, $ChatTableDataTable table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer:
-              $$ChatTableDataTableFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $$ChatTableDataTableOrderingComposer(ComposerState(db, table)),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<String> title = const Value.absent(),
-            Value<bool> isupdate = const Value.absent(),
-            Value<DateTime> datetime = const Value.absent(),
-          }) =>
-              ChatTableDataCompanion(
-            id: id,
-            title: title,
-            isupdate: isupdate,
-            datetime: datetime,
-          ),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<String> title = const Value.absent(),
-            Value<bool> isupdate = const Value.absent(),
-            Value<DateTime> datetime = const Value.absent(),
-          }) =>
-              ChatTableDataCompanion.insert(
-            id: id,
-            title: title,
-            isupdate: isupdate,
-            datetime: datetime,
-          ),
-        ));
-}
-
 class $$ChatTableDataTableFilterComposer
     extends FilterComposer<_$AppDatabase, $ChatTableDataTable> {
   $$ChatTableDataTableFilterComposer(super.$state);
@@ -854,6 +811,73 @@ class $$ChatTableDataTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+class $$ChatTableDataTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $ChatTableDataTable,
+    ChatTableDataData,
+    $$ChatTableDataTableFilterComposer,
+    $$ChatTableDataTableOrderingComposer,
+    $$ChatTableDataTableCreateCompanionBuilder,
+    $$ChatTableDataTableUpdateCompanionBuilder,
+    (
+      ChatTableDataData,
+      BaseReferences<_$AppDatabase, $ChatTableDataTable, ChatTableDataData>
+    ),
+    ChatTableDataData,
+    PrefetchHooks Function()> {
+  $$ChatTableDataTableTableManager(_$AppDatabase db, $ChatTableDataTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$ChatTableDataTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$ChatTableDataTableOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> title = const Value.absent(),
+            Value<bool> isupdate = const Value.absent(),
+            Value<DateTime> datetime = const Value.absent(),
+          }) =>
+              ChatTableDataCompanion(
+            id: id,
+            title: title,
+            isupdate: isupdate,
+            datetime: datetime,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> title = const Value.absent(),
+            Value<bool> isupdate = const Value.absent(),
+            Value<DateTime> datetime = const Value.absent(),
+          }) =>
+              ChatTableDataCompanion.insert(
+            id: id,
+            title: title,
+            isupdate: isupdate,
+            datetime: datetime,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$ChatTableDataTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $ChatTableDataTable,
+    ChatTableDataData,
+    $$ChatTableDataTableFilterComposer,
+    $$ChatTableDataTableOrderingComposer,
+    $$ChatTableDataTableCreateCompanionBuilder,
+    $$ChatTableDataTableUpdateCompanionBuilder,
+    (
+      ChatTableDataData,
+      BaseReferences<_$AppDatabase, $ChatTableDataTable, ChatTableDataData>
+    ),
+    ChatTableDataData,
+    PrefetchHooks Function()>;
 typedef $$ChatContentTableDataTableCreateCompanionBuilder
     = ChatContentTableDataCompanion Function({
   Value<int> id,
@@ -878,70 +902,6 @@ typedef $$ChatContentTableDataTableUpdateCompanionBuilder
   Value<int?> fileSize,
   Value<DateTime> datetime,
 });
-
-class $$ChatContentTableDataTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $ChatContentTableDataTable,
-    ChatContentTableDataData,
-    $$ChatContentTableDataTableFilterComposer,
-    $$ChatContentTableDataTableOrderingComposer,
-    $$ChatContentTableDataTableCreateCompanionBuilder,
-    $$ChatContentTableDataTableUpdateCompanionBuilder> {
-  $$ChatContentTableDataTableTableManager(
-      _$AppDatabase db, $ChatContentTableDataTable table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer: $$ChatContentTableDataTableFilterComposer(
-              ComposerState(db, table)),
-          orderingComposer: $$ChatContentTableDataTableOrderingComposer(
-              ComposerState(db, table)),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<int> parentid = const Value.absent(),
-            Value<String> title = const Value.absent(),
-            Value<String?> textarea = const Value.absent(),
-            Value<String> role = const Value.absent(),
-            Value<String> contentType = const Value.absent(),
-            Value<String?> fileUri = const Value.absent(),
-            Value<int?> fileSize = const Value.absent(),
-            Value<DateTime> datetime = const Value.absent(),
-          }) =>
-              ChatContentTableDataCompanion(
-            id: id,
-            parentid: parentid,
-            title: title,
-            textarea: textarea,
-            role: role,
-            contentType: contentType,
-            fileUri: fileUri,
-            fileSize: fileSize,
-            datetime: datetime,
-          ),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            required int parentid,
-            required String title,
-            Value<String?> textarea = const Value.absent(),
-            required String role,
-            required String contentType,
-            Value<String?> fileUri = const Value.absent(),
-            Value<int?> fileSize = const Value.absent(),
-            Value<DateTime> datetime = const Value.absent(),
-          }) =>
-              ChatContentTableDataCompanion.insert(
-            id: id,
-            parentid: parentid,
-            title: title,
-            textarea: textarea,
-            role: role,
-            contentType: contentType,
-            fileUri: fileUri,
-            fileSize: fileSize,
-            datetime: datetime,
-          ),
-        ));
-}
 
 class $$ChatContentTableDataTableFilterComposer
     extends FilterComposer<_$AppDatabase, $ChatContentTableDataTable> {
@@ -1040,6 +1000,98 @@ class $$ChatContentTableDataTableOrderingComposer
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
+
+class $$ChatContentTableDataTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $ChatContentTableDataTable,
+    ChatContentTableDataData,
+    $$ChatContentTableDataTableFilterComposer,
+    $$ChatContentTableDataTableOrderingComposer,
+    $$ChatContentTableDataTableCreateCompanionBuilder,
+    $$ChatContentTableDataTableUpdateCompanionBuilder,
+    (
+      ChatContentTableDataData,
+      BaseReferences<_$AppDatabase, $ChatContentTableDataTable,
+          ChatContentTableDataData>
+    ),
+    ChatContentTableDataData,
+    PrefetchHooks Function()> {
+  $$ChatContentTableDataTableTableManager(
+      _$AppDatabase db, $ChatContentTableDataTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer: $$ChatContentTableDataTableFilterComposer(
+              ComposerState(db, table)),
+          orderingComposer: $$ChatContentTableDataTableOrderingComposer(
+              ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<int> parentid = const Value.absent(),
+            Value<String> title = const Value.absent(),
+            Value<String?> textarea = const Value.absent(),
+            Value<String> role = const Value.absent(),
+            Value<String> contentType = const Value.absent(),
+            Value<String?> fileUri = const Value.absent(),
+            Value<int?> fileSize = const Value.absent(),
+            Value<DateTime> datetime = const Value.absent(),
+          }) =>
+              ChatContentTableDataCompanion(
+            id: id,
+            parentid: parentid,
+            title: title,
+            textarea: textarea,
+            role: role,
+            contentType: contentType,
+            fileUri: fileUri,
+            fileSize: fileSize,
+            datetime: datetime,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required int parentid,
+            required String title,
+            Value<String?> textarea = const Value.absent(),
+            required String role,
+            required String contentType,
+            Value<String?> fileUri = const Value.absent(),
+            Value<int?> fileSize = const Value.absent(),
+            Value<DateTime> datetime = const Value.absent(),
+          }) =>
+              ChatContentTableDataCompanion.insert(
+            id: id,
+            parentid: parentid,
+            title: title,
+            textarea: textarea,
+            role: role,
+            contentType: contentType,
+            fileUri: fileUri,
+            fileSize: fileSize,
+            datetime: datetime,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$ChatContentTableDataTableProcessedTableManager
+    = ProcessedTableManager<
+        _$AppDatabase,
+        $ChatContentTableDataTable,
+        ChatContentTableDataData,
+        $$ChatContentTableDataTableFilterComposer,
+        $$ChatContentTableDataTableOrderingComposer,
+        $$ChatContentTableDataTableCreateCompanionBuilder,
+        $$ChatContentTableDataTableUpdateCompanionBuilder,
+        (
+          ChatContentTableDataData,
+          BaseReferences<_$AppDatabase, $ChatContentTableDataTable,
+              ChatContentTableDataData>
+        ),
+        ChatContentTableDataData,
+        PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
