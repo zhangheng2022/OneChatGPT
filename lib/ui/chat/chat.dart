@@ -320,10 +320,9 @@ class _ChatPageState extends State<ChatPage> {
   Future<void> _fetchModelResponse() async {
     final completer = Completer<void>();
 
-    ModelConfig currentModelConfig =
+    final currentModelConfig =
         context.read<ModelConfigProvider>().currentModelConfig;
-    ChannelModel currentModel =
-        context.read<ModelConfigProvider>().currentModel;
+    final currentModel = context.read<ModelConfigProvider>().currentModel;
 
     final messages = _getHistoryMessages();
     // 调用 Supabase 函数
@@ -338,41 +337,54 @@ class _ChatPageState extends State<ChatPage> {
       'function-chat/completions',
       body: params.toJson(),
     );
-
-    String message = '';
     final messageid = const Uuid().v4();
+    String message = '';
+    String buffer = '';
     // 监听回复消息
     response.data.transform(const Utf8Decoder()).listen(
-      (val) {
+      (chunk) {
         // 提取 JSON 片段
-        Log.d('原始字符串：$val');
-        List<Map<String, dynamic>> jsonList = Util.extractJsonObjects(val);
-        Log.t('JSON数据：$jsonList');
-        // 解析并打印 JSON 片段
-        for (Map<String, dynamic> jsonData in jsonList) {
-          if (jsonData['error'] != null) {
-            message += jsonData['error']['message'];
-          } else {
-            try {
-              final messageContent = StreamChatMessage.fromJson(jsonData)
-                      .choices[0]
-                      .delta
-                      .content ??
-                  '';
-              message += messageContent;
-            } catch (e) {
-              Log.e(e);
+        buffer += chunk.toString();
+        while (true) {
+          final endOfEvent = buffer.indexOf('\n\n');
+          if (endOfEvent == -1) {
+            // 没有找到完整的事件块，等待更多数据
+            break;
+          }
+          // 提取完整的事件块
+          final event = buffer.substring(0, endOfEvent).trim();
+          buffer = buffer.substring(endOfEvent + 2); // 跳过 \n\n
+          if (event.isNotEmpty) {
+            Log.d('原始字符串：$event');
+            List<Map<String, dynamic>> jsonList =
+                Util.extractJsonObjects(event);
+            // 解析并打印 JSON 片段
+            for (Map<String, dynamic> jsonData in jsonList) {
+              if (jsonData['error'] != null) {
+                message += jsonData['error']['message'];
+              } else {
+                try {
+                  final messageContent = StreamChatMessage.fromJson(jsonData)
+                          .choices[0]
+                          .delta
+                          .content ??
+                      '';
+                  message += messageContent;
+                } catch (e) {
+                  Log.e(e);
+                }
+              }
+              // 创建文本消息对象
+              final modelMessage = types.TextMessage(
+                author: _model,
+                id: messageid,
+                text: message,
+                metadata: const {'role': "assistant"},
+              );
+              // 添加或更新消息到列表
+              _addOrUpdateMessage(modelMessage);
             }
           }
-          // 创建文本消息对象
-          final modelMessage = types.TextMessage(
-            author: _model,
-            id: messageid,
-            text: message,
-            metadata: const {'role': "assistant"},
-          );
-          // 添加或更新消息到列表
-          _addOrUpdateMessage(modelMessage);
         }
       },
       onDone: () {
