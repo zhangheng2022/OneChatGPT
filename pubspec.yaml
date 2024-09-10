@@ -58,10 +58,6 @@ dependencies:
   flutter_native_splash: ^2.4.1
   image_cropper: ^8.0.1
   flutter_smart_dialog: ^4.9.7+9
-  window_manager: ^0.4.2
-  responsive_builder: ^0.7.1
-  tray_manager: ^0.2.3
-  win32_registry: ^1.1.4
 
 
 dev_dependencies:

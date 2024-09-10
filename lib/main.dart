@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
-import 'package:one_chatgpt_flutter/utils/view_platform.dart';
-import 'package:one_chatgpt_flutter/widgets/global_tray.dart';
-import 'package:one_chatgpt_flutter/widgets/global_window.dart';
 import 'package:one_chatgpt_flutter/state/model_config.dart';
 import 'package:provider/provider.dart';
 import 'package:one_chatgpt_flutter/router.dart';
@@ -45,10 +42,6 @@ class RunApp extends StatelessWidget {
         routerConfig: AppRoutes.router,
         builder: (context, child) {
           child = FlutterSmartDialog.init()(context, child);
-          if (ViewPlatform.isDesktop) {
-            child = GlobalWindow(child: child);
-            child = GlobalTray(child: child);
-          }
           return child;
         },
         localizationsDelegates: const [

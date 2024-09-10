@@ -1,8 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:one_chatgpt_flutter/utils/view_platform.dart';
-import 'package:responsive_builder/responsive_builder.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -10,36 +8,17 @@ import 'package:app_links/app_links.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:window_manager/window_manager.dart';
 
 class Screen {
   static Future<void> initialize() async {
     // Initialize Flutter framework and preserve native splash screen
     WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-    ResponsiveSizingConfig.instance.setCustomBreakpoints(
-      const ScreenBreakpoints(desktop: 700, tablet: 500, watch: 200),
-    );
     // Set up platform-specific UI customization (Android)
     if (Platform.isAndroid) {
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
       );
-    }
-    if (ViewPlatform.isDesktop) {
-      await windowManager.ensureInitialized();
-      WindowOptions windowOptions = const WindowOptions(
-        size: Size(800, 600),
-        minimumSize: Size(800, 600),
-        center: true,
-        backgroundColor: Colors.transparent,
-        skipTaskbar: false,
-        titleBarStyle: TitleBarStyle.normal,
-      );
-      windowManager.waitUntilReadyToShow(windowOptions, () async {
-        await windowManager.show();
-        await windowManager.focus();
-      });
     }
 
     // Initialize app links listener

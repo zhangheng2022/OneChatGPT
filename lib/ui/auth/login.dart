@@ -1,15 +1,12 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:one_chatgpt_flutter/common/window_app_links_register.dart';
 import 'package:one_chatgpt_flutter/widgets/circular_progress.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:one_chatgpt_flutter/ui/auth/widgets/email_login.dart';
 import 'package:go_router/go_router.dart';
-import 'package:responsive_builder/responsive_builder.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -24,9 +21,6 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    if (Platform.isWindows) {
-      WindowAppLinksRegister('onechatgpt');
-    }
   }
 
   Future<void> _githubLogin() async {
@@ -44,14 +38,6 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _googleLogin() async {
     try {
       setState(() => _googleLoginLoading = true);
-
-      if (Platform.isWindows) {
-        await supabase.auth.signInWithOAuth(
-          OAuthProvider.google,
-          redirectTo: 'onechatgpt://login-callback',
-        );
-        return;
-      }
 
       /// Web Client ID that you registered with Google Cloud.
       const webClientId =
@@ -99,29 +85,17 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ResponsiveBuilder(
-                builder: (context, sizingInformation) {
-                  if (sizingInformation.isMobile) {
-                    return Image.network(
-                      "https://api.miaomc.cn/image/other/bing",
-                      height: appHeight * 0.5,
-                      fit: BoxFit.cover, // 保持图片的宽高比
-                      errorBuilder: (context, error, stackTrace) => Image.asset(
-                        'assets/images/login_header_default.jpg', //默认显示图片
-                        height: appHeight * 0.5,
-                        fit: BoxFit.cover,
-                      ),
-                    );
-                  }
-                  return const SizedBox.shrink();
-                },
+              Image.network(
+                "https://api.miaomc.cn/image/other/bing",
+                height: appHeight * 0.5,
+                fit: BoxFit.cover, // 保持图片的宽高比
+                errorBuilder: (context, error, stackTrace) => Image.asset(
+                  'assets/images/login_header_default.jpg', //默认显示图片
+                  height: appHeight * 0.5,
+                  fit: BoxFit.cover,
+                ),
               ),
               SizedBox(
-                height: getValueForScreenType(
-                  context: context,
-                  mobile: appHeight * 0.5,
-                  desktop: appHeight,
-                ),
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Column(
