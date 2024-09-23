@@ -66,7 +66,7 @@ class _ChatPageState extends State<ChatPage> {
         context.read<ModelConfigProvider>().currentModel;
     _model = types.User(
       id: const Uuid().v4(),
-      firstName: currentModel.label,
+      firstName: currentModel.company,
       lastName: currentModel.model,
       imageUrl: "$supabaseUrl/storage/v1/object/public/common/logo.png",
     );

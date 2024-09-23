@@ -121,11 +121,7 @@ class _ModelSettingState extends State<ModelSetting> {
                     child: Row(
                       children: [
                         Text(
-                          '${data.label}：',
-                          style: TextStyle(
-                            color: ChannelColor.getColorFromName(data.color),
-                            fontWeight: FontWeight.bold,
-                          ),
+                          '${data.company}：',
                         ),
                         Text(
                           data.model,

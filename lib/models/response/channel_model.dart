@@ -5,15 +5,15 @@ part 'channel_model.g.dart';
 class ChannelModel {
   @JsonKey(required: true)
   String model;
-  String value;
-  String label;
-  String color;
+  String configId;
+  String logo;
+  String company;
 
   ChannelModel({
     required this.model,
-    required this.value,
-    required this.label,
-    required this.color,
+    required this.configId,
+    required this.logo,
+    required this.company,
   });
 
   factory ChannelModel.fromJson(Map<String, dynamic> json) =>
