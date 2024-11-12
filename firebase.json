@@ -1,0 +1,22 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "onechatgpt-428305",
+          "appId": "1:343563540047:android:a067677be9693ff11dbc3a",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "onechatgpt-428305",
+          "configurations": {
+            "android": "1:343563540047:android:a067677be9693ff11dbc3a",
+            "ios": "1:343563540047:ios:c5f4b6fa825fbed61dbc3a"
+          }
+        }
+      }
+    }
+  }
+}

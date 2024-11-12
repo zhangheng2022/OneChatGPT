@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "343563540047",
+    "project_id": "onechatgpt-428305",
+    "storage_bucket": "onechatgpt-428305.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:343563540047:android:a067677be9693ff11dbc3a",
+        "android_client_info": {
+          "package_name": "com.onechatgpt"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "343563540047-f595uatd26cd75gjgqhfe6r9p5n6k3ih.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_tHT_WJx9ubhmkGyZ0aVdfA4eQAL3nZY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "343563540047-f595uatd26cd75gjgqhfe6r9p5n6k3ih.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "343563540047-m953d32kqfb7r6q7o48bpc8hpeter3cl.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "OneChatGPT"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
