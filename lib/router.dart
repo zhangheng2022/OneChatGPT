@@ -13,8 +13,11 @@ import 'package:one_chatgpt_flutter/ui/userinfo/update_mail.dart';
 import 'package:one_chatgpt_flutter/ui/userinfo/update_name.dart';
 import 'package:one_chatgpt_flutter/ui/userinfo/update_password.dart';
 import 'package:one_chatgpt_flutter/ui/userinfo/userinfo.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
+
+final supabase = Supabase.instance.client;
 
 class AppRoutes {
   static GoRouter router = GoRouter(

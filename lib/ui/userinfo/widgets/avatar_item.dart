@@ -5,7 +5,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
-import 'package:one_chatgpt_flutter/state/authentication.dart';
+import 'package:one_chatgpt_flutter/state/auth.dart';
 import 'package:one_chatgpt_flutter/widgets/network_image_with_loading.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';

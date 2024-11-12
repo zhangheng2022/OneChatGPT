@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
-import 'package:one_chatgpt_flutter/state/authentication.dart';
+import 'package:one_chatgpt_flutter/state/auth.dart';
 import 'package:one_chatgpt_flutter/ui/userinfo/widgets/avatar_item.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Userinfo extends StatefulWidget {
   const Userinfo({super.key});

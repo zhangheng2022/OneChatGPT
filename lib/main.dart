@@ -4,7 +4,7 @@ import 'package:one_chatgpt_flutter/database/database.dart';
 import 'package:one_chatgpt_flutter/state/model_config.dart';
 import 'package:provider/provider.dart';
 import 'package:one_chatgpt_flutter/router.dart';
-import 'package:one_chatgpt_flutter/state/authentication.dart';
+import 'package:one_chatgpt_flutter/state/auth.dart';
 import 'package:one_chatgpt_flutter/screen.dart';
 import 'package:one_chatgpt_flutter/common/theme.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -29,7 +29,7 @@ class RunApp extends StatelessWidget {
           lazy: false,
         ),
         ChangeNotifierProvider(
-          create: (_) => AuthenticationProvider(),
+          create: (_) => AuthProvider(),
           lazy: false,
         ),
       ],

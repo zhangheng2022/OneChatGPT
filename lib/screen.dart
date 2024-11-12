@@ -1,8 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:app_links/app_links.dart';
@@ -35,9 +34,18 @@ class Screen {
     // Initialize date formatting
     await initializeDateFormatting();
 
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
+    // Initialize Supabase client
+    await Supabase.initialize(
+      url: dotenv.env['SUPABASE_URL']!,
+      anonKey: dotenv.env['SUPABASE_ANONKEY']!,
     );
+
+    // Refresh session if needed
+    final supabase = Supabase.instance.client;
+    final session = supabase.auth.currentSession;
+    if (session != null && session.refreshToken != null && session.isExpired) {
+      await supabase.auth.refreshSession();
+    }
 
     // Remove the native splash screen
     FlutterNativeSplash.remove();

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -69,16 +67,6 @@ class _HomeState extends State<Home> {
     }
   }
 
-  Future<void> _test() async {
-    try {
-      final SupabaseClient supabase = Supabase.instance.client;
-      List<dynamic> data = await supabase.rpc('get_channel_model_info');
-      Log.t(data);
-    } catch (e) {
-      Log.e(e);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,7 +77,7 @@ class _HomeState extends State<Home> {
         leading: const Icon(Icons.model_training),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _test,
+        onPressed: _addCardListData,
         tooltip: '新增对话',
         child: const Icon(Icons.add_comment),
       ),
