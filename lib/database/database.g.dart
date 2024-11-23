@@ -764,51 +764,69 @@ typedef $$ChatTableDataTableUpdateCompanionBuilder = ChatTableDataCompanion
 });
 
 class $$ChatTableDataTableFilterComposer
-    extends FilterComposer<_$AppDatabase, $ChatTableDataTable> {
-  $$ChatTableDataTableFilterComposer(super.$state);
-  ColumnFilters<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+    extends Composer<_$AppDatabase, $ChatTableDataTable> {
+  $$ChatTableDataTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get title => $state.composableBuilder(
-      column: $state.table.title,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<bool> get isupdate => $state.composableBuilder(
-      column: $state.table.isupdate,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<bool> get isupdate => $composableBuilder(
+      column: $table.isupdate, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get datetime => $state.composableBuilder(
-      column: $state.table.datetime,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<DateTime> get datetime => $composableBuilder(
+      column: $table.datetime, builder: (column) => ColumnFilters(column));
 }
 
 class $$ChatTableDataTableOrderingComposer
-    extends OrderingComposer<_$AppDatabase, $ChatTableDataTable> {
-  $$ChatTableDataTableOrderingComposer(super.$state);
-  ColumnOrderings<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+    extends Composer<_$AppDatabase, $ChatTableDataTable> {
+  $$ChatTableDataTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get title => $state.composableBuilder(
-      column: $state.table.title,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<bool> get isupdate => $state.composableBuilder(
-      column: $state.table.isupdate,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<bool> get isupdate => $composableBuilder(
+      column: $table.isupdate, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get datetime => $state.composableBuilder(
-      column: $state.table.datetime,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<DateTime> get datetime => $composableBuilder(
+      column: $table.datetime, builder: (column) => ColumnOrderings(column));
+}
+
+class $$ChatTableDataTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ChatTableDataTable> {
+  $$ChatTableDataTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<bool> get isupdate =>
+      $composableBuilder(column: $table.isupdate, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get datetime =>
+      $composableBuilder(column: $table.datetime, builder: (column) => column);
 }
 
 class $$ChatTableDataTableTableManager extends RootTableManager<
@@ -817,6 +835,7 @@ class $$ChatTableDataTableTableManager extends RootTableManager<
     ChatTableDataData,
     $$ChatTableDataTableFilterComposer,
     $$ChatTableDataTableOrderingComposer,
+    $$ChatTableDataTableAnnotationComposer,
     $$ChatTableDataTableCreateCompanionBuilder,
     $$ChatTableDataTableUpdateCompanionBuilder,
     (
@@ -829,10 +848,12 @@ class $$ChatTableDataTableTableManager extends RootTableManager<
       : super(TableManagerState(
           db: db,
           table: table,
-          filteringComposer:
-              $$ChatTableDataTableFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $$ChatTableDataTableOrderingComposer(ComposerState(db, table)),
+          createFilteringComposer: () =>
+              $$ChatTableDataTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ChatTableDataTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ChatTableDataTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String> title = const Value.absent(),
@@ -870,6 +891,7 @@ typedef $$ChatTableDataTableProcessedTableManager = ProcessedTableManager<
     ChatTableDataData,
     $$ChatTableDataTableFilterComposer,
     $$ChatTableDataTableOrderingComposer,
+    $$ChatTableDataTableAnnotationComposer,
     $$ChatTableDataTableCreateCompanionBuilder,
     $$ChatTableDataTableUpdateCompanionBuilder,
     (
@@ -904,101 +926,114 @@ typedef $$ChatContentTableDataTableUpdateCompanionBuilder
 });
 
 class $$ChatContentTableDataTableFilterComposer
-    extends FilterComposer<_$AppDatabase, $ChatContentTableDataTable> {
-  $$ChatContentTableDataTableFilterComposer(super.$state);
-  ColumnFilters<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+    extends Composer<_$AppDatabase, $ChatContentTableDataTable> {
+  $$ChatContentTableDataTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get parentid => $state.composableBuilder(
-      column: $state.table.parentid,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<int> get parentid => $composableBuilder(
+      column: $table.parentid, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get title => $state.composableBuilder(
-      column: $state.table.title,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get textarea => $state.composableBuilder(
-      column: $state.table.textarea,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<String> get textarea => $composableBuilder(
+      column: $table.textarea, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get role => $state.composableBuilder(
-      column: $state.table.role,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<String> get role => $composableBuilder(
+      column: $table.role, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get contentType => $state.composableBuilder(
-      column: $state.table.contentType,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<String> get contentType => $composableBuilder(
+      column: $table.contentType, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get fileUri => $state.composableBuilder(
-      column: $state.table.fileUri,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<String> get fileUri => $composableBuilder(
+      column: $table.fileUri, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get fileSize => $state.composableBuilder(
-      column: $state.table.fileSize,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<int> get fileSize => $composableBuilder(
+      column: $table.fileSize, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get datetime => $state.composableBuilder(
-      column: $state.table.datetime,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<DateTime> get datetime => $composableBuilder(
+      column: $table.datetime, builder: (column) => ColumnFilters(column));
 }
 
 class $$ChatContentTableDataTableOrderingComposer
-    extends OrderingComposer<_$AppDatabase, $ChatContentTableDataTable> {
-  $$ChatContentTableDataTableOrderingComposer(super.$state);
-  ColumnOrderings<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+    extends Composer<_$AppDatabase, $ChatContentTableDataTable> {
+  $$ChatContentTableDataTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get parentid => $state.composableBuilder(
-      column: $state.table.parentid,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<int> get parentid => $composableBuilder(
+      column: $table.parentid, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get title => $state.composableBuilder(
-      column: $state.table.title,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get textarea => $state.composableBuilder(
-      column: $state.table.textarea,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<String> get textarea => $composableBuilder(
+      column: $table.textarea, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get role => $state.composableBuilder(
-      column: $state.table.role,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<String> get role => $composableBuilder(
+      column: $table.role, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get contentType => $state.composableBuilder(
-      column: $state.table.contentType,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<String> get contentType => $composableBuilder(
+      column: $table.contentType, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get fileUri => $state.composableBuilder(
-      column: $state.table.fileUri,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<String> get fileUri => $composableBuilder(
+      column: $table.fileUri, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get fileSize => $state.composableBuilder(
-      column: $state.table.fileSize,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<int> get fileSize => $composableBuilder(
+      column: $table.fileSize, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get datetime => $state.composableBuilder(
-      column: $state.table.datetime,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<DateTime> get datetime => $composableBuilder(
+      column: $table.datetime, builder: (column) => ColumnOrderings(column));
+}
+
+class $$ChatContentTableDataTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ChatContentTableDataTable> {
+  $$ChatContentTableDataTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get parentid =>
+      $composableBuilder(column: $table.parentid, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get textarea =>
+      $composableBuilder(column: $table.textarea, builder: (column) => column);
+
+  GeneratedColumn<String> get role =>
+      $composableBuilder(column: $table.role, builder: (column) => column);
+
+  GeneratedColumn<String> get contentType => $composableBuilder(
+      column: $table.contentType, builder: (column) => column);
+
+  GeneratedColumn<String> get fileUri =>
+      $composableBuilder(column: $table.fileUri, builder: (column) => column);
+
+  GeneratedColumn<int> get fileSize =>
+      $composableBuilder(column: $table.fileSize, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get datetime =>
+      $composableBuilder(column: $table.datetime, builder: (column) => column);
 }
 
 class $$ChatContentTableDataTableTableManager extends RootTableManager<
@@ -1007,6 +1042,7 @@ class $$ChatContentTableDataTableTableManager extends RootTableManager<
     ChatContentTableDataData,
     $$ChatContentTableDataTableFilterComposer,
     $$ChatContentTableDataTableOrderingComposer,
+    $$ChatContentTableDataTableAnnotationComposer,
     $$ChatContentTableDataTableCreateCompanionBuilder,
     $$ChatContentTableDataTableUpdateCompanionBuilder,
     (
@@ -1021,10 +1057,14 @@ class $$ChatContentTableDataTableTableManager extends RootTableManager<
       : super(TableManagerState(
           db: db,
           table: table,
-          filteringComposer: $$ChatContentTableDataTableFilterComposer(
-              ComposerState(db, table)),
-          orderingComposer: $$ChatContentTableDataTableOrderingComposer(
-              ComposerState(db, table)),
+          createFilteringComposer: () =>
+              $$ChatContentTableDataTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ChatContentTableDataTableOrderingComposer(
+                  $db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ChatContentTableDataTableAnnotationComposer(
+                  $db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<int> parentid = const Value.absent(),
@@ -1083,6 +1123,7 @@ typedef $$ChatContentTableDataTableProcessedTableManager
         ChatContentTableDataData,
         $$ChatContentTableDataTableFilterComposer,
         $$ChatContentTableDataTableOrderingComposer,
+        $$ChatContentTableDataTableAnnotationComposer,
         $$ChatContentTableDataTableCreateCompanionBuilder,
         $$ChatContentTableDataTableUpdateCompanionBuilder,
         (
