@@ -107,10 +107,9 @@ class _LoginPageState extends State<LoginPage> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Image.asset(
-                            "assets/logos/logo.gif", // The path to your local image
-                            height: 70, // Optional, adjust the height as needed
-                            fit: BoxFit
-                                .cover, // Maintain the aspect ratio of the image
+                            "assets/logos/logo.gif",
+                            height: 70,
+                            fit: BoxFit.cover,
                           ),
                           const SizedBox(width: 10),
                           Expanded(
