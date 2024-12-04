@@ -44,7 +44,7 @@ class ModelConfigProvider extends ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     try {
       /// 从 Supabase 获取可用模型列表。
-      List<dynamic> data = await _supabase.rpc('get_channel_model');
+      List<dynamic> data = await _supabase.rpc('get_model_config');
       List<ChannelModel> channels =
           data.map((item) => ChannelModel.fromJson(item)).toList();
       _channelModels = channels;

@@ -37,35 +37,38 @@ class _LoginPageState extends State<LoginPage> {
   bool _googleLoginLoading = false;
   Future<void> _googleLogin() async {
     try {
-      setState(() => _googleLoginLoading = true);
+      final SupabaseClient supabase = Supabase.instance.client;
+      List<dynamic> data = await supabase.rpc('get_model_config');
+      Log.i(data);
+      // setState(() => _googleLoginLoading = true);
 
-      /// Web Client ID that you registered with Google Cloud.
-      const webClientId =
-          '343563540047-f595uatd26cd75gjgqhfe6r9p5n6k3ih.apps.googleusercontent.com';
+      // /// Web Client ID that you registered with Google Cloud.
+      // const webClientId =
+      //     '343563540047-f595uatd26cd75gjgqhfe6r9p5n6k3ih.apps.googleusercontent.com';
 
-      /// iOS Client ID that you registered with Google Cloud.
-      const iosClientId =
-          '343563540047-m953d32kqfb7r6q7o48bpc8hpeter3cl.apps.googleusercontent.com';
+      // /// iOS Client ID that you registered with Google Cloud.
+      // const iosClientId =
+      //     '343563540047-m953d32kqfb7r6q7o48bpc8hpeter3cl.apps.googleusercontent.com';
 
-      final GoogleSignIn googleSignIn = GoogleSignIn(
-        clientId: iosClientId,
-        serverClientId: webClientId,
-      );
-      final googleUser = await googleSignIn.signIn();
-      final googleAuth = await googleUser!.authentication;
-      String? accessToken = googleAuth.accessToken;
-      String? idToken = googleAuth.idToken;
+      // final GoogleSignIn googleSignIn = GoogleSignIn(
+      //   clientId: iosClientId,
+      //   serverClientId: webClientId,
+      // );
+      // final googleUser = await googleSignIn.signIn();
+      // final googleAuth = await googleUser!.authentication;
+      // String? accessToken = googleAuth.accessToken;
+      // String? idToken = googleAuth.idToken;
 
-      if (accessToken == null || idToken == null) {
-        SmartDialog.showToast('授权错误，请检查');
-        return;
-      }
+      // if (accessToken == null || idToken == null) {
+      //   SmartDialog.showToast('授权错误，请检查');
+      //   return;
+      // }
 
-      await supabase.auth.signInWithIdToken(
-        provider: OAuthProvider.google,
-        idToken: idToken,
-        accessToken: accessToken,
-      );
+      // await supabase.auth.signInWithIdToken(
+      //   provider: OAuthProvider.google,
+      //   idToken: idToken,
+      //   accessToken: accessToken,
+      // );
     } catch (err) {
       Log.e("Google授权失败===>$err");
       SmartDialog.showToast('授权失败，请检查网络连接');
