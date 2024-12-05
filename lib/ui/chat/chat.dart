@@ -62,12 +62,14 @@ class _ChatPageState extends State<ChatPage> {
     // 初始化用户信息
     _user = types.User(id: widget.chatid);
 
-    ChannelModel currentModel =
-        context.read<ModelConfigProvider>().currentModel;
+    String currentModel = context.read<ModelConfigProvider>().currentModel;
+    String currentProvider =
+        context.read<ModelConfigProvider>().currentProvider;
+
     _model = types.User(
       id: const Uuid().v4(),
-      firstName: currentModel.company,
-      lastName: currentModel.model,
+      firstName: currentProvider,
+      lastName: currentModel,
       imageUrl: "$supabaseUrl/storage/v1/object/public/common/logo.png",
     );
   }
@@ -328,7 +330,7 @@ class _ChatPageState extends State<ChatPage> {
     // 调用 Supabase 函数
     final params = FunctionChatBody(
       messages: messages,
-      model: currentModel.model,
+      model: currentModel,
       maxTokens: currentModelConfig.maxTokens,
       temperature: currentModelConfig.temperature,
       topP: currentModelConfig.topP,

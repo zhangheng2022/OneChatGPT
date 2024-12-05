@@ -9,20 +9,26 @@ part of 'channel_model.dart';
 ChannelModel _$ChannelModelFromJson(Map<String, dynamic> json) {
   $checkKeys(
     json,
-    requiredKeys: const ['model'],
+    requiredKeys: const ['id'],
   );
   return ChannelModel(
-    model: json['model'] as String,
-    configId: json['configId'] as String,
-    logo: json['logo'] as String,
-    company: json['company'] as String,
+    id: (json['id'] as num).toInt(),
+    createdAt: DateTime.parse(json['created_at'] as String),
+    models: (json['models'] as List<dynamic>).map((e) => e as String).toList(),
+    providerLogo: json['provider_logo'] as String,
+    provider: json['provider'] as String,
+    portkeyConfig: json['portkey_config'],
+    host: json['host'] as bool,
   );
 }
 
 Map<String, dynamic> _$ChannelModelToJson(ChannelModel instance) =>
     <String, dynamic>{
-      'model': instance.model,
-      'configId': instance.configId,
-      'logo': instance.logo,
-      'company': instance.company,
+      'id': instance.id,
+      'created_at': instance.createdAt.toIso8601String(),
+      'models': instance.models,
+      'provider_logo': instance.providerLogo,
+      'provider': instance.provider,
+      'portkey_config': instance.portkeyConfig,
+      'host': instance.host,
     };

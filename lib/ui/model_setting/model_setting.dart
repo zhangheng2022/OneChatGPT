@@ -52,7 +52,7 @@ class _ModelSettingState extends State<ModelSetting> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              _buildModelSettingListTile(context),
+              // _buildModelSettingListTile(context),
               const SizedBox(height: 10),
               // 将最大令牌数和历史消息数合并到一个 ListTile 中
               Row(
@@ -78,75 +78,75 @@ class _ModelSettingState extends State<ModelSetting> {
     );
   }
 
-  Widget _buildModelSettingListTile(BuildContext context) {
-    return Selector<ModelConfigProvider, ChannelModel>(
-      selector: (context, model) => model.currentModel,
-      builder: (context, currentModel, child) {
-        return Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                '模型',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-              const Text(
-                "当前使用的模型",
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 12,
-                ),
-              ),
-              DropdownButton<String>(
-                value: currentModel.model,
-                borderRadius: BorderRadius.circular(10),
-                underline: Container(
-                  height: 0, // 隐藏下划线
-                ),
-                alignment: AlignmentDirectional.centerStart,
-                items: Provider.of<ModelConfigProvider>(context, listen: false)
-                    .channelModels
-                    .map((data) {
-                  return DropdownMenuItem<String>(
-                    value: data.model,
-                    child: Row(
-                      children: [
-                        Text(
-                          '${data.company}：',
-                        ),
-                        Text(
-                          data.model,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-                onChanged: (String? value) {
-                  if (value != null) {
-                    Provider.of<ModelConfigProvider>(context, listen: false)
-                        .updateModel(model: value);
-                  }
-                },
-                hint: const Text('请选择模型'),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+  // Widget _buildModelSettingListTile(BuildContext context) {
+  //   return Selector<ModelConfigProvider, ChannelModel>(
+  //     selector: (context, model) => model.currentModel,
+  //     builder: (context, currentModel, child) {
+  //       return Container(
+  //         width: double.infinity,
+  //         padding: const EdgeInsets.all(10),
+  //         decoration: BoxDecoration(
+  //           color: Colors.white,
+  //           borderRadius: BorderRadius.circular(10),
+  //         ),
+  //         child: Column(
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           children: [
+  //             const Text(
+  //               '模型',
+  //               style: TextStyle(
+  //                 fontWeight: FontWeight.bold,
+  //                 fontSize: 16,
+  //               ),
+  //             ),
+  //             const Text(
+  //               "当前使用的模型",
+  //               style: TextStyle(
+  //                 color: Colors.grey,
+  //                 fontSize: 12,
+  //               ),
+  //             ),
+  //             DropdownButton<String>(
+  //               value: currentModel.model,
+  //               borderRadius: BorderRadius.circular(10),
+  //               underline: Container(
+  //                 height: 0, // 隐藏下划线
+  //               ),
+  //               alignment: AlignmentDirectional.centerStart,
+  //               items: Provider.of<ModelConfigProvider>(context, listen: false)
+  //                   .channelModels
+  //                   .map((data) {
+  //                 return DropdownMenuItem<String>(
+  //                   value: data.model,
+  //                   child: Row(
+  //                     children: [
+  //                       Text(
+  //                         '${data.company}：',
+  //                       ),
+  //                       Text(
+  //                         data.model,
+  //                         style: const TextStyle(
+  //                           fontWeight: FontWeight.bold,
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 );
+  //               }).toList(),
+  //               onChanged: (String? value) {
+  //                 if (value != null) {
+  //                   Provider.of<ModelConfigProvider>(context, listen: false)
+  //                       .updateModel(model: value);
+  //                 }
+  //               },
+  //               hint: const Text('请选择模型'),
+  //             ),
+  //           ],
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 
   Widget _buildMaxTokensListTile(BuildContext context) {
     return Selector<ModelConfigProvider, ModelConfig>(

@@ -4,16 +4,31 @@ part 'channel_model.g.dart';
 @JsonSerializable()
 class ChannelModel {
   @JsonKey(required: true)
-  String model;
-  String configId;
-  String logo;
-  String company;
+  int id;
+
+  @JsonKey(name: 'created_at')
+  DateTime createdAt;
+
+  List<String> models;
+
+  @JsonKey(name: 'provider_logo')
+  String providerLogo;
+
+  String provider;
+
+  @JsonKey(name: 'portkey_config')
+  dynamic portkeyConfig;
+
+  bool host;
 
   ChannelModel({
-    required this.model,
-    required this.configId,
-    required this.logo,
-    required this.company,
+    required this.id,
+    required this.createdAt,
+    required this.models,
+    required this.providerLogo,
+    required this.provider,
+    required this.portkeyConfig,
+    required this.host,
   });
 
   factory ChannelModel.fromJson(Map<String, dynamic> json) =>

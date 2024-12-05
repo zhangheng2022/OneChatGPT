@@ -17,7 +17,8 @@ class ModelConfigProvider extends ChangeNotifier {
   late ModelConfig _currentModelConfig;
 
   /// 当前模型。
-  late ChannelModel _currentModel;
+  late String _currentModel;
+  late String _currentProvider;
 
   /// 可用模型列表。
   late List<ChannelModel> _channelModels;
@@ -26,7 +27,8 @@ class ModelConfigProvider extends ChangeNotifier {
   ModelConfig get currentModelConfig => _currentModelConfig;
 
   /// 获取当前模型。
-  ChannelModel get currentModel => _currentModel;
+  String get currentModel => _currentModel;
+  String get currentProvider => _currentProvider;
 
   /// 获取可用模型列表。
   List<ChannelModel> get channelModels => _channelModels;
@@ -40,49 +42,47 @@ class ModelConfigProvider extends ChangeNotifier {
 
   /// 初始化模型配置并获取可用模型列表。
   Future<void> _init() async {
+    /// 从 Supabase 获取可用模型列表。
+    List<dynamic> data = await _supabase.rpc('get_model_config');
+    _channelModels = data.map((item) => ChannelModel.fromJson(item)).toList();
+
     /// 获取 SharedPreferences 实例以存储和检索数据。
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    try {
-      /// 从 Supabase 获取可用模型列表。
-      List<dynamic> data = await _supabase.rpc('get_model_config');
-      List<ChannelModel> channels =
-          data.map((item) => ChannelModel.fromJson(item)).toList();
-      _channelModels = channels;
+    final SharedPreferencesWithCache prefsWithCache =
+        await SharedPreferencesWithCache.create(
+      cacheOptions: const SharedPreferencesWithCacheOptions(
+        // When an allowlist is included, any keys that aren't included cannot be used.
+        allowList: <String>{
+          'currentModelConfig',
+          'currentModel',
+          'currentProvider'
+        },
+      ),
+    );
 
-      /// 从 SharedPreferences 检索保存的模型配置。
-      String? configResult = prefs.getString('currentModelConfig');
+    /// 从 SharedPreferences 检索保存的模型配置。
+    String? configResult = prefsWithCache.getString('currentModelConfig');
 
-      /// 根据检索到的数据设置当前模型配置。
-      /// 如果未找到保存的配置，则使用默认配置。
-      if (configResult != null) {
-        _currentModelConfig = ModelConfig.fromJson(jsonDecode(configResult));
-      } else {
-        _currentModelConfig = ModelConfig(
-          maxTokens: 1000,
-          temperature: 0.5,
-          topP: 1,
-          historyMessages: 4,
-          autoTitle: false,
-        );
-      }
-
-      final String? modelResult = prefs.getString('currentModel');
-      if (modelResult != null) {
-        _currentModel = ChannelModel.fromJson(jsonDecode(modelResult));
-        int index = _channelModels
-            .indexWhere((data) => data.model == _currentModel.model);
-        if (index == -1) {
-          _currentModel = _channelModels.first;
-        }
-      } else {
-        _currentModel = _channelModels.first;
-      }
-
-      /// 通知监听器数据已更改。
-      notifyListeners();
-    } catch (e) {
-      Log.e(e);
+    /// 根据检索到的数据设置当前模型配置。
+    /// 如果未找到保存的配置，则使用默认配置。
+    if (configResult != null) {
+      _currentModelConfig = ModelConfig.fromJson(jsonDecode(configResult));
+    } else {
+      _currentModelConfig = ModelConfig(
+        maxTokens: 1000,
+        temperature: 0.5,
+        topP: 1,
+        historyMessages: 4,
+        autoTitle: false,
+      );
     }
+
+    final String? modelResult = prefsWithCache.getString('currentModel');
+    final String? providerResult = prefsWithCache.getString('currentProvider');
+    _currentModel = modelResult ?? _channelModels.first.models.first;
+    _currentProvider = providerResult ?? _channelModels.first.provider;
+
+    /// 通知监听器数据已更改。
+    notifyListeners();
   }
 
   /// 更新模型配置。
@@ -109,28 +109,32 @@ class ModelConfigProvider extends ChangeNotifier {
         );
 
     /// 获取 SharedPreferences 实例以存储和检索数据。
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final SharedPreferencesAsync asyncPrefs = SharedPreferencesAsync();
 
     /// 将更新后的模型配置保存到 SharedPreferences。
-    await prefs.setString(
+    asyncPrefs.setString(
         'currentModelConfig', jsonEncode(_currentModelConfig.toJson()));
 
     /// 通知监听器数据已更改。
     notifyListeners();
   }
 
-  Future<void> updateModel({required String model}) async {
-    _currentModel = _channelModels.firstWhere((data) => data.model == model);
+  Future<void> updateModel(
+      {required String model, required String provider}) async {
+    _currentModel = model;
+    _currentProvider = provider;
 
     /// 获取 SharedPreferences 实例以存储和检索数据。
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('currentModel', jsonEncode(_currentModel.toJson()));
+    final SharedPreferencesAsync asyncPrefs = SharedPreferencesAsync();
+    asyncPrefs.setString('currentModel', model);
+    asyncPrefs.setString('currentProvider', provider);
 
     /// 通知监听器数据已更改。
     notifyListeners();
   }
 
   Future<void> reset() async {
+    /// 删除模型配置
     _currentModelConfig = ModelConfig(
       maxTokens: 1000,
       temperature: 0.5,
@@ -138,12 +142,13 @@ class ModelConfigProvider extends ChangeNotifier {
       historyMessages: 4,
       autoTitle: false,
     );
+    final SharedPreferencesAsync asyncPrefs = SharedPreferencesAsync();
+    await asyncPrefs.remove("currentModelConfig");
 
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove("currentModelConfig");
-
-    _currentModel = _channelModels.first;
-    await prefs.remove("currentModel");
+    /// 删除模型名称
+    _currentModel = _channelModels.first.models.first;
+    _currentProvider = _channelModels.first.provider;
+    await asyncPrefs.remove("currentModel");
 
     notifyListeners();
   }

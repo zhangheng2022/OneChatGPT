@@ -25,7 +25,6 @@ class AppRoutes {
       final supabase = Supabase.instance.client;
       final session = supabase.auth.currentSession;
       final isSessionExpired = session?.isExpired ?? true;
-
       final noSessionPaths = ['/login', '/login/register'];
 
       if (noSessionPaths.contains(state.fullPath)) {
