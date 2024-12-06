@@ -1,3 +1,4 @@
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
@@ -35,10 +36,13 @@ class RunApp extends StatelessWidget {
       ],
       child: MaterialApp.router(
         title: 'OneChatGPT',
+        // The Mandy red, light theme.
+        theme: FlexThemeData.light(scheme: FlexScheme.blue),
+        // The Mandy red, dark theme.
+        darkTheme: FlexThemeData.dark(scheme: FlexScheme.blue),
+        // Use dark or light theme based on system setting.
         themeMode: ThemeMode.light,
-        theme: GlobalTheme.lightThemeData,
-        darkTheme: GlobalTheme.darkThemeData,
-        debugShowCheckedModeBanner: false,
+        debugShowCheckedModeBanner: true,
         routerConfig: AppRoutes.router,
         builder: (context, child) {
           child = FlutterSmartDialog.init()(context, child);

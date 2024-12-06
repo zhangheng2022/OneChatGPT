@@ -27,10 +27,7 @@ class _PersonState extends State<Person> {
     final defaultAvatar =
         '${dotenv.env['SUPABASE_URL']!}/storage/v1/object/public/common/default_avatar.png';
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        backgroundColor: Colors.grey[50],
-      ),
+      appBar: AppBar(),
       body: Container(
         margin: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(

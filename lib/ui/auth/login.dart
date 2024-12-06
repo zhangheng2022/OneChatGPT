@@ -8,6 +8,7 @@ import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:one_chatgpt_flutter/ui/auth/widgets/email_login.dart';
 import 'package:go_router/go_router.dart';
 import 'package:one_chatgpt_flutter/utils/connectivity_checker.dart';
+import 'dart:async';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -82,150 +83,191 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  bool _isCanPop = false;
+  Timer _timer = Timer(const Duration(), () {});
+
+  @override
+  void dispose() {
+    // 组件销毁时取消 Timer，避免内存泄漏
+    _timer.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     double appHeight = MediaQuery.of(context).size.height;
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Image.network(
-                "https://api.miaomc.cn/image/other/bing",
-                height: appHeight * 0.5,
-                fit: BoxFit.cover, // 保持图片的宽高比
-                errorBuilder: (context, error, stackTrace) => Image.asset(
-                  'assets/images/login_header_default.jpg', //默认显示图片
+    return PopScope(
+      canPop: _isCanPop,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        Log.i(didPop);
+        if (!didPop) {
+          SmartDialog.showToast('再按一次退出');
+          setState(() {
+            _isCanPop = true;
+          });
+          _timer.cancel();
+          _timer = Timer(const Duration(seconds: 2), () {
+            setState(() {
+              _isCanPop = false;
+            });
+          });
+        }
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        body: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Image.network(
+                  "https://api.miaomc.cn/image/other/bing",
                   height: appHeight * 0.5,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.5,
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            "assets/logos/logo.gif",
-                            height: 70,
-                            fit: BoxFit.cover,
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "你好，世界",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: GoogleFonts.oswald().fontFamily,
-                                  ),
-                                ),
-                                Text(
-                                  "ONE CHAT GPT",
-                                  style: TextStyle(
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.bold,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                    fontFamily: GoogleFonts.anton().fontFamily,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            width: double.infinity,
-                            height: 50,
-                            child: FilledButton.icon(
-                              icon: _googleLoginLoading
-                                  ? const CircularProgressWidget()
-                                  : Image.asset(
-                                      'assets/icons/google.png',
-                                      width: 20,
-                                      height: 20,
-                                    ),
-                              label: const Text("Google登录"),
-                              onPressed:
-                                  _googleLoginLoading ? null : _googleLogin,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 50,
-                            child: OutlinedButton.icon(
-                              icon: Image.asset(
-                                'assets/icons/github.png',
-                                width: 20,
-                                height: 20,
-                              ),
-                              label: const Text("Github登录"),
-                              onPressed: () {
-                                _githubLogin();
-                              },
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          TextButton(
-                            onPressed: () {
-                              _showLoginSheet(context);
-                            },
-                            child: Text(
-                              "邮箱登录",
-                              style: TextStyle(
-                                decoration: TextDecoration.underline,
-                                decorationColor:
-                                    Theme.of(context).colorScheme.primary,
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const Text(
-                            "没有账号？",
-                            style: TextStyle(
-                              color: Colors.grey,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              context.goNamed('register');
-                            },
-                            child: const Text(
-                              "去注册",
-                              style: TextStyle(
-                                color: Colors.black,
-                              ),
-                            ),
-                          )
-                        ],
-                      )
-                    ],
+                  fit: BoxFit.cover, // 保持图片的宽高比
+                  errorBuilder: (context, error, stackTrace) => Image.asset(
+                    'assets/images/login_header_default.jpg', //默认显示图片
+                    height: appHeight * 0.5,
+                    fit: BoxFit.cover,
                   ),
                 ),
-              )
-            ],
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.5,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              "assets/logos/logo.gif",
+                              height: 70,
+                              fit: BoxFit.cover,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "你好，世界",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily:
+                                          GoogleFonts.oswald().fontFamily,
+                                    ),
+                                  ),
+                                  Text(
+                                    "ONE CHAT GPT",
+                                    style: TextStyle(
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.bold,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                      fontFamily:
+                                          GoogleFonts.anton().fontFamily,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: double.infinity,
+                              height: 50,
+                              child: FilledButton.icon(
+                                icon: _googleLoginLoading
+                                    ? const CircularProgressWidget(
+                                        color: Colors.grey,
+                                      )
+                                    : Image.asset(
+                                        'assets/icons/google.png',
+                                        width: 20,
+                                        height: 20,
+                                      ),
+                                label: const Text("Google登录"),
+                                onPressed:
+                                    _googleLoginLoading ? null : _googleLogin,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 50,
+                              child: OutlinedButton.icon(
+                                style: ButtonStyle(
+                                  backgroundColor: WidgetStateProperty.all(
+                                    Colors.white,
+                                  ),
+                                  foregroundColor: WidgetStateProperty.all(
+                                    Colors.black,
+                                  ), // 设置文字颜色
+                                ),
+                                icon: Image.asset(
+                                  'assets/icons/github.png',
+                                  width: 20,
+                                  height: 20,
+                                ),
+                                label: const Text("Github登录"),
+                                onPressed: () {
+                                  _githubLogin();
+                                },
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            TextButton(
+                              onPressed: () {
+                                _showLoginSheet(context);
+                              },
+                              child: Text(
+                                "邮箱登录",
+                                style: TextStyle(
+                                  decoration: TextDecoration.underline,
+                                  decorationColor:
+                                      Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Text(
+                              "没有账号？",
+                              style: TextStyle(
+                                color: Colors.grey,
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                context.goNamed('register');
+                              },
+                              child: Text(
+                                "去注册",
+                                style: TextStyle(
+                                  decorationColor:
+                                      Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                            )
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -251,10 +293,9 @@ class _LoginPageState extends State<LoginPage> {
                   Row(
                     children: [
                       Image.asset(
-                        "assets/logos/logo.gif", // The path to your local image
-                        height: 40, // Optional, adjust the height as needed
-                        fit: BoxFit
-                            .cover, // Maintain the aspect ratio of the image
+                        "assets/logos/logo.gif",
+                        height: 40,
+                        fit: BoxFit.cover,
                       ),
                       const SizedBox(width: 10),
                       const Text(
@@ -266,7 +307,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ],
                   ),
-                  const LoginEmail(), // 你的登录表单
+                  const LoginEmail(),
                 ],
               ),
             ),
