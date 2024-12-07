@@ -1,5 +1,4 @@
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:one_chatgpt_flutter/utils/validator.dart';
 import 'package:one_chatgpt_flutter/widgets/circular_progress.dart';
@@ -55,9 +54,6 @@ class _LoginEmailState extends State<LoginEmail> {
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.mail_outline),
                 labelText: '邮箱',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10), // 圆角边框
-                ),
               ),
               validator: (value) {
                 if (value!.isEmpty) return "请输入邮箱";
@@ -73,9 +69,6 @@ class _LoginEmailState extends State<LoginEmail> {
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.lock_outline),
                 labelText: '密码',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10), // 圆角边框
-                ),
                 suffixIcon: _userPassword.isNotEmpty
                     ? IconButton(
                         icon: Icon(_hideObscureText
@@ -103,17 +96,14 @@ class _LoginEmailState extends State<LoginEmail> {
                     : const Icon(Icons.send),
                 label: const Text("登录"),
                 onPressed: _isLoading ? null : _onSubmit,
-                style: FilledButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10), // 圆角按钮
-                  ),
-                ),
               ),
             ),
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  SmartDialog.showToast('正在开发中');
+                },
                 child: const Text('忘记密码?'),
               ),
             )

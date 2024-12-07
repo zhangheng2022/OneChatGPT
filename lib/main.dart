@@ -7,8 +7,8 @@ import 'package:provider/provider.dart';
 import 'package:one_chatgpt_flutter/router.dart';
 import 'package:one_chatgpt_flutter/state/auth.dart';
 import 'package:one_chatgpt_flutter/screen.dart';
-import 'package:one_chatgpt_flutter/common/theme.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:one_chatgpt_flutter/common/app_theme.dart';
 
 Future<void> main() async {
   await Screen.initialize();
@@ -36,11 +36,8 @@ class RunApp extends StatelessWidget {
       ],
       child: MaterialApp.router(
         title: 'OneChatGPT',
-        // The Mandy red, light theme.
-        theme: FlexThemeData.light(scheme: FlexScheme.blue),
-        // The Mandy red, dark theme.
-        darkTheme: FlexThemeData.dark(scheme: FlexScheme.blue),
-        // Use dark or light theme based on system setting.
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
         themeMode: ThemeMode.light,
         debugShowCheckedModeBanner: true,
         routerConfig: AppRoutes.router,

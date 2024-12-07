@@ -24,7 +24,7 @@ class _RegisterPageState extends State<RegisterPage> {
             children: [
               Image.asset(
                 "assets/logos/logo.gif", // The path to your local image
-                height: 70, // Optional, adjust the height as needed
+                height: 90, // Optional, adjust the height as needed
                 fit: BoxFit.cover, // Maintain the aspect ratio of the image
               ),
               Text(

@@ -59,7 +59,7 @@ flutter_native_splash:
     image: assets/logos/splash_logo.png
 
     # 启动画面背景颜色。
-    color: "#0052d9"
+    # color: "#0052d9"
 
     # 应用程序图标背景颜色。
     # icon_background_color: "#ffffff"

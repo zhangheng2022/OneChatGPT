@@ -59,10 +59,6 @@ class _RegisterEmailState extends State<RegisterEmail> {
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.mail_outlined),
                 labelText: '邮箱',
-                border: OutlineInputBorder(
-                  borderRadius:
-                      BorderRadius.circular(10), // Set the border radius here
-                ),
                 hintText: "请输入邮箱",
                 helperText: "请输入邮箱",
               ),
@@ -84,10 +80,6 @@ class _RegisterEmailState extends State<RegisterEmail> {
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.lock_outlined),
                 labelText: '密码',
-                border: OutlineInputBorder(
-                  borderRadius:
-                      BorderRadius.circular(10), // Set the border radius here
-                ),
                 hintText: "请输入密码",
                 helperText: "最少6位，包括至少1个字母，1个数字",
                 suffixIcon: _userPassword.isNotEmpty
@@ -119,10 +111,6 @@ class _RegisterEmailState extends State<RegisterEmail> {
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.lock_outlined),
                 labelText: '密码',
-                border: OutlineInputBorder(
-                  borderRadius:
-                      BorderRadius.circular(10), // Set the border radius here
-                ),
                 hintText: "请再次输入密码",
                 helperText: "请再次输入密码",
                 suffixIcon: _userPassword.isNotEmpty
@@ -151,11 +139,6 @@ class _RegisterEmailState extends State<RegisterEmail> {
                     ? const CircularProgressWidget()
                     : const Icon(Icons.app_registration),
                 label: const Text("注册账户", style: TextStyle(fontSize: 16)),
-                style: FilledButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10), // 圆角按钮
-                  ),
-                ),
                 onPressed: () {
                   if (!_isLoading) _onSubmit(context);
                 },

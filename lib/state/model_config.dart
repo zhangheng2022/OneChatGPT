@@ -14,24 +14,30 @@ class ModelConfigProvider extends ChangeNotifier {
   final SupabaseClient _supabase = Supabase.instance.client;
 
   /// 当前模型配置。
-  late ModelConfig _currentModelConfig;
+  ModelConfig _currentModelConfig = ModelConfig(
+    maxTokens: 1000,
+    temperature: 0.5,
+    topP: 1,
+    historyMessages: 4,
+    autoTitle: false,
+  );
 
   /// 当前模型。
-  late String _currentModel;
-  late String _currentProvider;
+  String? _currentModel;
+  String? _currentProvider;
 
   /// 可用模型列表。
-  late List<ChannelModel> _channelModels;
+  List<ChannelModel>? _channelModels;
 
   /// 获取当前模型配置。
   ModelConfig get currentModelConfig => _currentModelConfig;
 
   /// 获取当前模型。
-  String get currentModel => _currentModel;
-  String get currentProvider => _currentProvider;
+  String get currentModel => _currentModel ?? '';
+  String get currentProvider => _currentProvider ?? '';
 
   /// 获取可用模型列表。
-  List<ChannelModel> get channelModels => _channelModels;
+  List<ChannelModel> get channelModels => _channelModels ?? [];
 
   /// ModelConfigProvider 类的构造函数。
   /// 通过调用 _init() 方法初始化类。
@@ -43,7 +49,15 @@ class ModelConfigProvider extends ChangeNotifier {
   /// 初始化模型配置并获取可用模型列表。
   Future<void> _init() async {
     /// 从 Supabase 获取可用模型列表。
-    List<dynamic> data = await _supabase.rpc('get_model_config');
+    List<dynamic> data =
+        await _supabase.rpc('get_model_config').catchError((onError) {
+      Log.e(onError);
+
+      return [];
+    });
+
+    if (data.isEmpty) return;
+
     _channelModels = data.map((item) => ChannelModel.fromJson(item)).toList();
 
     /// 获取 SharedPreferences 实例以存储和检索数据。
@@ -78,8 +92,8 @@ class ModelConfigProvider extends ChangeNotifier {
 
     final String? modelResult = prefsWithCache.getString('currentModel');
     final String? providerResult = prefsWithCache.getString('currentProvider');
-    _currentModel = modelResult ?? _channelModels.first.models.first;
-    _currentProvider = providerResult ?? _channelModels.first.provider;
+    _currentModel = modelResult ?? _channelModels?.first.models.first ?? "";
+    _currentProvider = providerResult ?? _channelModels?.first.provider ?? "";
 
     /// 通知监听器数据已更改。
     notifyListeners();
@@ -146,8 +160,8 @@ class ModelConfigProvider extends ChangeNotifier {
     await asyncPrefs.remove("currentModelConfig");
 
     /// 删除模型名称
-    _currentModel = _channelModels.first.models.first;
-    _currentProvider = _channelModels.first.provider;
+    _currentModel = _channelModels?.first.models.first ?? "";
+    _currentProvider = _channelModels?.first.provider ?? "";
     await asyncPrefs.remove("currentModel");
 
     notifyListeners();

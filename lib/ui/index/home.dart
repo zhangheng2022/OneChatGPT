@@ -70,10 +70,8 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: const Text("对话"),
-        backgroundColor: Colors.grey[50],
         leading: const Icon(Icons.model_training),
       ),
       floatingActionButton: FloatingActionButton(

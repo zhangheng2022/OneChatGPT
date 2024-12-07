@@ -14,13 +14,6 @@ class Screen {
     // Initialize Flutter framework and preserve native splash screen
     WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-    // Set up platform-specific UI customization (Android)
-    if (Platform.isAndroid) {
-      SystemChrome.setSystemUIOverlayStyle(
-        const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
-      );
-    }
-
     // Initialize app links listener
     final appLinks = AppLinks();
     appLinks.uriLinkStream.listen((uri) {

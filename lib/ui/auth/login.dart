@@ -66,7 +66,7 @@ class _LoginPageState extends State<LoginPage> {
       String? idToken = googleAuth.idToken;
 
       if (accessToken == null || idToken == null) {
-        SmartDialog.showToast('授权错误，请检查');
+        SmartDialog.showToast('授权错误');
         return;
       }
 
@@ -77,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
       );
     } catch (err) {
       Log.e("Google授权失败===>$err");
-      SmartDialog.showToast('授权失败，请检查网络连接');
+      SmartDialog.showToast('授权失败，请稍候再试');
     } finally {
       setState(() => _googleLoginLoading = false);
     }
@@ -155,7 +155,7 @@ class _LoginPageState extends State<LoginPage> {
                                   Text(
                                     "你好，世界",
                                     style: TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                       fontFamily:
                                           GoogleFonts.oswald().fontFamily,
@@ -164,7 +164,7 @@ class _LoginPageState extends State<LoginPage> {
                                   Text(
                                     "ONE CHAT GPT",
                                     style: TextStyle(
-                                      fontSize: 30,
+                                      fontSize: 28,
                                       fontWeight: FontWeight.bold,
                                       color:
                                           Theme.of(context).colorScheme.primary,
@@ -185,8 +185,10 @@ class _LoginPageState extends State<LoginPage> {
                               height: 50,
                               child: FilledButton.icon(
                                 icon: _googleLoginLoading
-                                    ? const CircularProgressWidget(
-                                        color: Colors.grey,
+                                    ? CircularProgressWidget(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .inversePrimary,
                                       )
                                     : Image.asset(
                                         'assets/icons/google.png',
@@ -203,14 +205,6 @@ class _LoginPageState extends State<LoginPage> {
                               width: double.infinity,
                               height: 50,
                               child: OutlinedButton.icon(
-                                style: ButtonStyle(
-                                  backgroundColor: WidgetStateProperty.all(
-                                    Colors.white,
-                                  ),
-                                  foregroundColor: WidgetStateProperty.all(
-                                    Colors.black,
-                                  ), // 设置文字颜色
-                                ),
                                 icon: Image.asset(
                                   'assets/icons/github.png',
                                   width: 20,
