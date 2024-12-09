@@ -17,7 +17,7 @@ import 'package:flutter/material.dart';
 ///  darkTheme: AppTheme.dark,
 ///  :
 /// );
-sealed class AppTheme {
+sealed class ThemeConfig {
   // The defined light theme.
   static ThemeData light = FlexThemeData.light(
     scheme: FlexScheme.greys,

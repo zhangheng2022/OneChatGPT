@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:one_chatgpt_flutter/state/auth.dart';
-import 'package:one_chatgpt_flutter/widgets/network_image_with_loading.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -25,6 +24,16 @@ class _PersonState extends State<Person> {
 
   @override
   Widget build(BuildContext context) {
+    final defaultAvatar =
+        '${dotenv.env['SUPABASE_URL']!}/storage/v1/object/public/common/default_avatar.png';
+    String avatarUrl =
+        context.read<AuthProvider>().user?.userMetadata?['avatar_url'] ??
+            defaultAvatar;
+    String userName =
+        context.read<AuthProvider>().user?.userMetadata?['full_name'] ?? '';
+    String email =
+        context.read<AuthProvider>().user?.userMetadata?['email'] ?? '';
+
     return Scaffold(
       appBar: AppBar(),
       body: Container(
@@ -35,24 +44,10 @@ class _PersonState extends State<Person> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                // ClipOval(
-                //   child: NetworkImageWithLoading(
-                //     imageUrl:
-                //         'https://dummyimage.com/400x400/f213f2/101aad.png&text=a',
-                //     width: 80,
-                //     height: 80,
-                //   ),
-                // ),
                 CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      'https://dummyimage.com/400x400/f213f2/101aad.png&text=a'),
+                  backgroundImage: NetworkImage(avatarUrl),
                   radius: 40,
                   backgroundColor: Theme.of(context).colorScheme.secondaryFixed,
-                  // child: const Text(
-                  //   '点击上传',
-                  //   overflow: TextOverflow.ellipsis,
-                  //   style: TextStyle(fontSize: 12),
-                  // ),
                 ),
                 FilledButton.icon(
                   label: const Text("修改"),
@@ -65,14 +60,14 @@ class _PersonState extends State<Person> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "zhang heng (山水有神怪)",
+                  userName,
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
-                  "laohu9711@gmail.com",
+                  email,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.secondary,
                   ),
@@ -176,6 +171,45 @@ class _PersonState extends State<Person> {
                         ],
                       ),
                     ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 40),
+            Column(
+              children: [
+                Card.outlined(
+                  margin: EdgeInsets.zero,
+                  child: Column(
+                    children: [
+                      ListTile(
+                        title: Text('账户管理'),
+                        leading: Icon(Icons.manage_accounts),
+                        onTap: () {
+                          context.goNamed("userinfo");
+                        },
+                      ),
+                      Divider(height: 0),
+                      ListTile(
+                        title: Text('模型设置'),
+                        leading: Icon(Icons.psychology),
+                        onTap: () {},
+                      ),
+                      Divider(height: 0),
+                      ListTile(
+                        title: Text('系统设置'),
+                        leading: Icon(Icons.settings),
+                        onTap: () {
+                          context.goNamed("system_setting");
+                        },
+                      ),
+                      Divider(height: 0),
+                      ListTile(
+                        title: Text('常见问题'),
+                        leading: Icon(Icons.help),
+                        onTap: () {},
+                      ),
+                    ],
                   ),
                 ),
               ],

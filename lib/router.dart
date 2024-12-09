@@ -9,6 +9,7 @@ import 'package:one_chatgpt_flutter/ui/index/scaffold_nav_bar.dart';
 import 'package:one_chatgpt_flutter/ui/index/home.dart';
 import 'package:one_chatgpt_flutter/ui/index/person.dart';
 import 'package:one_chatgpt_flutter/ui/model_setting/model_setting.dart';
+import 'package:one_chatgpt_flutter/ui/system_setting/system_setting.dart';
 import 'package:one_chatgpt_flutter/ui/userinfo/update_mail.dart';
 import 'package:one_chatgpt_flutter/ui/userinfo/update_name.dart';
 import 'package:one_chatgpt_flutter/ui/userinfo/update_password.dart';
@@ -104,6 +105,12 @@ class AppRoutes {
                         builder: (context, state) => const UpdatePassword(),
                       ),
                     ],
+                  ),
+                  GoRoute(
+                    name: 'system_setting',
+                    path: 'system_setting',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (context, state) => const SystemSetting(),
                   ),
                 ],
               ),
