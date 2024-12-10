@@ -45,7 +45,6 @@ class ThemeProvider extends ChangeNotifier {
 
   void updateTheme(String theme) {
     _currentTheme = themeKeyToThemeMode(theme);
-
     final SharedPreferencesAsync asyncPrefs = SharedPreferencesAsync();
 
     asyncPrefs.setString('currentTheme', theme);

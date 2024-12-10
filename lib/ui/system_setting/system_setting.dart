@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:one_chatgpt_flutter/state/theme.dart';
 import 'package:provider/provider.dart';
 
@@ -12,7 +13,7 @@ class SystemSetting extends StatefulWidget {
 class _SystemSettingState extends State<SystemSetting> {
   @override
   Widget build(BuildContext context) {
-    String currentThemeKey = context.read<ThemeProvider>().currentThemeKey;
+    String currentThemeKey = context.watch<ThemeProvider>().currentThemeKey;
 
     return Scaffold(
       appBar: AppBar(
@@ -70,46 +71,6 @@ class _SystemSettingState extends State<SystemSetting> {
                         .updateTheme(selected.first);
                   },
                 ),
-                // trailing: Selector<ThemeProvider, String>(
-                //   selector: (context, theme) => theme.currentThemeKey,
-                //   builder: (context, currentTheme, child) {
-                //     return SegmentedButton(
-                //       showSelectedIcon: true,
-                //       style: ButtonStyle(iconSize: WidgetStatePropertyAll(14)),
-                //       segments: [
-                //         ButtonSegment(
-                //           value: "system",
-                //           icon: Icon(Icons.settings_brightness),
-                //           label: Text(
-                //             "系统",
-                //             style: TextStyle(fontSize: 12),
-                //           ),
-                //         ),
-                //         ButtonSegment(
-                //           value: "light",
-                //           icon: Icon(Icons.light_mode),
-                //           label: Text(
-                //             "亮色",
-                //             style: TextStyle(fontSize: 12),
-                //           ),
-                //         ),
-                //         ButtonSegment(
-                //           value: "dark",
-                //           icon: Icon(Icons.dark_mode),
-                //           label: Text(
-                //             "暗黑",
-                //             style: TextStyle(fontSize: 12),
-                //           ),
-                //         ),
-                //       ],
-                //       selected: {currentTheme},
-                //       onSelectionChanged: (selected) {
-                //         Provider.of<ThemeProvider>(context, listen: false)
-                //             .updateTheme(selected.first);
-                //       },
-                //     );
-                //   },
-                // ),
               ),
               Divider(),
               ListTile(
