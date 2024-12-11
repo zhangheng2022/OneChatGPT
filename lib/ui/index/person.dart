@@ -7,6 +7,9 @@ import 'package:one_chatgpt_flutter/state/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+final defaultAvatar =
+    '${dotenv.env['SUPABASE_URL']!}/storage/v1/object/public/common/default_avatar.png';
+
 class Person extends StatefulWidget {
   const Person({super.key});
 
@@ -24,15 +27,17 @@ class _PersonState extends State<Person> {
 
   @override
   Widget build(BuildContext context) {
-    final defaultAvatar =
-        '${dotenv.env['SUPABASE_URL']!}/storage/v1/object/public/common/default_avatar.png';
     String avatarUrl =
-        context.read<AuthProvider>().user?.userMetadata?['avatar_url'] ??
+        context.watch<AuthProvider>().user?.userMetadata?['avatar_url'] ??
             defaultAvatar;
+
+    String updatedAt = context.watch<AuthProvider>().user?.updatedAt ?? '';
+
     String userName =
-        context.read<AuthProvider>().user?.userMetadata?['full_name'] ?? '';
+        context.watch<AuthProvider>().user?.userMetadata?['full_name'] ?? '';
+
     String email =
-        context.read<AuthProvider>().user?.userMetadata?['email'] ?? '';
+        context.watch<AuthProvider>().user?.userMetadata?['email'] ?? '';
 
     return Scaffold(
       appBar: AppBar(),
@@ -45,7 +50,7 @@ class _PersonState extends State<Person> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 CircleAvatar(
-                  backgroundImage: NetworkImage(avatarUrl),
+                  backgroundImage: NetworkImage('$avatarUrl?v=$updatedAt'),
                   radius: 40,
                   backgroundColor: Theme.of(context).colorScheme.secondaryFixed,
                 ),
