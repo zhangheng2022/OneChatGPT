@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:one_chatgpt_flutter/state/auth.dart';
-import 'package:one_chatgpt_flutter/ui/userinfo/widgets/avatar_item.dart';
+import 'package:one_chatgpt_flutter/widgets/user_avatar.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+final defaultAvatar =
+    '${dotenv.env['SUPABASE_URL']!}/storage/v1/object/public/common/default_avatar.png';
 
 class Userinfo extends StatefulWidget {
   const Userinfo({super.key});
@@ -15,153 +19,32 @@ class Userinfo extends StatefulWidget {
 class _Userinfo extends State<Userinfo> {
   @override
   Widget build(BuildContext context) {
+    String avatarUrl =
+        context.watch<AuthProvider>().user?.userMetadata?['avatar_url'] ??
+            defaultAvatar;
+
+    String updatedAt = context.watch<AuthProvider>().user?.updatedAt ?? '';
     return Scaffold(
-      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        backgroundColor: Colors.grey[50],
+        title: Text("账户管理"),
       ),
       body: Column(
         children: [
-          Container(
-            margin: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                const AvatarItem(),
-                ListTile(
-                  onTap: () {
-                    context.goNamed("update_name");
-                  },
-                  enableFeedback: true,
-                  title: const Text(
-                    "用户名",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Selector<AuthProvider, User?>(
-                        selector: (context, state) => state.user,
-                        builder: (context, value, child) {
-                          return Text(
-                            value?.userMetadata?['full_name'] ?? '点击完善信息',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey,
-                            ),
-                          );
-                        },
-                      ),
-                      const Icon(
-                        Icons.chevron_right,
-                        color: Colors.grey,
-                      )
-                    ],
-                  ),
-                ),
-                ListTile(
-                  onTap: () {
-                    context.goNamed("update_mail");
-                  },
-                  enableFeedback: true,
-                  title: const Text(
-                    "邮箱",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Selector<AuthProvider, User?>(
-                        selector: (context, state) => state.user,
-                        builder: (context, value, child) {
-                          return Text(
-                            value?.email ?? '',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey,
-                            ),
-                          );
-                        },
-                      ),
-                      const Icon(
-                        Icons.chevron_right,
-                        color: Colors.grey,
-                      )
-                    ],
-                  ),
-                ),
-                ListTile(
-                  onTap: () {
-                    context.goNamed("update_password");
-                  },
-                  enableFeedback: true,
-                  title: const Text(
-                    "密码修改",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  trailing: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        "修改",
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      Icon(
-                        Icons.chevron_right,
-                        color: Colors.grey,
-                      )
-                    ],
-                  ),
-                ),
-              ],
+          ListTile(
+            title: Text("头像"),
+            trailing: UserAvatar(
+              radius: 30,
+              url: '$avatarUrl?v=$updatedAt',
+              isUpload: true,
             ),
           ),
-          TextButton.icon(
-            onPressed: _logout,
-            style: TextButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.error,
-            ),
-            label: const Text("退出登录"),
-            icon: const Icon(Icons.logout_rounded),
-          )
+          Divider(),
         ],
       ),
     );
   }
 
   Future<void> _logout() async {
-    // Show a confirmation dialog
     bool? confirmed = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {

@@ -6,58 +6,40 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:one_chatgpt_flutter/common/log.dart';
 import 'package:one_chatgpt_flutter/state/auth.dart';
-import 'package:one_chatgpt_flutter/widgets/network_image_with_loading.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:path/path.dart' as path;
 
-class AvatarItem extends StatefulWidget {
-  const AvatarItem({super.key});
+class UserAvatar extends StatefulWidget {
+  final double radius; // 添加 radius 参数
+  final String url; // 添加 url 参数
+  final bool isUpload; // 添加 isUpload 参数
+
+  const UserAvatar({
+    super.key,
+    required this.radius,
+    required this.url,
+    this.isUpload = false,
+  });
+
   @override
-  State<AvatarItem> createState() => _AvatarItem();
+  State<UserAvatar> createState() => _UserAvatar();
 }
 
-class _AvatarItem extends State<AvatarItem> {
+class _UserAvatar extends State<UserAvatar> {
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      onTap: _handleImageSelection,
-      title: const Text(
-        "头像",
-        style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
+    return CircleAvatar(
+      backgroundImage: NetworkImage(widget.url),
+      radius: widget.radius,
+      backgroundColor: Theme.of(context).colorScheme.secondaryFixed,
+      child: Material(
+        shape: CircleBorder(),
+        clipBehavior: Clip.hardEdge,
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: widget.isUpload ? _handleImageSelection : null,
         ),
-      ),
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: 20,
-        vertical: 10,
-      ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Selector<AuthProvider, User?>(
-            selector: (context, state) => state.user,
-            builder: (context, data, child) {
-              final defaultAvatar =
-                  '${dotenv.env['SUPABASE_URL']!}/storage/v1/object/public/common/default_avatar.png';
-              final avatarUrl =
-                  data?.userMetadata?['avatar_url'] ?? defaultAvatar;
-              return ClipOval(
-                child: NetworkImageWithLoading(
-                  imageUrl: '$avatarUrl?v=${data?.updatedAt}',
-                  height: 50,
-                  width: 50,
-                ),
-              );
-            },
-          ),
-          const Icon(
-            Icons.chevron_right,
-            color: Colors.grey,
-          )
-        ],
       ),
     );
   }
@@ -112,6 +94,7 @@ class _AvatarItem extends State<AvatarItem> {
           toolbarWidgetColor: Colors.white,
           initAspectRatio: CropAspectRatioPreset.square,
           cropStyle: CropStyle.circle,
+          activeControlsWidgetColor: Theme.of(context).colorScheme.primary,
         ),
         IOSUiSettings(
           minimumAspectRatio: 1.0,
