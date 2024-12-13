@@ -15,7 +15,16 @@
 
 ## 简介
 
-OneChatGPT 是一个基于 Flutter 开发的开源聊天应用，支持多种 AI 模型，包括 GPT-3.5 和 Google Gemini 等。该项目旨在提供一个免费、易用的 AI 聊天平台。
+OneChatGPT 是一个开源的多模型 AI 聊天平台，基于 Flutter
+开发。它集成了多个主流大语言模型，包括：
+
+- OpenAI ChatGPT
+- Google Gemini
+- 百度文心一言
+- 智谱 ChatGLM
+
+本项目致力于为用户提供一站式的 AI
+对话体验，让用户可以便捷地体验和对比不同大语言模型的特点。
 
 ## 功能特点
 
