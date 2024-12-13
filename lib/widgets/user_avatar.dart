@@ -23,10 +23,10 @@ class UserAvatar extends StatefulWidget {
   });
 
   @override
-  State<UserAvatar> createState() => _UserAvatar();
+  UserAvatarState createState() => UserAvatarState();
 }
 
-class _UserAvatar extends State<UserAvatar> {
+class UserAvatarState extends State<UserAvatar> {
   @override
   Widget build(BuildContext context) {
     return CircleAvatar(
@@ -38,14 +38,14 @@ class _UserAvatar extends State<UserAvatar> {
         clipBehavior: Clip.hardEdge,
         color: Colors.transparent,
         child: InkWell(
-          onTap: widget.isUpload ? _handleImageSelection : null,
+          onTap: widget.isUpload ? handleImageSelection : null,
         ),
       ),
     );
   }
 
   // 处理图片选择
-  void _handleImageSelection() async {
+  void handleImageSelection() async {
     // 选择图片
     final XFile? file =
         await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -94,7 +94,8 @@ class _UserAvatar extends State<UserAvatar> {
           toolbarWidgetColor: Colors.white,
           initAspectRatio: CropAspectRatioPreset.square,
           cropStyle: CropStyle.circle,
-          activeControlsWidgetColor: Theme.of(context).colorScheme.primary,
+          showCropGrid: true,
+          hideBottomControls: true,
         ),
         IOSUiSettings(
           minimumAspectRatio: 1.0,

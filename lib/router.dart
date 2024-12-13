@@ -1,6 +1,7 @@
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
+import 'package:one_chatgpt_flutter/ui/faq/faq.dart';
 import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:one_chatgpt_flutter/ui/auth/login.dart';
 import 'package:one_chatgpt_flutter/ui/auth/register.dart';
@@ -110,6 +111,12 @@ class AppRoutes {
                     path: 'system_setting',
                     parentNavigatorKey: _rootNavigatorKey,
                     builder: (context, state) => const SystemSetting(),
+                  ),
+                  GoRoute(
+                    name: 'faq',
+                    path: 'faq',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (context, state) => const Faq(),
                   ),
                 ],
               ),

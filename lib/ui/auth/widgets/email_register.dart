@@ -138,7 +138,7 @@ class _RegisterEmailState extends State<RegisterEmail> {
                 icon: _isLoading
                     ? const CircularProgressWidget()
                     : const Icon(Icons.app_registration),
-                label: const Text("注册账户", style: TextStyle(fontSize: 16)),
+                label: const Text("注册账户"),
                 onPressed: () {
                   if (!_isLoading) _onSubmit(context);
                 },

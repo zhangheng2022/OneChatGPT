@@ -67,9 +67,6 @@ class _UpdatePassword extends State<UpdatePassword> {
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.lock_outlined),
                   labelText: '新密码',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
                   hintText: "请输入新密码",
                   helperText: "最少6位，包括至少1个字母，1个数字",
                   suffixIcon: userPasswordController.text.isNotEmpty
@@ -101,9 +98,6 @@ class _UpdatePassword extends State<UpdatePassword> {
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.lock_outlined),
                   labelText: '新密码',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
                   hintText: "请再次输入新密码",
                   helperText: "请再次输入新密码",
                   suffixIcon: userRepeatPasswordController.text.isNotEmpty
@@ -138,11 +132,6 @@ class _UpdatePassword extends State<UpdatePassword> {
                   icon: const Icon(Icons.save),
                   label: const Text("保存"),
                   onPressed: _onSubmit,
-                  style: FilledButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10), // 圆角按钮
-                    ),
-                  ),
                 ),
               ),
             ],

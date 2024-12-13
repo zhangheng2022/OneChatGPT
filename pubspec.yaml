@@ -59,6 +59,7 @@ dependencies:
   http: ^1.2.2
   flex_color_scheme: ^8.0.2
   drift_flutter: ^0.2.2
+  package_info_plus: ^8.1.2
 
 
 dev_dependencies:

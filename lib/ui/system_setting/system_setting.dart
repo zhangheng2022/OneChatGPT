@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:one_chatgpt_flutter/state/theme.dart';
 import 'package:provider/provider.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class SystemSetting extends StatefulWidget {
   const SystemSetting({super.key});
@@ -11,6 +13,22 @@ class SystemSetting extends StatefulWidget {
 }
 
 class _SystemSettingState extends State<SystemSetting> {
+  late PackageInfo packageInfo;
+
+  Future<void> init() async {
+    try {
+      packageInfo = await PackageInfo.fromPlatform();
+    } catch (e) {
+      Log.e("packageInfo错误：$e");
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    init();
+  }
+
   @override
   Widget build(BuildContext context) {
     String currentThemeKey = context.watch<ThemeProvider>().currentThemeKey;
@@ -87,11 +105,56 @@ class _SystemSettingState extends State<SystemSetting> {
                   icon: Icon(Icons.delete),
                   label: Text("清理"),
                 ),
-              )
+              ),
+              Container(
+                padding: EdgeInsets.fromLTRB(18, 18, 0, 0),
+                child: Text(
+                  "其他",
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+              ListTile(
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return _buildAboutDialog();
+                    },
+                  );
+                },
+                title: Text(
+                  "关于我们",
+                  style: TextStyle(fontSize: 14),
+                ),
+                trailing: Icon(Icons.navigate_next),
+              ),
             ],
           ),
         ],
       ),
+    );
+  }
+
+  AboutDialog _buildAboutDialog() {
+    return AboutDialog(
+      applicationIcon: Image.asset(
+        "assets/logos/logo.png",
+        height: 30,
+        fit: BoxFit.cover,
+      ),
+      applicationName: packageInfo.appName,
+      applicationVersion: packageInfo.version,
+      children: [
+        Center(
+          child: Text(
+            "${packageInfo.appName}，一个AI",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        )
+      ],
     );
   }
 }

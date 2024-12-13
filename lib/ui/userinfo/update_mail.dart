@@ -29,7 +29,7 @@ class _UpdateMail extends State<UpdateMail> {
       );
       SmartDialog.showToast("修改成功，请到新邮箱验证");
     } catch (err) {
-      Log.e("updateUser错误===>$err");
+      Log.e("更新邮箱错误：$err");
       SmartDialog.showToast("系统错误，请稍候再试");
     } finally {
       SmartDialog.dismiss(status: SmartStatus.loading);
@@ -63,13 +63,11 @@ class _UpdateMail extends State<UpdateMail> {
             children: <Widget>[
               TextFormField(
                 autofocus: true,
+                maxLength: 30,
                 controller: userMailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   hintText: "请输入新邮箱地址",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10), // 圆角边框
-                  ),
                   suffixIcon: userMailController.text.isNotEmpty
                       ? IconButton(
                           icon: const Icon(Icons.cancel),
@@ -79,7 +77,7 @@ class _UpdateMail extends State<UpdateMail> {
                             });
                           },
                         )
-                      : const SizedBox.shrink(),
+                      : null,
                 ),
                 validator: (value) {
                   if (value!.isEmpty) return "请输入新邮箱地址";
@@ -99,11 +97,6 @@ class _UpdateMail extends State<UpdateMail> {
                   icon: const Icon(Icons.save),
                   label: const Text("保存"),
                   onPressed: _onSubmit,
-                  style: FilledButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10), // 圆角按钮
-                    ),
-                  ),
                 ),
               ),
             ],

@@ -29,7 +29,7 @@ class _UpdateName extends State<UpdateName> {
       );
       SmartDialog.showToast("修改成功");
     } catch (err) {
-      Log.e("updateUser错误===>$err");
+      Log.e("更新用户名错误：$err");
       SmartDialog.showToast("系统错误，请稍候再试");
     } finally {
       SmartDialog.dismiss(status: SmartStatus.loading);
@@ -63,16 +63,11 @@ class _UpdateName extends State<UpdateName> {
             children: <Widget>[
               TextFormField(
                 autofocus: true,
-                maxLength: 10,
+                maxLength: 20,
                 controller: userNameController,
                 keyboardType: TextInputType.name,
                 decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
                   hintText: "请输入用户名",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10), // 圆角边框
-                  ),
                   suffixIcon: userNameController.text.isNotEmpty
                       ? IconButton(
                           icon: const Icon(Icons.cancel),
@@ -82,7 +77,7 @@ class _UpdateName extends State<UpdateName> {
                             });
                           },
                         )
-                      : const SizedBox.shrink(),
+                      : null,
                 ),
                 validator: (value) {
                   if (value!.isEmpty) return "请输入用户名";
@@ -102,11 +97,6 @@ class _UpdateName extends State<UpdateName> {
                   icon: const Icon(Icons.save),
                   label: const Text("保存"),
                   onPressed: _onSubmit,
-                  style: FilledButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10), // 圆角按钮
-                    ),
-                  ),
                 ),
               ),
             ],

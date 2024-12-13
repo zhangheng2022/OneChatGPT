@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:one_chatgpt_flutter/state/auth.dart';
+import 'package:one_chatgpt_flutter/widgets/user_avatar.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -49,10 +50,9 @@ class _PersonState extends State<Person> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                CircleAvatar(
-                  backgroundImage: NetworkImage('$avatarUrl?v=$updatedAt'),
+                UserAvatar(
                   radius: 40,
-                  backgroundColor: Theme.of(context).colorScheme.secondaryFixed,
+                  url: '$avatarUrl?v=$updatedAt',
                 ),
                 FilledButton.icon(
                   label: const Text("修改"),
@@ -212,7 +212,9 @@ class _PersonState extends State<Person> {
                       ListTile(
                         title: Text('常见问题'),
                         leading: Icon(Icons.help),
-                        onTap: () {},
+                        onTap: () {
+                          context.goNamed("faq");
+                        },
                       ),
                     ],
                   ),
