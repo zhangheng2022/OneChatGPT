@@ -9,36 +9,55 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 class Screen {
   static Future<void> initialize() async {
-    // Initialize Flutter framework and preserve native splash screen
-    WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-    FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-    // Initialize app links listener
-    final appLinks = AppLinks();
-    appLinks.uriLinkStream.listen((uri) {
-      Log.i("uri: $uri");
-    });
+    try {
+      // Initialize Flutter framework and preserve native splash screen
+      final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+      FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-    await dotenv.load();
+      // Load environment variables first since they're needed for Supabase
+      await dotenv.load();
 
-    // Set default locale and load environment variables
-    Intl.defaultLocale = 'zh_CN';
-    // Initialize date formatting
-    await initializeDateFormatting();
+      // Run initialization tasks in parallel
+      await Future.wait([
+        _initializeAppLinks(),
+        _initializeLocalization(),
+        _initializeSupabase(),
+      ]);
 
-    // Initialize Supabase client
-    await Supabase.initialize(
-      url: dotenv.env['SUPABASE_URL']!,
-      anonKey: dotenv.env['SUPABASE_ANONKEY']!,
-    );
-
-    // Refresh session if needed
-    final supabase = Supabase.instance.client;
-    final session = supabase.auth.currentSession;
-    if (session != null && session.refreshToken != null && session.isExpired) {
-      await supabase.auth.refreshSession();
+      // Remove splash screen after all initialization is complete
+      FlutterNativeSplash.remove();
+    } catch (e) {
+      Log.e('Initialization failed: $e');
+      FlutterNativeSplash.remove();
+      rethrow;
     }
+  }
 
-    // Remove the native splash screen
-    FlutterNativeSplash.remove();
+  static Future<void> _initializeAppLinks() async {
+    final appLinks = AppLinks();
+    appLinks.uriLinkStream.listen((uri) => Log.i('Deep link received: $uri'));
+  }
+
+  static Future<void> _initializeLocalization() async {
+    Intl.defaultLocale = 'zh_CN';
+    await initializeDateFormatting();
+  }
+
+  static Future<void> _initializeSupabase() async {
+    try {
+      await Supabase.initialize(
+        url: dotenv.env['SUPABASE_URL'] ?? '',
+        anonKey: dotenv.env['SUPABASE_ANONKEY'] ?? '',
+      );
+
+      final supabase = Supabase.instance.client;
+      final session = supabase.auth.currentSession;
+      if (session?.refreshToken != null && session!.isExpired) {
+        await supabase.auth.refreshSession();
+      }
+    } catch (e) {
+      Log.e('Supabase initialization failed: $e');
+      rethrow;
+    }
   }
 }
