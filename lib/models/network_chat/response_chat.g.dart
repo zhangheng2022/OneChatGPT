@@ -1,28 +1,28 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'stream_chat_message.dart';
+part of 'response_chat.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-StreamChatMessage _$StreamChatMessageFromJson(Map<String, dynamic> json) {
+ResponseChat _$ResponseChatFromJson(Map<String, dynamic> json) {
   $checkKeys(
     json,
     requiredKeys: const ['id'],
   );
-  return StreamChatMessage(
+  return ResponseChat(
     id: json['id'] as String,
     object: json['object'] as String?,
     created: (json['created'] as num).toInt(),
     model: json['model'] as String,
     choices: (json['choices'] as List<dynamic>)
-        .map((e) => StreamChatMessageChoice.fromJson(e as Map<String, dynamic>))
+        .map((e) => Choice.fromJson(e as Map<String, dynamic>))
         .toList(),
   );
 }
 
-Map<String, dynamic> _$StreamChatMessageToJson(StreamChatMessage instance) =>
+Map<String, dynamic> _$ResponseChatToJson(ResponseChat instance) =>
     <String, dynamic>{
       'id': instance.id,
       'object': instance.object,
@@ -31,31 +31,22 @@ Map<String, dynamic> _$StreamChatMessageToJson(StreamChatMessage instance) =>
       'choices': instance.choices,
     };
 
-StreamChatMessageChoice _$StreamChatMessageChoiceFromJson(
-        Map<String, dynamic> json) =>
-    StreamChatMessageChoice(
+Choice _$ChoiceFromJson(Map<String, dynamic> json) => Choice(
       index: (json['index'] as num).toInt(),
-      delta: StreamChatMessageDelta.fromJson(
-          json['delta'] as Map<String, dynamic>),
+      delta: Delta.fromJson(json['delta'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$StreamChatMessageChoiceToJson(
-        StreamChatMessageChoice instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$ChoiceToJson(Choice instance) => <String, dynamic>{
       'index': instance.index,
       'delta': instance.delta,
     };
 
-StreamChatMessageDelta _$StreamChatMessageDeltaFromJson(
-        Map<String, dynamic> json) =>
-    StreamChatMessageDelta(
+Delta _$DeltaFromJson(Map<String, dynamic> json) => Delta(
       content: json['content'] as String?,
       role: json['role'] as String?,
     );
 
-Map<String, dynamic> _$StreamChatMessageDeltaToJson(
-        StreamChatMessageDelta instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$DeltaToJson(Delta instance) => <String, dynamic>{
       'content': instance.content,
       'role': instance.role,
     };

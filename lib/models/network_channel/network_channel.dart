@@ -1,14 +1,8 @@
 import 'package:json_annotation/json_annotation.dart';
-part 'channel_model.g.dart';
+part 'network_channel.g.dart';
 
 @JsonSerializable()
-class ChannelModel {
-  @JsonKey(required: true)
-  int id;
-
-  @JsonKey(name: 'created_at')
-  DateTime createdAt;
-
+class NetworkChannel {
   List<String> models;
 
   @JsonKey(name: 'provider_logo')
@@ -21,9 +15,7 @@ class ChannelModel {
 
   bool host;
 
-  ChannelModel({
-    required this.id,
-    required this.createdAt,
+  NetworkChannel({
     required this.models,
     required this.providerLogo,
     required this.provider,
@@ -31,8 +23,8 @@ class ChannelModel {
     required this.host,
   });
 
-  factory ChannelModel.fromJson(Map<String, dynamic> json) =>
-      _$ChannelModelFromJson(json);
+  factory NetworkChannel.fromJson(Map<String, dynamic> json) =>
+      _$NetworkChannelFromJson(json);
 
-  Map<String, dynamic> toJson() => _$ChannelModelToJson(this);
+  Map<String, dynamic> toJson() => _$NetworkChannelToJson(this);
 }

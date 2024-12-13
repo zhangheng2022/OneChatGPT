@@ -3,7 +3,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:one_chatgpt_flutter/common/theme_config.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
 import 'package:one_chatgpt_flutter/state/theme.dart';
-import 'package:one_chatgpt_flutter/state/model_config.dart';
+import 'package:one_chatgpt_flutter/state/model_setting.dart';
 import 'package:provider/provider.dart';
 import 'package:one_chatgpt_flutter/router.dart';
 import 'package:one_chatgpt_flutter/state/auth.dart';
@@ -26,7 +26,7 @@ class RunApp extends StatelessWidget {
           dispose: (context, db) => db.close(),
         ),
         ChangeNotifierProvider(
-          create: (_) => ModelConfigProvider(),
+          create: (_) => ModelSettingProvider(),
           lazy: false,
         ),
         ChangeNotifierProvider(

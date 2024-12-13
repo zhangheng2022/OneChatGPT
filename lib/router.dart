@@ -8,7 +8,6 @@ import 'package:one_chatgpt_flutter/ui/chat/chat.dart';
 import 'package:one_chatgpt_flutter/ui/index/scaffold_nav_bar.dart';
 import 'package:one_chatgpt_flutter/ui/index/home.dart';
 import 'package:one_chatgpt_flutter/ui/index/person.dart';
-import 'package:one_chatgpt_flutter/ui/model_setting/model_setting.dart';
 import 'package:one_chatgpt_flutter/ui/system_setting/system_setting.dart';
 import 'package:one_chatgpt_flutter/ui/userinfo/update_mail.dart';
 import 'package:one_chatgpt_flutter/ui/userinfo/update_name.dart';
@@ -74,12 +73,12 @@ class AppRoutes {
                 builder: (BuildContext context, GoRouterState state) =>
                     const Person(),
                 routes: <RouteBase>[
-                  GoRoute(
-                    name: 'model_setting',
-                    path: 'model_setting',
-                    parentNavigatorKey: _rootNavigatorKey,
-                    builder: (context, state) => const ModelSetting(),
-                  ),
+                  // GoRoute(
+                  //   name: 'model_setting',
+                  //   path: 'model_setting',
+                  //   parentNavigatorKey: _rootNavigatorKey,
+                  //   builder: (context, state) => const ModelSetting(),
+                  // ),
                   GoRoute(
                     name: 'userinfo',
                     path: 'userinfo',

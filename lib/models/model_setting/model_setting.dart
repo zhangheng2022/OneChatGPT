@@ -1,15 +1,15 @@
 import 'package:json_annotation/json_annotation.dart';
-part 'model_config.g.dart';
+part 'model_setting.g.dart';
 
 @JsonSerializable()
-class ModelConfig {
+class ModelSetting {
   int? maxTokens; // 最大令牌数 (max_tokens)
   double? temperature; // 随机性 (temperature)
   double? topP; // 核采样 (top_p)
   double? historyMessages; // 历史消息数 (history_messages)
   bool? autoTitle; // 自动标题 (auto_title)
 
-  ModelConfig({
+  ModelSetting({
     this.maxTokens,
     this.temperature,
     this.topP,
@@ -17,7 +17,7 @@ class ModelConfig {
     this.autoTitle,
   });
 
-  ModelConfig copyWith({
+  ModelSetting copyWith({
     String? model,
     int? maxTokens,
     double? temperature,
@@ -25,7 +25,7 @@ class ModelConfig {
     double? historyMessages,
     bool? autoTitle,
   }) {
-    return ModelConfig(
+    return ModelSetting(
       maxTokens: maxTokens ?? this.maxTokens,
       temperature: temperature ?? this.temperature,
       topP: topP ?? this.topP,
@@ -34,8 +34,8 @@ class ModelConfig {
     );
   }
 
-  factory ModelConfig.fromJson(Map<String, dynamic> json) =>
-      _$ModelConfigFromJson(json);
+  factory ModelSetting.fromJson(Map<String, dynamic> json) =>
+      _$ModelSettingFromJson(json);
 
-  Map<String, dynamic> toJson() => _$ModelConfigToJson(this);
+  Map<String, dynamic> toJson() => _$ModelSettingToJson(this);
 }

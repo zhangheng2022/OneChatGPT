@@ -1,19 +1,19 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'function_chat_body.dart';
+part of 'request_chat.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-FunctionChatBody _$FunctionChatBodyFromJson(Map<String, dynamic> json) {
+RequestChat _$RequestChatFromJson(Map<String, dynamic> json) {
   $checkKeys(
     json,
     requiredKeys: const ['model'],
   );
-  return FunctionChatBody(
+  return RequestChat(
     messages: (json['messages'] as List<dynamic>)
-        .map((e) => FunctionChatBodyMessage.fromJson(e as Map<String, dynamic>))
+        .map((e) => RequestChatMessage.fromJson(e as Map<String, dynamic>))
         .toList(),
     model: json['model'] as String,
     maxTokens: (json['maxTokens'] as num?)?.toInt(),
@@ -24,7 +24,7 @@ FunctionChatBody _$FunctionChatBodyFromJson(Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$FunctionChatBodyToJson(FunctionChatBody instance) =>
+Map<String, dynamic> _$RequestChatToJson(RequestChat instance) =>
     <String, dynamic>{
       'maxTokens': instance.maxTokens,
       'temperature': instance.temperature,
@@ -35,20 +35,18 @@ Map<String, dynamic> _$FunctionChatBodyToJson(FunctionChatBody instance) =>
       'messages': instance.messages,
     };
 
-FunctionChatBodyMessage _$FunctionChatBodyMessageFromJson(
-    Map<String, dynamic> json) {
+RequestChatMessage _$RequestChatMessageFromJson(Map<String, dynamic> json) {
   $checkKeys(
     json,
     requiredKeys: const ['role'],
   );
-  return FunctionChatBodyMessage(
+  return RequestChatMessage(
     role: json['role'] as String,
     content: json['content'] as String,
   );
 }
 
-Map<String, dynamic> _$FunctionChatBodyMessageToJson(
-        FunctionChatBodyMessage instance) =>
+Map<String, dynamic> _$RequestChatMessageToJson(RequestChatMessage instance) =>
     <String, dynamic>{
       'role': instance.role,
       'content': instance.content,

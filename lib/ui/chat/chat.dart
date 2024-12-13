@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:one_chatgpt_flutter/models/request/function_chat_body.dart';
-import 'package:one_chatgpt_flutter/models/response/stream_chat_message.dart';
-import 'package:one_chatgpt_flutter/state/model_config.dart';
+import 'package:one_chatgpt_flutter/models/network_chat/request_chat.dart';
+import 'package:one_chatgpt_flutter/models/network_chat/response_chat.dart';
+import 'package:one_chatgpt_flutter/state/model_setting.dart';
 import 'package:one_chatgpt_flutter/utils/util.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -60,9 +60,9 @@ class _ChatPageState extends State<ChatPage> {
     // 初始化用户信息
     _user = types.User(id: widget.chatid);
 
-    String currentModel = context.read<ModelConfigProvider>().currentModel;
+    String currentModel = context.read<ModelSettingProvider>().currentModel;
     String currentProvider =
-        context.read<ModelConfigProvider>().currentProvider;
+        context.read<ModelSettingProvider>().currentProvider;
 
     _model = types.User(
       id: const Uuid().v4(),
@@ -299,16 +299,16 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   // 获取历史消息
-  List<FunctionChatBodyMessage> _getHistoryMessages() {
+  List<RequestChatMessage> _getHistoryMessages() {
     // Convert messages to the required format for Supabase API
     return _messages.reversed.map((message) {
       if (message is types.TextMessage) {
-        return FunctionChatBodyMessage(
+        return RequestChatMessage(
           content: message.text,
           role: message.metadata?['role'],
         );
       } else {
-        return FunctionChatBodyMessage(
+        return RequestChatMessage(
           content: "Unknown message type",
           role: message.metadata?['role'],
         );
@@ -321,12 +321,12 @@ class _ChatPageState extends State<ChatPage> {
     final completer = Completer<void>();
 
     final currentModelConfig =
-        context.read<ModelConfigProvider>().currentModelConfig;
-    final currentModel = context.read<ModelConfigProvider>().currentModel;
+        context.read<ModelSettingProvider>().currentModelConfig;
+    final currentModel = context.read<ModelSettingProvider>().currentModel;
 
     final messages = _getHistoryMessages();
     // 调用 Supabase 函数
-    final params = FunctionChatBody(
+    final params = RequestChat(
       messages: messages,
       model: currentModel,
       maxTokens: currentModelConfig.maxTokens,
@@ -364,7 +364,7 @@ class _ChatPageState extends State<ChatPage> {
                 message += jsonData['error']['message'];
               } else {
                 try {
-                  final messageContent = StreamChatMessage.fromJson(jsonData)
+                  final messageContent = ResponseChat.fromJson(jsonData)
                           .choices[0]
                           .delta
                           .content ??

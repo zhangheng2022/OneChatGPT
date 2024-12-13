@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'model_config.dart';
+part of 'model_setting.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-ModelConfig _$ModelConfigFromJson(Map<String, dynamic> json) => ModelConfig(
+ModelSetting _$ModelSettingFromJson(Map<String, dynamic> json) => ModelSetting(
       maxTokens: (json['maxTokens'] as num?)?.toInt(),
       temperature: (json['temperature'] as num?)?.toDouble(),
       topP: (json['topP'] as num?)?.toDouble(),
@@ -14,7 +14,7 @@ ModelConfig _$ModelConfigFromJson(Map<String, dynamic> json) => ModelConfig(
       autoTitle: json['autoTitle'] as bool?,
     );
 
-Map<String, dynamic> _$ModelConfigToJson(ModelConfig instance) =>
+Map<String, dynamic> _$ModelSettingToJson(ModelSetting instance) =>
     <String, dynamic>{
       'maxTokens': instance.maxTokens,
       'temperature': instance.temperature,
