@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:one_chatgpt_flutter/widgets/circular_progress.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:one_chatgpt_flutter/common/log.dart';
+import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:one_chatgpt_flutter/ui/auth/widgets/email_login.dart';
 import 'package:go_router/go_router.dart';
 import 'package:one_chatgpt_flutter/utils/connectivity_checker.dart';

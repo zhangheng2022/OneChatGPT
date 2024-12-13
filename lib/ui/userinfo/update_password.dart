@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:one_chatgpt_flutter/common/log.dart';
+import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:one_chatgpt_flutter/utils/validator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

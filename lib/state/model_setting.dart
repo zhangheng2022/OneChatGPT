@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:one_chatgpt_flutter/common/log.dart';
+import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:one_chatgpt_flutter/models/model_setting/model_setting.dart';
 import 'package:one_chatgpt_flutter/models/network_channel/network_channel.dart';
 import 'package:shared_preferences/shared_preferences.dart';

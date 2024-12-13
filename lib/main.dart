@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:one_chatgpt_flutter/common/theme_config.dart';
+import 'package:one_chatgpt_flutter/config/theme_config.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
 import 'package:one_chatgpt_flutter/state/theme.dart';
 import 'package:one_chatgpt_flutter/state/model_setting.dart';

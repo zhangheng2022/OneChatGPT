@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
-import 'package:one_chatgpt_flutter/common/log.dart';
+import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:one_chatgpt_flutter/state/auth.dart';
 import 'package:one_chatgpt_flutter/widgets/user_avatar.dart';
 import 'package:provider/provider.dart';

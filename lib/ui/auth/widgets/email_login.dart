@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:one_chatgpt_flutter/utils/validator.dart';
 import 'package:one_chatgpt_flutter/widgets/circular_progress.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:one_chatgpt_flutter/common/log.dart';
+import 'package:one_chatgpt_flutter/utils/log.dart';
 
 class LoginEmail extends StatefulWidget {
   const LoginEmail({super.key});
