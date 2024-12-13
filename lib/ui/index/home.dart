@@ -24,46 +24,65 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> _loadChatList() async {
-    final data = await _database.select(_database.chatTableData).get();
-    setState(() {
-      _chatList.clear();
-      _chatList.addAll(data);
-    });
+    try {
+      final data = await _database.select(_database.chatTableData).get();
+      setState(() {
+        _chatList
+          ..clear()
+          ..addAll(data);
+      });
+    } catch (e) {
+      debugPrint('Error loading chat list: $e');
+    }
   }
 
-  Future<void> _addCardListData() async {
+  Future<void> _addChat() async {
     try {
       final newChat = await _database
           .into(_database.chatTableData)
           .insertReturning(ChatTableDataCompanion.insert());
+
       setState(() {
         _chatList.add(newChat);
         _listKey.currentState?.insertItem(_chatList.length - 1);
       });
+
+      context.goNamed(
+        'chat',
+        pathParameters: {'chatid': newChat.id.toString()},
+      );
     } catch (e) {
-      debugPrint('Error adding card list data: $e');
+      debugPrint('Error adding chat: $e');
     }
   }
 
-  Future<void> _deleteCardListData(int id) async {
+  Future<void> _deleteChat(int id) async {
     try {
       final index = _chatList.indexWhere((chat) => chat.id == id);
       if (index != -1) {
         await (_database.delete(_database.chatTableData)
               ..where((row) => row.id.equals(id)))
             .go();
+
         setState(() {
           final removedItem = _chatList.removeAt(index);
           _listKey.currentState?.removeItem(
             index,
-            (context, animation) =>
-                _buildChatCard(context, removedItem, animation),
+            (context, animation) => ChatList(
+              listKey: _listKey,
+              chatList: _chatList,
+              onDelete: _deleteChat,
+            )._buildChatCard(
+              context: context,
+              chatData: removedItem,
+              animation: animation,
+            ),
             duration: const Duration(milliseconds: 300),
           );
         });
       }
     } catch (e) {
-      debugPrint('Error deleting card list data: $e');
+      debugPrint('Error deleting chat: $e');
     }
   }
 
@@ -72,26 +91,28 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("对话"),
-        leading: const Icon(Icons.model_training),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _addCardListData,
+        onPressed: _addChat,
         tooltip: '新增对话',
         child: const Icon(Icons.add_comment),
       ),
       body: _chatList.isEmpty
-          ? _buildEmptyState()
-          : AnimatedList(
-              key: _listKey,
-              initialItemCount: _chatList.length,
-              padding: const EdgeInsets.all(20),
-              itemBuilder: (context, index, animation) =>
-                  _buildChatCard(context, _chatList[index], animation),
+          ? const EmptyState()
+          : ChatList(
+              listKey: _listKey,
+              chatList: _chatList,
+              onDelete: _deleteChat,
             ),
     );
   }
+}
 
-  Widget _buildEmptyState() {
+class EmptyState extends StatelessWidget {
+  const EmptyState({super.key});
+
+  @override
+  Widget build(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -101,36 +122,137 @@ class _HomeState extends State<Home> {
             height: 200,
             fit: BoxFit.cover,
           ),
-          const Text(
+          Text(
             '点击右下角+新增对话',
-            style: TextStyle(color: Colors.grey),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.secondary,
+            ),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildChatCard(BuildContext context, ChatTableDataData chatData,
-      Animation<double> animation) {
+class ChatList extends StatelessWidget {
+  final GlobalKey<AnimatedListState> listKey;
+  final List<ChatTableDataData> chatList;
+  final Function(int) onDelete;
+
+  const ChatList({
+    super.key,
+    required this.listKey,
+    required this.chatList,
+    required this.onDelete,
+  });
+
+  String _getGroupTitle(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+    final dateToCompare = DateTime(date.year, date.month, date.day);
+
+    if (dateToCompare == today) {
+      return '今天';
+    } else if (dateToCompare == yesterday) {
+      return '昨天';
+    } else if (now.difference(date).inDays <= 7) {
+      return '一周内';
+    } else if (now.difference(date).inDays <= 30) {
+      return '一个月内';
+    } else {
+      return '更早';
+    }
+  }
+
+  Map<String, List<ChatTableDataData>> _groupChats() {
+    final groups = <String, List<ChatTableDataData>>{};
+
+    for (var chat in chatList) {
+      final groupTitle = _getGroupTitle(chat.datetime);
+      groups.putIfAbsent(groupTitle, () => []).add(chat);
+    }
+
+    // Sort chats within each group by datetime in descending order
+    groups.forEach((key, value) {
+      value.sort((a, b) => b.datetime.compareTo(a.datetime));
+    });
+
+    return groups;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final groupedChats = _groupChats();
+    final groups = groupedChats.keys.toList();
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(20),
+      itemCount: groups.length,
+      itemBuilder: (context, groupIndex) {
+        final groupTitle = groups[groupIndex];
+        final chatsInGroup = groupedChats[groupTitle]!;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 16, bottom: 8),
+              child: Text(
+                groupTitle,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+              ),
+            ),
+            ...chatsInGroup.map((chat) => _buildChatCard(
+                  context: context,
+                  chatData: chat,
+                  animation: const AlwaysStoppedAnimation(1),
+                )),
+            const SizedBox(height: 16),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildChatCard({
+    required BuildContext context,
+    required ChatTableDataData chatData,
+    required Animation<double> animation,
+  }) {
     return SizeTransition(
       sizeFactor: animation,
       child: Card(
         elevation: 0,
-        color: Theme.of(context).colorScheme.tertiary,
         margin: const EdgeInsets.only(bottom: 20),
         child: ListTile(
-          leading: const Icon(Icons.smart_toy),
+          leading: Icon(
+            Icons.smart_toy,
+            color: Theme.of(context).colorScheme.primary,
+          ),
           title: Text(
             chatData.title,
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
           subtitle: Text(
-            DateFormat.MMMEd().add_Hm().format(chatData.datetime),
-            style: const TextStyle(color: Colors.grey),
+            DateFormat.Hm().format(chatData.datetime),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.secondary,
+            ),
           ),
           trailing: IconButton(
-            onPressed: () => _deleteCardListData(chatData.id),
-            icon: const Icon(Icons.delete_outline),
+            onPressed: () => onDelete(chatData.id),
+            icon: Icon(
+              Icons.delete_outline,
+              color: Theme.of(context).colorScheme.error,
+            ),
           ),
           onTap: () {
             context.goNamed(

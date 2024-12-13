@@ -16,6 +16,7 @@ class Faq extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               children: [
                 Card.outlined(
+                  margin: EdgeInsets.zero,
                   child: Padding(
                     padding: const EdgeInsets.all(10),
                     child: Column(
@@ -36,6 +37,7 @@ class Faq extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Card.outlined(
+                  margin: EdgeInsets.zero,
                   child: Padding(
                     padding: const EdgeInsets.all(10),
                     child: Column(
@@ -56,6 +58,7 @@ class Faq extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Card.outlined(
+                  margin: EdgeInsets.zero,
                   child: Padding(
                     padding: const EdgeInsets.all(10),
                     child: Column(
@@ -76,6 +79,7 @@ class Faq extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Card.outlined(
+                  margin: EdgeInsets.zero,
                   child: Padding(
                     padding: const EdgeInsets.all(10),
                     child: Column(

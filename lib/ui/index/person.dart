@@ -43,7 +43,7 @@ class _PersonState extends State<Person> {
     return Scaffold(
       appBar: AppBar(),
       body: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 20),
+        margin: const EdgeInsets.symmetric(horizontal: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
