@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:one_chatgpt_flutter/database/database.dart';
 import 'package:one_chatgpt_flutter/ui/chat/drift_chat_controller.dart';
 import 'package:one_chatgpt_flutter/ui/chat/widgets/chat_text_message.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:cross_cache/cross_cache.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
+import 'package:one_chatgpt_flutter/utils/log.dart';
+import 'package:provider/provider.dart';
 
 class ChatHome extends StatefulWidget {
   final String chatid;
@@ -18,9 +21,20 @@ class _ChatHomeState extends State<ChatHome> {
   final _crossCache = CrossCache();
   final _scrollController = ScrollController();
 
+  late final ChatController _chatController;
+
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _chatController = DriftChatController(
+      database: Provider.of<AppDatabase>(context),
+      chatid: widget.chatid,
+    );
   }
 
   @override
@@ -30,11 +44,10 @@ class _ChatHomeState extends State<ChatHome> {
         title: Text("Chat"),
       ),
       body: Chat(
-        builders: Builders(
-          textMessageBuilder: (context, message) =>
-              ChatTextMessage(message: message),
-        ),
-        chatController: DriftChatController(context),
+        onMessageSend: (text) {
+          Log.i(text);
+        },
+        chatController: _chatController,
         user: User(id: widget.chatid),
         crossCache: _crossCache,
         scrollController: _scrollController,
