@@ -45,7 +45,7 @@ class UserAvatarState extends State<UserAvatar> {
   }
 
   // 处理图片选择
-  void handleImageSelection() async {
+  Future<void> handleImageSelection() async {
     // 选择图片
     final XFile? file =
         await ImagePicker().pickImage(source: ImageSource.gallery);

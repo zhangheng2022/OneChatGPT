@@ -10,21 +10,17 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 class Screen {
   static Future<void> initialize() async {
     try {
-      // Initialize Flutter framework and preserve native splash screen
       final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
       FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-      // Load environment variables first since they're needed for Supabase
       await dotenv.load();
 
-      // Run initialization tasks in parallel
       await Future.wait([
         _initializeAppLinks(),
         _initializeLocalization(),
         _initializeSupabase(),
       ]);
 
-      // Remove splash screen after all initialization is complete
       FlutterNativeSplash.remove();
     } catch (e) {
       Log.e('Initialization failed: $e');

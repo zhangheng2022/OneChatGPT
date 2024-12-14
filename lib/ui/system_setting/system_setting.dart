@@ -187,6 +187,12 @@ class _SystemSettingState extends State<SystemSetting> {
           },
           child: Text("取消"),
         ),
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text("清除"),
+        ),
       ],
     );
   }
