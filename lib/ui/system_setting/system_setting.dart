@@ -101,7 +101,14 @@ class _SystemSettingState extends State<SystemSetting> {
                     backgroundColor: WidgetStatePropertyAll(
                         Theme.of(context).colorScheme.error),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return _buildClearCacheDialog();
+                      },
+                    );
+                  },
                   icon: Icon(Icons.delete),
                   label: Text("清理"),
                 ),
@@ -139,21 +146,47 @@ class _SystemSettingState extends State<SystemSetting> {
     return AboutDialog(
       applicationIcon: Image.asset(
         "assets/logos/logo.png",
-        height: 30,
+        height: 80,
         fit: BoxFit.cover,
       ),
       applicationName: packageInfo.appName,
       applicationVersion: packageInfo.version,
+      applicationLegalese: "© 2024 OneChatGPT",
       children: [
-        Center(
-          child: Text(
-            "${packageInfo.appName}，一个AI",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+        const SizedBox(height: 20),
+        Text(
+          "OneChatGPT 是一个开源的多模型 AI 聊天平台，集成了多个主流大语言模型，包括 OpenAI ChatGPT、Google Gemini、百度文心一言和智谱 ChatGLM。",
+          style: TextStyle(
+            fontSize: 14,
           ),
-        )
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.code, size: 14),
+            const SizedBox(width: 4),
+            Text(
+              "基于 Flutter 开发",
+              style: TextStyle(fontSize: 16),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  AlertDialog _buildClearCacheDialog() {
+    return AlertDialog(
+      title: Text("清除缓存"),
+      content: Text("确定要清除缓存吗？"),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text("取消"),
+        ),
       ],
     );
   }
