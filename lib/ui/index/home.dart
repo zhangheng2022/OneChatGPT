@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
+import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:provider/provider.dart';
 
 class Home extends StatefulWidget {
@@ -26,6 +27,7 @@ class _HomeState extends State<Home> {
   Future<void> _loadChatList() async {
     try {
       final data = await _database.select(_database.chatTableData).get();
+      Log.i('data: $data');
       setState(() {
         _chatList
           ..clear()

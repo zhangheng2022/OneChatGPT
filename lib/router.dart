@@ -5,7 +5,7 @@ import 'package:one_chatgpt_flutter/ui/faq/faq.dart';
 import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:one_chatgpt_flutter/ui/auth/login.dart';
 import 'package:one_chatgpt_flutter/ui/auth/register.dart';
-import 'package:one_chatgpt_flutter/ui/chat/chat.dart';
+import 'package:one_chatgpt_flutter/ui/chat/chat_home.dart';
 import 'package:one_chatgpt_flutter/ui/index/scaffold_nav_bar.dart';
 import 'package:one_chatgpt_flutter/ui/index/home.dart';
 import 'package:one_chatgpt_flutter/ui/index/person.dart';
@@ -57,9 +57,7 @@ class AppRoutes {
                     parentNavigatorKey: _rootNavigatorKey,
                     builder: (BuildContext context, GoRouterState state) {
                       final String chatid = state.pathParameters['chatid']!;
-                      return ChatPage(
-                        chatid: chatid,
-                      );
+                      return ChatHome(chatid: chatid);
                     },
                   ),
                 ],
