@@ -12,7 +12,13 @@ class ChatCustomInput extends StatelessWidget {
       child: Container(
         width: double.infinity,
         height: 90,
-        color: Theme.of(context).colorScheme.primary,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+          color: Theme.of(context).colorScheme.primary,
+        ),
         child: Row(
           children: [
             IconButton(
@@ -22,9 +28,26 @@ class ChatCustomInput extends StatelessWidget {
             ),
             SizedBox(width: 10),
             Expanded(
-              child: TextField(
-                decoration: InputDecoration(hintText: 'qing'),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: '输入你的问题或需求',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(50),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
               ),
+            ),
+            SizedBox(width: 10),
+            IconButton(
+              icon: Icon(Icons.send),
+              color: Theme.of(context).colorScheme.onPrimary,
+              onPressed: () {},
             ),
           ],
         ),
