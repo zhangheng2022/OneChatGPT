@@ -53,11 +53,11 @@ class AppRoutes {
                 routes: <RouteBase>[
                   GoRoute(
                     name: 'chat',
-                    path: 'chat/:chatid',
+                    path: 'chat/:chatId',
                     parentNavigatorKey: _rootNavigatorKey,
                     builder: (BuildContext context, GoRouterState state) {
-                      final String chatid = state.pathParameters['chatid']!;
-                      return ChatHome(chatid: chatid);
+                      final String chatId = state.pathParameters['chatId']!;
+                      return ChatHome(chatId: chatId);
                     },
                   ),
                 ],

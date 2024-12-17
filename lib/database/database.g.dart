@@ -3,12 +3,12 @@
 part of 'database.dart';
 
 // ignore_for_file: type=lint
-class $ChatTableDataTable extends ChatTableData
-    with TableInfo<$ChatTableDataTable, ChatTableDataData> {
+class $ChatRecordTable extends ChatRecord
+    with TableInfo<$ChatRecordTable, ChatRecordData> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $ChatTableDataTable(this.attachedDatabase, [this._alias]);
+  $ChatRecordTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -24,43 +24,41 @@ class $ChatTableDataTable extends ChatTableData
       'title', aliasedName, false,
       type: DriftSqlType.string,
       requiredDuringInsert: false,
-      defaultValue: const Constant("新的对话"));
-  static const VerificationMeta _autoTitleMeta =
-      const VerificationMeta('autoTitle');
-  @override
-  late final GeneratedColumn<bool> autoTitle = GeneratedColumn<bool>(
-      'auto_title', aliasedName, false,
-      type: DriftSqlType.bool,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('CHECK ("auto_title" IN (0, 1))'),
-      defaultValue: const Constant(true));
-  static const VerificationMeta _datetimeMeta =
-      const VerificationMeta('datetime');
-  @override
-  late final GeneratedColumn<DateTime> datetime = GeneratedColumn<DateTime>(
-      'datetime', aliasedName, false,
-      type: DriftSqlType.dateTime,
-      requiredDuringInsert: false,
-      defaultValue: currentDateAndTime);
+      defaultValue: Constant('新的话题'));
   static const VerificationMeta _presetMeta = const VerificationMeta('preset');
   @override
   late final GeneratedColumnWithTypeConverter<PresetEnum, String> preset =
       GeneratedColumn<String>('preset', aliasedName, false,
               type: DriftSqlType.string,
               requiredDuringInsert: false,
-              defaultValue: Constant("comprehensive"))
-          .withConverter<PresetEnum>($ChatTableDataTable.$converterpreset);
+              defaultValue: Constant('comprehensive'))
+          .withConverter<PresetEnum>($ChatRecordTable.$converterpreset);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, title, autoTitle, datetime, preset];
+      [id, title, preset, createdAt, updatedAt];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'chat_table_data';
+  static const String $name = 'chat_record';
   @override
-  VerificationContext validateIntegrity(Insertable<ChatTableDataData> instance,
+  VerificationContext validateIntegrity(Insertable<ChatRecordData> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -71,94 +69,93 @@ class $ChatTableDataTable extends ChatTableData
       context.handle(
           _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
     }
-    if (data.containsKey('auto_title')) {
-      context.handle(_autoTitleMeta,
-          autoTitle.isAcceptableOrUnknown(data['auto_title']!, _autoTitleMeta));
-    }
-    if (data.containsKey('datetime')) {
-      context.handle(_datetimeMeta,
-          datetime.isAcceptableOrUnknown(data['datetime']!, _datetimeMeta));
-    }
     context.handle(_presetMeta, const VerificationResult.success());
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    }
     return context;
   }
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  ChatTableDataData map(Map<String, dynamic> data, {String? tablePrefix}) {
+  ChatRecordData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return ChatTableDataData(
+    return ChatRecordData(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       title: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
-      autoTitle: attachedDatabase.typeMapping
-          .read(DriftSqlType.bool, data['${effectivePrefix}auto_title'])!,
-      datetime: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}datetime'])!,
-      preset: $ChatTableDataTable.$converterpreset.fromSql(attachedDatabase
+      preset: $ChatRecordTable.$converterpreset.fromSql(attachedDatabase
           .typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}preset'])!),
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
     );
   }
 
   @override
-  $ChatTableDataTable createAlias(String alias) {
-    return $ChatTableDataTable(attachedDatabase, alias);
+  $ChatRecordTable createAlias(String alias) {
+    return $ChatRecordTable(attachedDatabase, alias);
   }
 
   static JsonTypeConverter2<PresetEnum, String, String> $converterpreset =
       const EnumNameConverter<PresetEnum>(PresetEnum.values);
 }
 
-class ChatTableDataData extends DataClass
-    implements Insertable<ChatTableDataData> {
+class ChatRecordData extends DataClass implements Insertable<ChatRecordData> {
   final int id;
   final String title;
-  final bool autoTitle;
-  final DateTime datetime;
   final PresetEnum preset;
-  const ChatTableDataData(
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const ChatRecordData(
       {required this.id,
       required this.title,
-      required this.autoTitle,
-      required this.datetime,
-      required this.preset});
+      required this.preset,
+      required this.createdAt,
+      required this.updatedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['title'] = Variable<String>(title);
-    map['auto_title'] = Variable<bool>(autoTitle);
-    map['datetime'] = Variable<DateTime>(datetime);
     {
       map['preset'] =
-          Variable<String>($ChatTableDataTable.$converterpreset.toSql(preset));
+          Variable<String>($ChatRecordTable.$converterpreset.toSql(preset));
     }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
 
-  ChatTableDataCompanion toCompanion(bool nullToAbsent) {
-    return ChatTableDataCompanion(
+  ChatRecordCompanion toCompanion(bool nullToAbsent) {
+    return ChatRecordCompanion(
       id: Value(id),
       title: Value(title),
-      autoTitle: Value(autoTitle),
-      datetime: Value(datetime),
       preset: Value(preset),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
     );
   }
 
-  factory ChatTableDataData.fromJson(Map<String, dynamic> json,
+  factory ChatRecordData.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return ChatTableDataData(
+    return ChatRecordData(
       id: serializer.fromJson<int>(json['id']),
       title: serializer.fromJson<String>(json['title']),
-      autoTitle: serializer.fromJson<bool>(json['autoTitle']),
-      datetime: serializer.fromJson<DateTime>(json['datetime']),
-      preset: $ChatTableDataTable.$converterpreset
+      preset: $ChatRecordTable.$converterpreset
           .fromJson(serializer.fromJson<String>(json['preset'])),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
   @override
@@ -167,109 +164,109 @@ class ChatTableDataData extends DataClass
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'title': serializer.toJson<String>(title),
-      'autoTitle': serializer.toJson<bool>(autoTitle),
-      'datetime': serializer.toJson<DateTime>(datetime),
       'preset': serializer
-          .toJson<String>($ChatTableDataTable.$converterpreset.toJson(preset)),
+          .toJson<String>($ChatRecordTable.$converterpreset.toJson(preset)),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
 
-  ChatTableDataData copyWith(
+  ChatRecordData copyWith(
           {int? id,
           String? title,
-          bool? autoTitle,
-          DateTime? datetime,
-          PresetEnum? preset}) =>
-      ChatTableDataData(
+          PresetEnum? preset,
+          DateTime? createdAt,
+          DateTime? updatedAt}) =>
+      ChatRecordData(
         id: id ?? this.id,
         title: title ?? this.title,
-        autoTitle: autoTitle ?? this.autoTitle,
-        datetime: datetime ?? this.datetime,
         preset: preset ?? this.preset,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
       );
-  ChatTableDataData copyWithCompanion(ChatTableDataCompanion data) {
-    return ChatTableDataData(
+  ChatRecordData copyWithCompanion(ChatRecordCompanion data) {
+    return ChatRecordData(
       id: data.id.present ? data.id.value : this.id,
       title: data.title.present ? data.title.value : this.title,
-      autoTitle: data.autoTitle.present ? data.autoTitle.value : this.autoTitle,
-      datetime: data.datetime.present ? data.datetime.value : this.datetime,
       preset: data.preset.present ? data.preset.value : this.preset,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
 
   @override
   String toString() {
-    return (StringBuffer('ChatTableDataData(')
+    return (StringBuffer('ChatRecordData(')
           ..write('id: $id, ')
           ..write('title: $title, ')
-          ..write('autoTitle: $autoTitle, ')
-          ..write('datetime: $datetime, ')
-          ..write('preset: $preset')
+          ..write('preset: $preset, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, title, autoTitle, datetime, preset);
+  int get hashCode => Object.hash(id, title, preset, createdAt, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is ChatTableDataData &&
+      (other is ChatRecordData &&
           other.id == this.id &&
           other.title == this.title &&
-          other.autoTitle == this.autoTitle &&
-          other.datetime == this.datetime &&
-          other.preset == this.preset);
+          other.preset == this.preset &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
 }
 
-class ChatTableDataCompanion extends UpdateCompanion<ChatTableDataData> {
+class ChatRecordCompanion extends UpdateCompanion<ChatRecordData> {
   final Value<int> id;
   final Value<String> title;
-  final Value<bool> autoTitle;
-  final Value<DateTime> datetime;
   final Value<PresetEnum> preset;
-  const ChatTableDataCompanion({
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const ChatRecordCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
-    this.autoTitle = const Value.absent(),
-    this.datetime = const Value.absent(),
     this.preset = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
   });
-  ChatTableDataCompanion.insert({
+  ChatRecordCompanion.insert({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
-    this.autoTitle = const Value.absent(),
-    this.datetime = const Value.absent(),
     this.preset = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
   });
-  static Insertable<ChatTableDataData> custom({
+  static Insertable<ChatRecordData> custom({
     Expression<int>? id,
     Expression<String>? title,
-    Expression<bool>? autoTitle,
-    Expression<DateTime>? datetime,
     Expression<String>? preset,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (title != null) 'title': title,
-      if (autoTitle != null) 'auto_title': autoTitle,
-      if (datetime != null) 'datetime': datetime,
       if (preset != null) 'preset': preset,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
     });
   }
 
-  ChatTableDataCompanion copyWith(
+  ChatRecordCompanion copyWith(
       {Value<int>? id,
       Value<String>? title,
-      Value<bool>? autoTitle,
-      Value<DateTime>? datetime,
-      Value<PresetEnum>? preset}) {
-    return ChatTableDataCompanion(
+      Value<PresetEnum>? preset,
+      Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt}) {
+    return ChatRecordCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
-      autoTitle: autoTitle ?? this.autoTitle,
-      datetime: datetime ?? this.datetime,
       preset: preset ?? this.preset,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
@@ -282,38 +279,38 @@ class ChatTableDataCompanion extends UpdateCompanion<ChatTableDataData> {
     if (title.present) {
       map['title'] = Variable<String>(title.value);
     }
-    if (autoTitle.present) {
-      map['auto_title'] = Variable<bool>(autoTitle.value);
-    }
-    if (datetime.present) {
-      map['datetime'] = Variable<DateTime>(datetime.value);
-    }
     if (preset.present) {
       map['preset'] = Variable<String>(
-          $ChatTableDataTable.$converterpreset.toSql(preset.value));
+          $ChatRecordTable.$converterpreset.toSql(preset.value));
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
     return map;
   }
 
   @override
   String toString() {
-    return (StringBuffer('ChatTableDataCompanion(')
+    return (StringBuffer('ChatRecordCompanion(')
           ..write('id: $id, ')
           ..write('title: $title, ')
-          ..write('autoTitle: $autoTitle, ')
-          ..write('datetime: $datetime, ')
-          ..write('preset: $preset')
+          ..write('preset: $preset, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
 }
 
-class $ChatContentTableDataTable extends ChatContentTableData
-    with TableInfo<$ChatContentTableDataTable, ChatContentTableDataData> {
+class $ChatRecordDetailTable extends ChatRecordDetail
+    with TableInfo<$ChatRecordDetailTable, ChatRecordDetailData> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $ChatContentTableDataTable(this.attachedDatabase, [this._alias]);
+  $ChatRecordDetailTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -323,123 +320,69 @@ class $ChatContentTableDataTable extends ChatContentTableData
       requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
-  static const VerificationMeta _parentidMeta =
-      const VerificationMeta('parentid');
+  static const VerificationMeta _chatIdMeta = const VerificationMeta('chatId');
   @override
-  late final GeneratedColumn<int> parentid = GeneratedColumn<int>(
-      'parentid', aliasedName, false,
+  late final GeneratedColumn<int> chatId = GeneratedColumn<int>(
+      'chat_id', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  static const VerificationMeta _messageMeta =
+      const VerificationMeta('message');
   @override
-  late final GeneratedColumn<String> title = GeneratedColumn<String>(
-      'title', aliasedName, false,
+  late final GeneratedColumn<String> message = GeneratedColumn<String>(
+      'message', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _contentMeta =
-      const VerificationMeta('content');
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
   @override
-  late final GeneratedColumn<String> content = GeneratedColumn<String>(
-      'content', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _contentTypeMeta =
-      const VerificationMeta('contentType');
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
   @override
-  late final GeneratedColumnWithTypeConverter<ContentTypeEnum, String>
-      contentType = GeneratedColumn<String>('content_type', aliasedName, false,
-              type: DriftSqlType.string, requiredDuringInsert: true)
-          .withConverter<ContentTypeEnum>(
-              $ChatContentTableDataTable.$convertercontentType);
-  static const VerificationMeta _roleMeta = const VerificationMeta('role');
-  @override
-  late final GeneratedColumnWithTypeConverter<RoleEnum, String> role =
-      GeneratedColumn<String>('role', aliasedName, false,
-              type: DriftSqlType.string, requiredDuringInsert: true)
-          .withConverter<RoleEnum>($ChatContentTableDataTable.$converterrole);
-  static const VerificationMeta _fileUriMeta =
-      const VerificationMeta('fileUri');
-  @override
-  late final GeneratedColumn<String> fileUri = GeneratedColumn<String>(
-      'file_uri', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _fileSizeMeta =
-      const VerificationMeta('fileSize');
-  @override
-  late final GeneratedColumn<int> fileSize = GeneratedColumn<int>(
-      'file_size', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
-  static const VerificationMeta _presetMeta = const VerificationMeta('preset');
-  @override
-  late final GeneratedColumnWithTypeConverter<PresetEnum, String> preset =
-      GeneratedColumn<String>('preset', aliasedName, false,
-              type: DriftSqlType.string,
-              requiredDuringInsert: false,
-              defaultValue: Constant(PresetEnum.comprehensive.toString()))
-          .withConverter<PresetEnum>(
-              $ChatContentTableDataTable.$converterpreset);
-  static const VerificationMeta _datetimeMeta =
-      const VerificationMeta('datetime');
-  @override
-  late final GeneratedColumn<DateTime> datetime = GeneratedColumn<DateTime>(
-      'datetime', aliasedName, false,
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
       type: DriftSqlType.dateTime,
       requiredDuringInsert: false,
       defaultValue: currentDateAndTime);
   @override
-  List<GeneratedColumn> get $columns => [
-        id,
-        parentid,
-        title,
-        content,
-        contentType,
-        role,
-        fileUri,
-        fileSize,
-        preset,
-        datetime
-      ];
+  List<GeneratedColumn> get $columns =>
+      [id, chatId, message, createdAt, updatedAt];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'chat_content_table_data';
+  static const String $name = 'chat_record_detail';
   @override
   VerificationContext validateIntegrity(
-      Insertable<ChatContentTableDataData> instance,
+      Insertable<ChatRecordDetailData> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
-    if (data.containsKey('parentid')) {
-      context.handle(_parentidMeta,
-          parentid.isAcceptableOrUnknown(data['parentid']!, _parentidMeta));
+    if (data.containsKey('chat_id')) {
+      context.handle(_chatIdMeta,
+          chatId.isAcceptableOrUnknown(data['chat_id']!, _chatIdMeta));
     } else if (isInserting) {
-      context.missing(_parentidMeta);
+      context.missing(_chatIdMeta);
     }
-    if (data.containsKey('title')) {
-      context.handle(
-          _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
+    if (data.containsKey('message')) {
+      context.handle(_messageMeta,
+          message.isAcceptableOrUnknown(data['message']!, _messageMeta));
     } else if (isInserting) {
-      context.missing(_titleMeta);
+      context.missing(_messageMeta);
     }
-    if (data.containsKey('content')) {
-      context.handle(_contentMeta,
-          content.isAcceptableOrUnknown(data['content']!, _contentMeta));
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
     }
-    context.handle(_contentTypeMeta, const VerificationResult.success());
-    context.handle(_roleMeta, const VerificationResult.success());
-    if (data.containsKey('file_uri')) {
-      context.handle(_fileUriMeta,
-          fileUri.isAcceptableOrUnknown(data['file_uri']!, _fileUriMeta));
-    }
-    if (data.containsKey('file_size')) {
-      context.handle(_fileSizeMeta,
-          fileSize.isAcceptableOrUnknown(data['file_size']!, _fileSizeMeta));
-    }
-    context.handle(_presetMeta, const VerificationResult.success());
-    if (data.containsKey('datetime')) {
-      context.handle(_datetimeMeta,
-          datetime.isAcceptableOrUnknown(data['datetime']!, _datetimeMeta));
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
     }
     return context;
   }
@@ -447,142 +390,71 @@ class $ChatContentTableDataTable extends ChatContentTableData
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  ChatContentTableDataData map(Map<String, dynamic> data,
-      {String? tablePrefix}) {
+  ChatRecordDetailData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return ChatContentTableDataData(
+    return ChatRecordDetailData(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      parentid: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}parentid'])!,
-      title: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
-      content: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}content']),
-      contentType: $ChatContentTableDataTable.$convertercontentType.fromSql(
-          attachedDatabase.typeMapping.read(
-              DriftSqlType.string, data['${effectivePrefix}content_type'])!),
-      role: $ChatContentTableDataTable.$converterrole.fromSql(attachedDatabase
-          .typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}role'])!),
-      fileUri: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}file_uri']),
-      fileSize: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}file_size']),
-      preset: $ChatContentTableDataTable.$converterpreset.fromSql(
-          attachedDatabase.typeMapping
-              .read(DriftSqlType.string, data['${effectivePrefix}preset'])!),
-      datetime: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}datetime'])!,
+      chatId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}chat_id'])!,
+      message: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}message'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
     );
   }
 
   @override
-  $ChatContentTableDataTable createAlias(String alias) {
-    return $ChatContentTableDataTable(attachedDatabase, alias);
+  $ChatRecordDetailTable createAlias(String alias) {
+    return $ChatRecordDetailTable(attachedDatabase, alias);
   }
-
-  static JsonTypeConverter2<ContentTypeEnum, String, String>
-      $convertercontentType =
-      const EnumNameConverter<ContentTypeEnum>(ContentTypeEnum.values);
-  static JsonTypeConverter2<RoleEnum, String, String> $converterrole =
-      const EnumNameConverter<RoleEnum>(RoleEnum.values);
-  static JsonTypeConverter2<PresetEnum, String, String> $converterpreset =
-      const EnumNameConverter<PresetEnum>(PresetEnum.values);
 }
 
-class ChatContentTableDataData extends DataClass
-    implements Insertable<ChatContentTableDataData> {
+class ChatRecordDetailData extends DataClass
+    implements Insertable<ChatRecordDetailData> {
   final int id;
-  final int parentid;
-  final String title;
-  final String? content;
-  final ContentTypeEnum contentType;
-  final RoleEnum role;
-  final String? fileUri;
-  final int? fileSize;
-  final PresetEnum preset;
-  final DateTime datetime;
-  const ChatContentTableDataData(
+  final int chatId;
+  final String message;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const ChatRecordDetailData(
       {required this.id,
-      required this.parentid,
-      required this.title,
-      this.content,
-      required this.contentType,
-      required this.role,
-      this.fileUri,
-      this.fileSize,
-      required this.preset,
-      required this.datetime});
+      required this.chatId,
+      required this.message,
+      required this.createdAt,
+      required this.updatedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    map['parentid'] = Variable<int>(parentid);
-    map['title'] = Variable<String>(title);
-    if (!nullToAbsent || content != null) {
-      map['content'] = Variable<String>(content);
-    }
-    {
-      map['content_type'] = Variable<String>(
-          $ChatContentTableDataTable.$convertercontentType.toSql(contentType));
-    }
-    {
-      map['role'] = Variable<String>(
-          $ChatContentTableDataTable.$converterrole.toSql(role));
-    }
-    if (!nullToAbsent || fileUri != null) {
-      map['file_uri'] = Variable<String>(fileUri);
-    }
-    if (!nullToAbsent || fileSize != null) {
-      map['file_size'] = Variable<int>(fileSize);
-    }
-    {
-      map['preset'] = Variable<String>(
-          $ChatContentTableDataTable.$converterpreset.toSql(preset));
-    }
-    map['datetime'] = Variable<DateTime>(datetime);
+    map['chat_id'] = Variable<int>(chatId);
+    map['message'] = Variable<String>(message);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
 
-  ChatContentTableDataCompanion toCompanion(bool nullToAbsent) {
-    return ChatContentTableDataCompanion(
+  ChatRecordDetailCompanion toCompanion(bool nullToAbsent) {
+    return ChatRecordDetailCompanion(
       id: Value(id),
-      parentid: Value(parentid),
-      title: Value(title),
-      content: content == null && nullToAbsent
-          ? const Value.absent()
-          : Value(content),
-      contentType: Value(contentType),
-      role: Value(role),
-      fileUri: fileUri == null && nullToAbsent
-          ? const Value.absent()
-          : Value(fileUri),
-      fileSize: fileSize == null && nullToAbsent
-          ? const Value.absent()
-          : Value(fileSize),
-      preset: Value(preset),
-      datetime: Value(datetime),
+      chatId: Value(chatId),
+      message: Value(message),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
     );
   }
 
-  factory ChatContentTableDataData.fromJson(Map<String, dynamic> json,
+  factory ChatRecordDetailData.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return ChatContentTableDataData(
+    return ChatRecordDetailData(
       id: serializer.fromJson<int>(json['id']),
-      parentid: serializer.fromJson<int>(json['parentid']),
-      title: serializer.fromJson<String>(json['title']),
-      content: serializer.fromJson<String?>(json['content']),
-      contentType: $ChatContentTableDataTable.$convertercontentType
-          .fromJson(serializer.fromJson<String>(json['contentType'])),
-      role: $ChatContentTableDataTable.$converterrole
-          .fromJson(serializer.fromJson<String>(json['role'])),
-      fileUri: serializer.fromJson<String?>(json['fileUri']),
-      fileSize: serializer.fromJson<int?>(json['fileSize']),
-      preset: $ChatContentTableDataTable.$converterpreset
-          .fromJson(serializer.fromJson<String>(json['preset'])),
-      datetime: serializer.fromJson<DateTime>(json['datetime']),
+      chatId: serializer.fromJson<int>(json['chatId']),
+      message: serializer.fromJson<String>(json['message']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
   @override
@@ -590,184 +462,110 @@ class ChatContentTableDataData extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'parentid': serializer.toJson<int>(parentid),
-      'title': serializer.toJson<String>(title),
-      'content': serializer.toJson<String?>(content),
-      'contentType': serializer.toJson<String>(
-          $ChatContentTableDataTable.$convertercontentType.toJson(contentType)),
-      'role': serializer.toJson<String>(
-          $ChatContentTableDataTable.$converterrole.toJson(role)),
-      'fileUri': serializer.toJson<String?>(fileUri),
-      'fileSize': serializer.toJson<int?>(fileSize),
-      'preset': serializer.toJson<String>(
-          $ChatContentTableDataTable.$converterpreset.toJson(preset)),
-      'datetime': serializer.toJson<DateTime>(datetime),
+      'chatId': serializer.toJson<int>(chatId),
+      'message': serializer.toJson<String>(message),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
 
-  ChatContentTableDataData copyWith(
+  ChatRecordDetailData copyWith(
           {int? id,
-          int? parentid,
-          String? title,
-          Value<String?> content = const Value.absent(),
-          ContentTypeEnum? contentType,
-          RoleEnum? role,
-          Value<String?> fileUri = const Value.absent(),
-          Value<int?> fileSize = const Value.absent(),
-          PresetEnum? preset,
-          DateTime? datetime}) =>
-      ChatContentTableDataData(
+          int? chatId,
+          String? message,
+          DateTime? createdAt,
+          DateTime? updatedAt}) =>
+      ChatRecordDetailData(
         id: id ?? this.id,
-        parentid: parentid ?? this.parentid,
-        title: title ?? this.title,
-        content: content.present ? content.value : this.content,
-        contentType: contentType ?? this.contentType,
-        role: role ?? this.role,
-        fileUri: fileUri.present ? fileUri.value : this.fileUri,
-        fileSize: fileSize.present ? fileSize.value : this.fileSize,
-        preset: preset ?? this.preset,
-        datetime: datetime ?? this.datetime,
+        chatId: chatId ?? this.chatId,
+        message: message ?? this.message,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
       );
-  ChatContentTableDataData copyWithCompanion(
-      ChatContentTableDataCompanion data) {
-    return ChatContentTableDataData(
+  ChatRecordDetailData copyWithCompanion(ChatRecordDetailCompanion data) {
+    return ChatRecordDetailData(
       id: data.id.present ? data.id.value : this.id,
-      parentid: data.parentid.present ? data.parentid.value : this.parentid,
-      title: data.title.present ? data.title.value : this.title,
-      content: data.content.present ? data.content.value : this.content,
-      contentType:
-          data.contentType.present ? data.contentType.value : this.contentType,
-      role: data.role.present ? data.role.value : this.role,
-      fileUri: data.fileUri.present ? data.fileUri.value : this.fileUri,
-      fileSize: data.fileSize.present ? data.fileSize.value : this.fileSize,
-      preset: data.preset.present ? data.preset.value : this.preset,
-      datetime: data.datetime.present ? data.datetime.value : this.datetime,
+      chatId: data.chatId.present ? data.chatId.value : this.chatId,
+      message: data.message.present ? data.message.value : this.message,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
 
   @override
   String toString() {
-    return (StringBuffer('ChatContentTableDataData(')
+    return (StringBuffer('ChatRecordDetailData(')
           ..write('id: $id, ')
-          ..write('parentid: $parentid, ')
-          ..write('title: $title, ')
-          ..write('content: $content, ')
-          ..write('contentType: $contentType, ')
-          ..write('role: $role, ')
-          ..write('fileUri: $fileUri, ')
-          ..write('fileSize: $fileSize, ')
-          ..write('preset: $preset, ')
-          ..write('datetime: $datetime')
+          ..write('chatId: $chatId, ')
+          ..write('message: $message, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, parentid, title, content, contentType,
-      role, fileUri, fileSize, preset, datetime);
+  int get hashCode => Object.hash(id, chatId, message, createdAt, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is ChatContentTableDataData &&
+      (other is ChatRecordDetailData &&
           other.id == this.id &&
-          other.parentid == this.parentid &&
-          other.title == this.title &&
-          other.content == this.content &&
-          other.contentType == this.contentType &&
-          other.role == this.role &&
-          other.fileUri == this.fileUri &&
-          other.fileSize == this.fileSize &&
-          other.preset == this.preset &&
-          other.datetime == this.datetime);
+          other.chatId == this.chatId &&
+          other.message == this.message &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
 }
 
-class ChatContentTableDataCompanion
-    extends UpdateCompanion<ChatContentTableDataData> {
+class ChatRecordDetailCompanion extends UpdateCompanion<ChatRecordDetailData> {
   final Value<int> id;
-  final Value<int> parentid;
-  final Value<String> title;
-  final Value<String?> content;
-  final Value<ContentTypeEnum> contentType;
-  final Value<RoleEnum> role;
-  final Value<String?> fileUri;
-  final Value<int?> fileSize;
-  final Value<PresetEnum> preset;
-  final Value<DateTime> datetime;
-  const ChatContentTableDataCompanion({
+  final Value<int> chatId;
+  final Value<String> message;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const ChatRecordDetailCompanion({
     this.id = const Value.absent(),
-    this.parentid = const Value.absent(),
-    this.title = const Value.absent(),
-    this.content = const Value.absent(),
-    this.contentType = const Value.absent(),
-    this.role = const Value.absent(),
-    this.fileUri = const Value.absent(),
-    this.fileSize = const Value.absent(),
-    this.preset = const Value.absent(),
-    this.datetime = const Value.absent(),
+    this.chatId = const Value.absent(),
+    this.message = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
   });
-  ChatContentTableDataCompanion.insert({
+  ChatRecordDetailCompanion.insert({
     this.id = const Value.absent(),
-    required int parentid,
-    required String title,
-    this.content = const Value.absent(),
-    required ContentTypeEnum contentType,
-    required RoleEnum role,
-    this.fileUri = const Value.absent(),
-    this.fileSize = const Value.absent(),
-    this.preset = const Value.absent(),
-    this.datetime = const Value.absent(),
-  })  : parentid = Value(parentid),
-        title = Value(title),
-        contentType = Value(contentType),
-        role = Value(role);
-  static Insertable<ChatContentTableDataData> custom({
+    required int chatId,
+    required String message,
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  })  : chatId = Value(chatId),
+        message = Value(message);
+  static Insertable<ChatRecordDetailData> custom({
     Expression<int>? id,
-    Expression<int>? parentid,
-    Expression<String>? title,
-    Expression<String>? content,
-    Expression<String>? contentType,
-    Expression<String>? role,
-    Expression<String>? fileUri,
-    Expression<int>? fileSize,
-    Expression<String>? preset,
-    Expression<DateTime>? datetime,
+    Expression<int>? chatId,
+    Expression<String>? message,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (parentid != null) 'parentid': parentid,
-      if (title != null) 'title': title,
-      if (content != null) 'content': content,
-      if (contentType != null) 'content_type': contentType,
-      if (role != null) 'role': role,
-      if (fileUri != null) 'file_uri': fileUri,
-      if (fileSize != null) 'file_size': fileSize,
-      if (preset != null) 'preset': preset,
-      if (datetime != null) 'datetime': datetime,
+      if (chatId != null) 'chat_id': chatId,
+      if (message != null) 'message': message,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
     });
   }
 
-  ChatContentTableDataCompanion copyWith(
+  ChatRecordDetailCompanion copyWith(
       {Value<int>? id,
-      Value<int>? parentid,
-      Value<String>? title,
-      Value<String?>? content,
-      Value<ContentTypeEnum>? contentType,
-      Value<RoleEnum>? role,
-      Value<String?>? fileUri,
-      Value<int?>? fileSize,
-      Value<PresetEnum>? preset,
-      Value<DateTime>? datetime}) {
-    return ChatContentTableDataCompanion(
+      Value<int>? chatId,
+      Value<String>? message,
+      Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt}) {
+    return ChatRecordDetailCompanion(
       id: id ?? this.id,
-      parentid: parentid ?? this.parentid,
-      title: title ?? this.title,
-      content: content ?? this.content,
-      contentType: contentType ?? this.contentType,
-      role: role ?? this.role,
-      fileUri: fileUri ?? this.fileUri,
-      fileSize: fileSize ?? this.fileSize,
-      preset: preset ?? this.preset,
-      datetime: datetime ?? this.datetime,
+      chatId: chatId ?? this.chatId,
+      message: message ?? this.message,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
@@ -777,53 +575,29 @@ class ChatContentTableDataCompanion
     if (id.present) {
       map['id'] = Variable<int>(id.value);
     }
-    if (parentid.present) {
-      map['parentid'] = Variable<int>(parentid.value);
+    if (chatId.present) {
+      map['chat_id'] = Variable<int>(chatId.value);
     }
-    if (title.present) {
-      map['title'] = Variable<String>(title.value);
+    if (message.present) {
+      map['message'] = Variable<String>(message.value);
     }
-    if (content.present) {
-      map['content'] = Variable<String>(content.value);
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
     }
-    if (contentType.present) {
-      map['content_type'] = Variable<String>($ChatContentTableDataTable
-          .$convertercontentType
-          .toSql(contentType.value));
-    }
-    if (role.present) {
-      map['role'] = Variable<String>(
-          $ChatContentTableDataTable.$converterrole.toSql(role.value));
-    }
-    if (fileUri.present) {
-      map['file_uri'] = Variable<String>(fileUri.value);
-    }
-    if (fileSize.present) {
-      map['file_size'] = Variable<int>(fileSize.value);
-    }
-    if (preset.present) {
-      map['preset'] = Variable<String>(
-          $ChatContentTableDataTable.$converterpreset.toSql(preset.value));
-    }
-    if (datetime.present) {
-      map['datetime'] = Variable<DateTime>(datetime.value);
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
     return map;
   }
 
   @override
   String toString() {
-    return (StringBuffer('ChatContentTableDataCompanion(')
+    return (StringBuffer('ChatRecordDetailCompanion(')
           ..write('id: $id, ')
-          ..write('parentid: $parentid, ')
-          ..write('title: $title, ')
-          ..write('content: $content, ')
-          ..write('contentType: $contentType, ')
-          ..write('role: $role, ')
-          ..write('fileUri: $fileUri, ')
-          ..write('fileSize: $fileSize, ')
-          ..write('preset: $preset, ')
-          ..write('datetime: $datetime')
+          ..write('chatId: $chatId, ')
+          ..write('message: $message, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
@@ -832,37 +606,35 @@ class ChatContentTableDataCompanion
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
-  late final $ChatTableDataTable chatTableData = $ChatTableDataTable(this);
-  late final $ChatContentTableDataTable chatContentTableData =
-      $ChatContentTableDataTable(this);
+  late final $ChatRecordTable chatRecord = $ChatRecordTable(this);
+  late final $ChatRecordDetailTable chatRecordDetail =
+      $ChatRecordDetailTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [chatTableData, chatContentTableData];
+      [chatRecord, chatRecordDetail];
 }
 
-typedef $$ChatTableDataTableCreateCompanionBuilder = ChatTableDataCompanion
-    Function({
+typedef $$ChatRecordTableCreateCompanionBuilder = ChatRecordCompanion Function({
   Value<int> id,
   Value<String> title,
-  Value<bool> autoTitle,
-  Value<DateTime> datetime,
   Value<PresetEnum> preset,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
 });
-typedef $$ChatTableDataTableUpdateCompanionBuilder = ChatTableDataCompanion
-    Function({
+typedef $$ChatRecordTableUpdateCompanionBuilder = ChatRecordCompanion Function({
   Value<int> id,
   Value<String> title,
-  Value<bool> autoTitle,
-  Value<DateTime> datetime,
   Value<PresetEnum> preset,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
 });
 
-class $$ChatTableDataTableFilterComposer
-    extends Composer<_$AppDatabase, $ChatTableDataTable> {
-  $$ChatTableDataTableFilterComposer({
+class $$ChatRecordTableFilterComposer
+    extends Composer<_$AppDatabase, $ChatRecordTable> {
+  $$ChatRecordTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -875,21 +647,21 @@ class $$ChatTableDataTableFilterComposer
   ColumnFilters<String> get title => $composableBuilder(
       column: $table.title, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<bool> get autoTitle => $composableBuilder(
-      column: $table.autoTitle, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<DateTime> get datetime => $composableBuilder(
-      column: $table.datetime, builder: (column) => ColumnFilters(column));
-
   ColumnWithTypeConverterFilters<PresetEnum, PresetEnum, String> get preset =>
       $composableBuilder(
           column: $table.preset,
           builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
 }
 
-class $$ChatTableDataTableOrderingComposer
-    extends Composer<_$AppDatabase, $ChatTableDataTable> {
-  $$ChatTableDataTableOrderingComposer({
+class $$ChatRecordTableOrderingComposer
+    extends Composer<_$AppDatabase, $ChatRecordTable> {
+  $$ChatRecordTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -902,19 +674,19 @@ class $$ChatTableDataTableOrderingComposer
   ColumnOrderings<String> get title => $composableBuilder(
       column: $table.title, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<bool> get autoTitle => $composableBuilder(
-      column: $table.autoTitle, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<DateTime> get datetime => $composableBuilder(
-      column: $table.datetime, builder: (column) => ColumnOrderings(column));
-
   ColumnOrderings<String> get preset => $composableBuilder(
       column: $table.preset, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
 }
 
-class $$ChatTableDataTableAnnotationComposer
-    extends Composer<_$AppDatabase, $ChatTableDataTable> {
-  $$ChatTableDataTableAnnotationComposer({
+class $$ChatRecordTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ChatRecordTable> {
+  $$ChatRecordTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -927,68 +699,68 @@ class $$ChatTableDataTableAnnotationComposer
   GeneratedColumn<String> get title =>
       $composableBuilder(column: $table.title, builder: (column) => column);
 
-  GeneratedColumn<bool> get autoTitle =>
-      $composableBuilder(column: $table.autoTitle, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get datetime =>
-      $composableBuilder(column: $table.datetime, builder: (column) => column);
-
   GeneratedColumnWithTypeConverter<PresetEnum, String> get preset =>
       $composableBuilder(column: $table.preset, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
 
-class $$ChatTableDataTableTableManager extends RootTableManager<
+class $$ChatRecordTableTableManager extends RootTableManager<
     _$AppDatabase,
-    $ChatTableDataTable,
-    ChatTableDataData,
-    $$ChatTableDataTableFilterComposer,
-    $$ChatTableDataTableOrderingComposer,
-    $$ChatTableDataTableAnnotationComposer,
-    $$ChatTableDataTableCreateCompanionBuilder,
-    $$ChatTableDataTableUpdateCompanionBuilder,
+    $ChatRecordTable,
+    ChatRecordData,
+    $$ChatRecordTableFilterComposer,
+    $$ChatRecordTableOrderingComposer,
+    $$ChatRecordTableAnnotationComposer,
+    $$ChatRecordTableCreateCompanionBuilder,
+    $$ChatRecordTableUpdateCompanionBuilder,
     (
-      ChatTableDataData,
-      BaseReferences<_$AppDatabase, $ChatTableDataTable, ChatTableDataData>
+      ChatRecordData,
+      BaseReferences<_$AppDatabase, $ChatRecordTable, ChatRecordData>
     ),
-    ChatTableDataData,
+    ChatRecordData,
     PrefetchHooks Function()> {
-  $$ChatTableDataTableTableManager(_$AppDatabase db, $ChatTableDataTable table)
+  $$ChatRecordTableTableManager(_$AppDatabase db, $ChatRecordTable table)
       : super(TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$ChatTableDataTableFilterComposer($db: db, $table: table),
+              $$ChatRecordTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$ChatTableDataTableOrderingComposer($db: db, $table: table),
+              $$ChatRecordTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$ChatTableDataTableAnnotationComposer($db: db, $table: table),
+              $$ChatRecordTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String> title = const Value.absent(),
-            Value<bool> autoTitle = const Value.absent(),
-            Value<DateTime> datetime = const Value.absent(),
             Value<PresetEnum> preset = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
           }) =>
-              ChatTableDataCompanion(
+              ChatRecordCompanion(
             id: id,
             title: title,
-            autoTitle: autoTitle,
-            datetime: datetime,
             preset: preset,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String> title = const Value.absent(),
-            Value<bool> autoTitle = const Value.absent(),
-            Value<DateTime> datetime = const Value.absent(),
             Value<PresetEnum> preset = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
           }) =>
-              ChatTableDataCompanion.insert(
+              ChatRecordCompanion.insert(
             id: id,
             title: title,
-            autoTitle: autoTitle,
-            datetime: datetime,
             preset: preset,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -997,51 +769,41 @@ class $$ChatTableDataTableTableManager extends RootTableManager<
         ));
 }
 
-typedef $$ChatTableDataTableProcessedTableManager = ProcessedTableManager<
+typedef $$ChatRecordTableProcessedTableManager = ProcessedTableManager<
     _$AppDatabase,
-    $ChatTableDataTable,
-    ChatTableDataData,
-    $$ChatTableDataTableFilterComposer,
-    $$ChatTableDataTableOrderingComposer,
-    $$ChatTableDataTableAnnotationComposer,
-    $$ChatTableDataTableCreateCompanionBuilder,
-    $$ChatTableDataTableUpdateCompanionBuilder,
+    $ChatRecordTable,
+    ChatRecordData,
+    $$ChatRecordTableFilterComposer,
+    $$ChatRecordTableOrderingComposer,
+    $$ChatRecordTableAnnotationComposer,
+    $$ChatRecordTableCreateCompanionBuilder,
+    $$ChatRecordTableUpdateCompanionBuilder,
     (
-      ChatTableDataData,
-      BaseReferences<_$AppDatabase, $ChatTableDataTable, ChatTableDataData>
+      ChatRecordData,
+      BaseReferences<_$AppDatabase, $ChatRecordTable, ChatRecordData>
     ),
-    ChatTableDataData,
+    ChatRecordData,
     PrefetchHooks Function()>;
-typedef $$ChatContentTableDataTableCreateCompanionBuilder
-    = ChatContentTableDataCompanion Function({
+typedef $$ChatRecordDetailTableCreateCompanionBuilder
+    = ChatRecordDetailCompanion Function({
   Value<int> id,
-  required int parentid,
-  required String title,
-  Value<String?> content,
-  required ContentTypeEnum contentType,
-  required RoleEnum role,
-  Value<String?> fileUri,
-  Value<int?> fileSize,
-  Value<PresetEnum> preset,
-  Value<DateTime> datetime,
+  required int chatId,
+  required String message,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
 });
-typedef $$ChatContentTableDataTableUpdateCompanionBuilder
-    = ChatContentTableDataCompanion Function({
+typedef $$ChatRecordDetailTableUpdateCompanionBuilder
+    = ChatRecordDetailCompanion Function({
   Value<int> id,
-  Value<int> parentid,
-  Value<String> title,
-  Value<String?> content,
-  Value<ContentTypeEnum> contentType,
-  Value<RoleEnum> role,
-  Value<String?> fileUri,
-  Value<int?> fileSize,
-  Value<PresetEnum> preset,
-  Value<DateTime> datetime,
+  Value<int> chatId,
+  Value<String> message,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
 });
 
-class $$ChatContentTableDataTableFilterComposer
-    extends Composer<_$AppDatabase, $ChatContentTableDataTable> {
-  $$ChatContentTableDataTableFilterComposer({
+class $$ChatRecordDetailTableFilterComposer
+    extends Composer<_$AppDatabase, $ChatRecordDetailTable> {
+  $$ChatRecordDetailTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1051,43 +813,22 @@ class $$ChatContentTableDataTableFilterComposer
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get parentid => $composableBuilder(
-      column: $table.parentid, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get chatId => $composableBuilder(
+      column: $table.chatId, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get title => $composableBuilder(
-      column: $table.title, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get message => $composableBuilder(
+      column: $table.message, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get content => $composableBuilder(
-      column: $table.content, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
 
-  ColumnWithTypeConverterFilters<ContentTypeEnum, ContentTypeEnum, String>
-      get contentType => $composableBuilder(
-          column: $table.contentType,
-          builder: (column) => ColumnWithTypeConverterFilters(column));
-
-  ColumnWithTypeConverterFilters<RoleEnum, RoleEnum, String> get role =>
-      $composableBuilder(
-          column: $table.role,
-          builder: (column) => ColumnWithTypeConverterFilters(column));
-
-  ColumnFilters<String> get fileUri => $composableBuilder(
-      column: $table.fileUri, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<int> get fileSize => $composableBuilder(
-      column: $table.fileSize, builder: (column) => ColumnFilters(column));
-
-  ColumnWithTypeConverterFilters<PresetEnum, PresetEnum, String> get preset =>
-      $composableBuilder(
-          column: $table.preset,
-          builder: (column) => ColumnWithTypeConverterFilters(column));
-
-  ColumnFilters<DateTime> get datetime => $composableBuilder(
-      column: $table.datetime, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
 }
 
-class $$ChatContentTableDataTableOrderingComposer
-    extends Composer<_$AppDatabase, $ChatContentTableDataTable> {
-  $$ChatContentTableDataTableOrderingComposer({
+class $$ChatRecordDetailTableOrderingComposer
+    extends Composer<_$AppDatabase, $ChatRecordDetailTable> {
+  $$ChatRecordDetailTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1097,37 +838,22 @@ class $$ChatContentTableDataTableOrderingComposer
   ColumnOrderings<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get parentid => $composableBuilder(
-      column: $table.parentid, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get chatId => $composableBuilder(
+      column: $table.chatId, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get title => $composableBuilder(
-      column: $table.title, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get message => $composableBuilder(
+      column: $table.message, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get content => $composableBuilder(
-      column: $table.content, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get contentType => $composableBuilder(
-      column: $table.contentType, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get role => $composableBuilder(
-      column: $table.role, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get fileUri => $composableBuilder(
-      column: $table.fileUri, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<int> get fileSize => $composableBuilder(
-      column: $table.fileSize, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get preset => $composableBuilder(
-      column: $table.preset, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<DateTime> get datetime => $composableBuilder(
-      column: $table.datetime, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
 }
 
-class $$ChatContentTableDataTableAnnotationComposer
-    extends Composer<_$AppDatabase, $ChatContentTableDataTable> {
-  $$ChatContentTableDataTableAnnotationComposer({
+class $$ChatRecordDetailTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ChatRecordDetailTable> {
+  $$ChatRecordDetailTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -1137,111 +863,73 @@ class $$ChatContentTableDataTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<int> get parentid =>
-      $composableBuilder(column: $table.parentid, builder: (column) => column);
+  GeneratedColumn<int> get chatId =>
+      $composableBuilder(column: $table.chatId, builder: (column) => column);
 
-  GeneratedColumn<String> get title =>
-      $composableBuilder(column: $table.title, builder: (column) => column);
+  GeneratedColumn<String> get message =>
+      $composableBuilder(column: $table.message, builder: (column) => column);
 
-  GeneratedColumn<String> get content =>
-      $composableBuilder(column: $table.content, builder: (column) => column);
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
-  GeneratedColumnWithTypeConverter<ContentTypeEnum, String> get contentType =>
-      $composableBuilder(
-          column: $table.contentType, builder: (column) => column);
-
-  GeneratedColumnWithTypeConverter<RoleEnum, String> get role =>
-      $composableBuilder(column: $table.role, builder: (column) => column);
-
-  GeneratedColumn<String> get fileUri =>
-      $composableBuilder(column: $table.fileUri, builder: (column) => column);
-
-  GeneratedColumn<int> get fileSize =>
-      $composableBuilder(column: $table.fileSize, builder: (column) => column);
-
-  GeneratedColumnWithTypeConverter<PresetEnum, String> get preset =>
-      $composableBuilder(column: $table.preset, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get datetime =>
-      $composableBuilder(column: $table.datetime, builder: (column) => column);
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
 
-class $$ChatContentTableDataTableTableManager extends RootTableManager<
+class $$ChatRecordDetailTableTableManager extends RootTableManager<
     _$AppDatabase,
-    $ChatContentTableDataTable,
-    ChatContentTableDataData,
-    $$ChatContentTableDataTableFilterComposer,
-    $$ChatContentTableDataTableOrderingComposer,
-    $$ChatContentTableDataTableAnnotationComposer,
-    $$ChatContentTableDataTableCreateCompanionBuilder,
-    $$ChatContentTableDataTableUpdateCompanionBuilder,
+    $ChatRecordDetailTable,
+    ChatRecordDetailData,
+    $$ChatRecordDetailTableFilterComposer,
+    $$ChatRecordDetailTableOrderingComposer,
+    $$ChatRecordDetailTableAnnotationComposer,
+    $$ChatRecordDetailTableCreateCompanionBuilder,
+    $$ChatRecordDetailTableUpdateCompanionBuilder,
     (
-      ChatContentTableDataData,
-      BaseReferences<_$AppDatabase, $ChatContentTableDataTable,
-          ChatContentTableDataData>
+      ChatRecordDetailData,
+      BaseReferences<_$AppDatabase, $ChatRecordDetailTable,
+          ChatRecordDetailData>
     ),
-    ChatContentTableDataData,
+    ChatRecordDetailData,
     PrefetchHooks Function()> {
-  $$ChatContentTableDataTableTableManager(
-      _$AppDatabase db, $ChatContentTableDataTable table)
+  $$ChatRecordDetailTableTableManager(
+      _$AppDatabase db, $ChatRecordDetailTable table)
       : super(TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$ChatContentTableDataTableFilterComposer($db: db, $table: table),
+              $$ChatRecordDetailTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$ChatContentTableDataTableOrderingComposer(
-                  $db: db, $table: table),
+              $$ChatRecordDetailTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$ChatContentTableDataTableAnnotationComposer(
-                  $db: db, $table: table),
+              $$ChatRecordDetailTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
-            Value<int> parentid = const Value.absent(),
-            Value<String> title = const Value.absent(),
-            Value<String?> content = const Value.absent(),
-            Value<ContentTypeEnum> contentType = const Value.absent(),
-            Value<RoleEnum> role = const Value.absent(),
-            Value<String?> fileUri = const Value.absent(),
-            Value<int?> fileSize = const Value.absent(),
-            Value<PresetEnum> preset = const Value.absent(),
-            Value<DateTime> datetime = const Value.absent(),
+            Value<int> chatId = const Value.absent(),
+            Value<String> message = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
           }) =>
-              ChatContentTableDataCompanion(
+              ChatRecordDetailCompanion(
             id: id,
-            parentid: parentid,
-            title: title,
-            content: content,
-            contentType: contentType,
-            role: role,
-            fileUri: fileUri,
-            fileSize: fileSize,
-            preset: preset,
-            datetime: datetime,
+            chatId: chatId,
+            message: message,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
-            required int parentid,
-            required String title,
-            Value<String?> content = const Value.absent(),
-            required ContentTypeEnum contentType,
-            required RoleEnum role,
-            Value<String?> fileUri = const Value.absent(),
-            Value<int?> fileSize = const Value.absent(),
-            Value<PresetEnum> preset = const Value.absent(),
-            Value<DateTime> datetime = const Value.absent(),
+            required int chatId,
+            required String message,
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
           }) =>
-              ChatContentTableDataCompanion.insert(
+              ChatRecordDetailCompanion.insert(
             id: id,
-            parentid: parentid,
-            title: title,
-            content: content,
-            contentType: contentType,
-            role: role,
-            fileUri: fileUri,
-            fileSize: fileSize,
-            preset: preset,
-            datetime: datetime,
+            chatId: chatId,
+            message: message,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -1250,29 +938,28 @@ class $$ChatContentTableDataTableTableManager extends RootTableManager<
         ));
 }
 
-typedef $$ChatContentTableDataTableProcessedTableManager
-    = ProcessedTableManager<
-        _$AppDatabase,
-        $ChatContentTableDataTable,
-        ChatContentTableDataData,
-        $$ChatContentTableDataTableFilterComposer,
-        $$ChatContentTableDataTableOrderingComposer,
-        $$ChatContentTableDataTableAnnotationComposer,
-        $$ChatContentTableDataTableCreateCompanionBuilder,
-        $$ChatContentTableDataTableUpdateCompanionBuilder,
-        (
-          ChatContentTableDataData,
-          BaseReferences<_$AppDatabase, $ChatContentTableDataTable,
-              ChatContentTableDataData>
-        ),
-        ChatContentTableDataData,
-        PrefetchHooks Function()>;
+typedef $$ChatRecordDetailTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $ChatRecordDetailTable,
+    ChatRecordDetailData,
+    $$ChatRecordDetailTableFilterComposer,
+    $$ChatRecordDetailTableOrderingComposer,
+    $$ChatRecordDetailTableAnnotationComposer,
+    $$ChatRecordDetailTableCreateCompanionBuilder,
+    $$ChatRecordDetailTableUpdateCompanionBuilder,
+    (
+      ChatRecordDetailData,
+      BaseReferences<_$AppDatabase, $ChatRecordDetailTable,
+          ChatRecordDetailData>
+    ),
+    ChatRecordDetailData,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
-  $$ChatTableDataTableTableManager get chatTableData =>
-      $$ChatTableDataTableTableManager(_db, _db.chatTableData);
-  $$ChatContentTableDataTableTableManager get chatContentTableData =>
-      $$ChatContentTableDataTableTableManager(_db, _db.chatContentTableData);
+  $$ChatRecordTableTableManager get chatRecord =>
+      $$ChatRecordTableTableManager(_db, _db.chatRecord);
+  $$ChatRecordDetailTableTableManager get chatRecordDetail =>
+      $$ChatRecordDetailTableTableManager(_db, _db.chatRecordDetail);
 }

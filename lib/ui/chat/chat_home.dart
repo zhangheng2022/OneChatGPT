@@ -7,21 +7,33 @@ import 'package:cross_cache/cross_cache.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 
 class ChatHome extends StatefulWidget {
-  final String chatid;
-  const ChatHome({super.key, required this.chatid});
+  final String chatId;
+  const ChatHome({super.key, required this.chatId});
 
   @override
   State<ChatHome> createState() => _ChatHomeState();
 }
 
 class _ChatHomeState extends State<ChatHome> {
-  // final _uuid = const Uuid().v4();
   final _crossCache = CrossCache();
   final _scrollController = ScrollController();
 
   late final ChatController _chatController;
+
+  void _handleMessageSend(String text) async {
+    await _chatController.insert(
+      TextMessage(
+        id: const Uuid().v4(),
+        author: User(id: widget.chatId),
+        createdAt: DateTime.now().toUtc(),
+        text: text,
+        metadata: {'role': 'user'},
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -33,7 +45,7 @@ class _ChatHomeState extends State<ChatHome> {
     super.didChangeDependencies();
     _chatController = DriftChatController(
       database: Provider.of<AppDatabase>(context),
-      chatid: widget.chatid,
+      chatId: widget.chatId,
     );
   }
 
@@ -44,11 +56,13 @@ class _ChatHomeState extends State<ChatHome> {
         title: Text("Chat"),
       ),
       body: Chat(
-        onMessageSend: (text) {
-          Log.i(text);
-        },
+        builders: Builders(
+          textMessageBuilder: (context, message) =>
+              ChatTextMessage(message: message),
+        ),
+        onMessageSend: _handleMessageSend,
         chatController: _chatController,
-        user: User(id: widget.chatid),
+        user: User(id: widget.chatId),
         crossCache: _crossCache,
         scrollController: _scrollController,
       ),

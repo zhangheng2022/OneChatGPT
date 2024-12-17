@@ -1,68 +1,104 @@
 import 'dart:async';
-
+import 'dart:convert';
+import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
-import 'package:one_chatgpt_flutter/utils/log.dart';
-import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 class DriftChatController implements ChatController {
-  final String chatid;
   final AppDatabase database;
-
-  DriftChatController({required this.database, required this.chatid}) {
-    // 使用 Future.microtask 或在创建后立即调用
-    Future.microtask(() => initMessagesList());
-  }
-
-  // AppDatabase database = Provider.of<AppDatabase>(context);
-  // database = Provider.of<AppDatabase>(context);
-  // initMessagesList();
-
+  final String chatId;
   final _operationsController = StreamController<ChatOperation>.broadcast();
-
-  final User _modelAuthor = User(
-    id: const Uuid().v4(),
-    firstName: "firstName",
-    lastName: "lastName",
-  );
-
-  late User _userAuthor;
-
   List<Message> messagesList = [];
 
-  Future<void> initMessagesList() async {
-    _userAuthor = User(
-      id: chatid,
-      firstName: "firstName",
-      lastName: "lastName",
-    );
+  final _userAuthor = User(id: 'me');
+  final _modelAuthor = User(id: 'model');
 
-    final messages = await (database.select(database.chatContentTableData)
-          ..where((tbl) => tbl.parentid.equals(int.parse(chatid))))
+  DriftChatController({required this.database, required this.chatId}) {
+    Future.microtask(() => _loadMessages());
+  }
+
+  Future<void> _loadMessages() async {
+    final messages = await database.managers.chatRecordDetail
+        .filter((row) => row.chatId.equals(int.parse(chatId)))
         .get();
+    if (messages.isNotEmpty) {
+      messagesList = messages
+          .map((row) => Message.fromJson(jsonDecode(row.message)))
+          .toList();
+      _operationsController.add(ChatOperation.set());
+    }
     if (messages.isEmpty) {
       Message welcomeMessage = Message.text(
         id: const Uuid().v4(),
         author: _modelAuthor,
         createdAt: DateTime.now(),
         text: "你好，有什么可以帮你的吗？",
+        metadata: {'role': 'assistant'},
       );
       await insert(welcomeMessage);
-    } else {
-      // 将数据库中的消息转换为 Message 对象
-      messagesList = messages
-          .map(
-            (msg) => Message.text(
-              id: msg.id.toString(),
-              author: _modelAuthor,
-              createdAt: msg.datetime,
-              text: msg.content ?? '',
-            ),
-          )
-          .toList();
     }
+  }
+
+  @override
+  Future<void> insert(Message message, {int? index}) async {
+    await database.managers.chatRecordDetail.create(
+      (row) => row(
+        chatId: int.parse(chatId),
+        message: jsonEncode(message.toJson()),
+      ),
+    );
+    messagesList.add(message);
+    _operationsController.add(
+      ChatOperation.insert(message, index ?? messagesList.length - 1),
+    );
+  }
+
+  @override
+  Future<void> remove(Message message) async {
+    final index = messagesList.indexWhere((msg) => msg.id == message.id);
+    if (index != -1) {
+      await database.managers.chatRecordDetail
+          .filter((row) => row.id.equals(int.parse(message.id)))
+          .delete();
+      messagesList.removeAt(index);
+      _operationsController.add(ChatOperation.remove(message, index));
+    }
+  }
+
+  @override
+  Future<void> update(Message oldMessage, Message newMessage) async {
+    if (oldMessage == newMessage) return;
+
+    final index = messagesList.indexWhere((msg) => msg.id == oldMessage.id);
+    if (index != -1) {
+      final recordRow = await database.managers.chatRecordDetail
+          .filter((row) => row.id.equals(int.parse(oldMessage.id)))
+          .getSingle();
+      await database.managers.chatRecordDetail.replace(
+        recordRow.copyWith(message: jsonEncode(newMessage.toJson())),
+      );
+      messagesList[index] = newMessage;
+      _operationsController.add(ChatOperation.update(oldMessage, newMessage));
+    }
+  }
+
+  @override
+  Future<void> set(List<Message> messages) async {
+    await database.managers.chatRecordDetail
+        .filter((row) => row.chatId.equals(int.parse(chatId)))
+        .delete();
+    await database.managers.chatRecordDetail.bulkCreate(
+      (row) => messages.map(
+        (message) => row(
+          chatId: int.parse(chatId),
+          message: jsonEncode(message.toJson()),
+        ),
+      ),
+    );
+    messagesList = messages;
+    _operationsController.add(ChatOperation.set());
   }
 
   @override
@@ -72,44 +108,7 @@ class DriftChatController implements ChatController {
   Stream<ChatOperation> get operationsStream => _operationsController.stream;
 
   @override
-  Future<void> insert(Message message, {int? index}) async {
-    // 插入到数据库
-    // await database.into(database.chatContentTableData).insert(
-    //       ChatContentTableDataCompanion.insert(
-    //         id: Value.absent(),
-    //         parentid: int.parse(chatid),
-    //         content: message.text,
-    //         role: 'user', // 根据实际情况设置
-    //         createTime: DateTime.now(),
-    //       ),
-    //     );
-    // 更新内存中的消息列表
-    messagesList.add(message);
-
-    // 通知操作流
-    _operationsController.add(
-      ChatOperation.insert(message, index ?? messagesList.length - 1),
-    );
-  }
-
-  @override
-  Future<void> remove(Message message) async {
-    // TODO: Implement remove
-  }
-
-  @override
-  Future<void> set(List<Message> messages) async {
-    // TODO: Implement set
-  }
-
-  @override
-  Future<void> update(Message oldMessage, Message newMessage) async {
-    // TODO: Implement update
-  }
-
-  @override
-  Future<void> dispose() async {
-    // TODO: Implement dispose
+  void dispose() {
     _operationsController.close();
   }
 }
