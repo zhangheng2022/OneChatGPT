@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
 import 'package:one_chatgpt_flutter/ui/chat/drift_chat_controller.dart';
+import 'package:one_chatgpt_flutter/ui/chat/widgets/chat_input.dart';
 import 'package:one_chatgpt_flutter/ui/chat/widgets/chat_text_message.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:cross_cache/cross_cache.dart';
@@ -59,12 +60,14 @@ class _ChatHomeState extends State<ChatHome> {
         builders: Builders(
           textMessageBuilder: (context, message) =>
               ChatTextMessage(message: message),
+          inputBuilder: (context) => ChatCustomInput(),
         ),
         onMessageSend: _handleMessageSend,
         chatController: _chatController,
         user: User(id: widget.chatId),
         crossCache: _crossCache,
         scrollController: _scrollController,
+        themeMode: ThemeMode.light,
       ),
     );
   }

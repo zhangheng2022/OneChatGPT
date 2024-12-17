@@ -1,27 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart' show Share;
 
+final supabaseUrl = dotenv.get('SUPABASE_URL', fallback: null);
+
 class ChatTextMessage extends StatelessWidget {
   final TextMessage message;
-  final EdgeInsetsGeometry? padding;
-  final BorderRadiusGeometry? borderRadius;
-  final VoidCallback? onLongPress;
 
   const ChatTextMessage({
     super.key,
     required this.message,
-    this.padding = const EdgeInsets.symmetric(
-      horizontal: 16,
-      vertical: 10,
-    ),
-    this.borderRadius = const BorderRadius.all(Radius.circular(12)),
-    this.onLongPress,
   });
 
   @override
@@ -29,64 +22,45 @@ class ChatTextMessage extends StatelessWidget {
     final textMessageTheme =
         context.select((ChatTheme theme) => theme.textMessageTheme);
     final isSentByMe = context.watch<User>().id == message.author.id;
-
-    return GestureDetector(
-      onLongPress: onLongPress ??
-          () {
-            _showMessageOptions(context);
-          },
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(12),
+          topRight: Radius.circular(12),
+          bottomLeft: Radius.circular(0),
+          bottomRight: Radius.circular(12),
+        ),
+      ),
       child: Column(
-        crossAxisAlignment:
-            isSentByMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: padding,
-            decoration: BoxDecoration(
-              color: isSentByMe
-                  ? textMessageTheme.sentBackgroundColor
-                  : textMessageTheme.receivedBackgroundColor,
-              borderRadius: borderRadius,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 3,
-                  offset: Offset(0, 1),
-                ),
-              ],
-            ),
-            child: MarkdownBody(
-              data: message.text,
-              styleSheet: MarkdownStyleSheet(
-                p: isSentByMe
-                    ? textMessageTheme.sentTextStyle
-                    : textMessageTheme.receivedTextStyle,
-                code: TextStyle(
-                  backgroundColor: Colors.grey[200],
-                  fontFamily: 'monospace',
-                  fontSize: 14,
-                ),
-                blockquote: TextStyle(
-                  color: Colors.grey[700],
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-              onTapLink: (text, href, title) {
-                if (href != null) {
-                  launchUrl(Uri.parse(href));
-                }
-              },
+          MarkdownBody(
+            data: message.text,
+            styleSheet: MarkdownStyleSheet(
+              textScaler: TextScaler.linear(1.2),
             ),
           ),
-          Padding(
-            padding: EdgeInsets.only(top: 4),
-            child: Text(
-              _formatMessageTime(message.createdAt),
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
+          SizedBox(height: 10),
+          Row(
+            children: [
+              InkWell(
+                child: Icon(
+                  Icons.copy_all,
+                  size: 20,
+                ),
               ),
-            ),
-          ),
+              SizedBox(width: 20),
+              InkWell(
+                child: Icon(
+                  Icons.volume_up,
+                  size: 20,
+                ),
+              ),
+            ],
+          )
         ],
       ),
     );
