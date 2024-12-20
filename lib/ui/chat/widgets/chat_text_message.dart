@@ -19,19 +19,19 @@ class ChatTextMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textMessageTheme =
-        context.select((ChatTheme theme) => theme.textMessageTheme);
-    final isSentByMe = context.watch<User>().id == message.author.id;
+    final isByMe = context.watch<User>().id == message.author.id;
     return Container(
-      width: double.infinity,
+      width: isByMe ? null : double.infinity,
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainer,
+        color: isByMe
+            ? Theme.of(context).colorScheme.primaryContainer
+            : Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(12),
           topRight: Radius.circular(12),
-          bottomLeft: Radius.circular(0),
-          bottomRight: Radius.circular(12),
+          bottomLeft: Radius.circular(isByMe ? 12 : 0),
+          bottomRight: Radius.circular(isByMe ? 0 : 12),
         ),
       ),
       child: Column(
@@ -39,28 +39,32 @@ class ChatTextMessage extends StatelessWidget {
         children: [
           MarkdownBody(
             data: message.text,
+            selectable: true,
             styleSheet: MarkdownStyleSheet(
               textScaler: TextScaler.linear(1.2),
             ),
           ),
-          SizedBox(height: 10),
-          Row(
-            children: [
-              InkWell(
-                child: Icon(
-                  Icons.copy_all,
-                  size: 20,
+          if (!isByMe) ...[
+            SizedBox(height: 10),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                InkWell(
+                  child: Icon(
+                    Icons.copy_all,
+                    size: 20,
+                  ),
                 ),
-              ),
-              SizedBox(width: 20),
-              InkWell(
-                child: Icon(
-                  Icons.volume_up,
-                  size: 20,
+                SizedBox(width: 20),
+                InkWell(
+                  child: Icon(
+                    Icons.volume_up,
+                    size: 20,
+                  ),
                 ),
-              ),
-            ],
-          )
+              ],
+            )
+          ],
         ],
       ),
     );

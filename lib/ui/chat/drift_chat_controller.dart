@@ -12,7 +12,6 @@ class DriftChatController implements ChatController {
   final _operationsController = StreamController<ChatOperation>.broadcast();
   List<Message> messagesList = [];
 
-  final _userAuthor = User(id: 'me');
   final _modelAuthor = User(id: 'model');
 
   DriftChatController({required this.database, required this.chatId}) {
