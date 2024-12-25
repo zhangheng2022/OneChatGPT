@@ -42,10 +42,14 @@ class HomeLeftDrawerState extends State<HomeLeftDrawer> {
 
   Future<void> deleteChat(int id) async {
     try {
-      await _database.managers.chatRecord
-          .filter((f) => f.id.equals(id))
-          .delete();
-      if (!mounted) return;
+      await _database.transaction(() async {
+        await _database.managers.chatRecord
+            .filter((f) => f.id.equals(id))
+            .delete();
+        await _database.managers.chatRecordDetail
+            .filter((f) => f.chatId.equals(id))
+            .delete();
+      });
     } catch (e) {
       debugPrint('Error deleting chat: $e');
     }

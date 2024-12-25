@@ -1,13 +1,25 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
+import 'package:one_chatgpt_flutter/models/network_chat/request_chat.dart';
+import 'package:one_chatgpt_flutter/models/network_chat/response_chat.dart';
+import 'package:one_chatgpt_flutter/services/dio_singleton.dart';
 import 'package:one_chatgpt_flutter/ui/chat/drift_chat_controller.dart';
 import 'package:one_chatgpt_flutter/ui/chat/widgets/chat_custom_input.dart';
 import 'package:one_chatgpt_flutter/ui/chat/widgets/chat_text_message.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
-import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import 'package:uuid/uuid.dart';
+
+// 初始化 Supabase 客户端
+final supabaseClient = supabase.Supabase.instance.client;
+final supabaseUrl = dotenv.get('SUPABASE_URL', fallback: null);
 
 class ChatHome extends StatefulWidget {
   final String chatId;
@@ -22,16 +34,119 @@ class _ChatHomeState extends State<ChatHome> {
 
   late final ChatController _chatController;
 
+  bool _isDisableSend = false;
+
+  Stream<String> _getModelMessage() async* {
+    final List<RequestChatMessage> historyMessages = _chatController.messages
+        .where((message) => message is TextMessage && message.text.isNotEmpty)
+        .map(
+      (message) {
+        if (message is TextMessage) {
+          return RequestChatMessage(
+            content: message.text,
+            role: message.author.id,
+          );
+        } else {
+          return RequestChatMessage(
+            content: "不支持的消息类型",
+            role: message.author.id,
+          );
+        }
+      },
+    ).toList();
+
+    final params = RequestChat(
+      messages: historyMessages,
+      preset: "comprehensive",
+    );
+
+    final session = supabaseClient.auth.currentSession;
+    final response = await DioSingleton.instance.post(
+      '${dotenv.env['SUPABASE_URL']}/functions/v1/portkeyai/completions',
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer ${session?.accessToken}',
+        },
+        responseType: ResponseType.stream,
+      ),
+      data: params.toJson(),
+    );
+
+    StreamTransformer<Uint8List, List<int>> unit8Transformer =
+        StreamTransformer.fromHandlers(
+      handleData: (data, sink) {
+        sink.add(List<int>.from(data));
+      },
+    );
+
+    await for (final chunk in response.data!.stream
+        .transform(unit8Transformer)
+        .transform(const Utf8Decoder())
+        .transform(const LineSplitter())) {
+      if (chunk.startsWith('data: ')) {
+        final jsonString = chunk.substring(6);
+        final messageContent = ResponseChat.fromJson(json.decode(jsonString))
+                .choices[0]
+                .delta
+                .content ??
+            '';
+        yield messageContent;
+      }
+    }
+  }
+
   void _handleMessageSend(String text) async {
+    if (text.isEmpty) return;
+
+    setState(() {
+      _isDisableSend = true;
+    });
+
     await _chatController.insert(
       TextMessage(
         id: const Uuid().v4(),
-        author: User(id: widget.chatId),
+        author: User(id: 'user'),
         createdAt: DateTime.now(),
         text: text,
-        metadata: {'role': 'user'},
       ),
     );
+
+    final messageId = const Uuid().v4();
+    await _chatController.insert(
+      TextMessage(
+        id: messageId,
+        author: User(id: 'assistant'),
+        createdAt: DateTime.now(),
+        text: '',
+      ),
+    );
+    await for (final content in _getModelMessage()) {
+      final index = _chatController.messages.indexWhere(
+        (message) => message.id == messageId,
+      );
+      if (index != -1) {
+        final oldMessage = _chatController.messages[index];
+        if (oldMessage is TextMessage) {
+          final newMessage = oldMessage.copyWith(
+            text: oldMessage.text + content,
+          );
+          await _chatController.update(oldMessage, newMessage);
+        }
+      } else {
+        await _chatController.insert(
+          TextMessage(
+            id: messageId,
+            author: User(id: 'assistant'),
+            createdAt: DateTime.now(),
+            text: content,
+          ),
+        );
+      }
+    }
+
+    setState(() {
+      _isDisableSend = false;
+    });
   }
 
   void _handleAttachmentTap() async {
@@ -76,6 +191,10 @@ class _ChatHomeState extends State<ChatHome> {
         ),
         actions: [
           IconButton(
+            icon: Icon(Icons.volume_off_outlined),
+            onPressed: () {},
+          ),
+          IconButton(
             icon: Icon(Icons.more_vert),
             onPressed: () {},
           ),
@@ -85,12 +204,14 @@ class _ChatHomeState extends State<ChatHome> {
         builders: Builders(
           textMessageBuilder: (context, message) =>
               ChatTextMessage(message: message),
-          inputBuilder: (context) => ChatCustomInput(),
+          inputBuilder: (context) => ChatCustomInput(
+            disableSend: _isDisableSend,
+          ),
         ),
         onMessageSend: _handleMessageSend,
         onAttachmentTap: _handleAttachmentTap,
         chatController: _chatController,
-        user: User(id: widget.chatId),
+        user: User(id: 'user'),
         scrollController: _scrollController,
         themeMode: ThemeMode.light,
       ),

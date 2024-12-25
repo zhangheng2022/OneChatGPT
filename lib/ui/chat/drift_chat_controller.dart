@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:drift/drift.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
+import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:uuid/uuid.dart';
 
 class DriftChatController implements ChatController {
@@ -11,8 +11,6 @@ class DriftChatController implements ChatController {
   final String chatId;
   final _operationsController = StreamController<ChatOperation>.broadcast();
   List<Message> messagesList = [];
-
-  final _modelAuthor = User(id: 'model');
 
   DriftChatController({required this.database, required this.chatId}) {
     Future.microtask(() => _loadMessages());
@@ -31,10 +29,9 @@ class DriftChatController implements ChatController {
     if (messages.isEmpty) {
       Message welcomeMessage = Message.text(
         id: const Uuid().v4(),
-        author: _modelAuthor,
+        author: User(id: 'assistant'),
         createdAt: DateTime.now(),
         text: "你好，有什么可以帮你的吗？",
-        metadata: {'role': 'assistant'},
       );
       await insert(welcomeMessage);
     }
@@ -45,9 +42,15 @@ class DriftChatController implements ChatController {
     await database.managers.chatRecordDetail.create(
       (row) => row(
         chatId: int.parse(chatId),
+        messageId: message.id,
         message: jsonEncode(message.toJson()),
       ),
     );
+    if (message is TextMessage && message.text.isNotEmpty) {
+      await database.managers.chatRecord
+          .filter((row) => row.id.equals(int.parse(chatId)))
+          .update((row) => row(title: Value(message.text)));
+    }
     messagesList.add(message);
     _operationsController.add(
       ChatOperation.insert(message, index ?? messagesList.length - 1),
@@ -73,13 +76,15 @@ class DriftChatController implements ChatController {
     final index = messagesList.indexWhere((msg) => msg.id == oldMessage.id);
     if (index != -1) {
       final recordRow = await database.managers.chatRecordDetail
-          .filter((row) => row.id.equals(int.parse(oldMessage.id)))
+          .filter((row) => row.messageId.equals(oldMessage.id))
           .getSingle();
       await database.managers.chatRecordDetail.replace(
         recordRow.copyWith(message: jsonEncode(newMessage.toJson())),
       );
       messagesList[index] = newMessage;
       _operationsController.add(ChatOperation.update(oldMessage, newMessage));
+    } else {
+      Log.e('更新失败,缺少需要更新的消息');
     }
   }
 
@@ -92,6 +97,7 @@ class DriftChatController implements ChatController {
       (row) => messages.map(
         (message) => row(
           chatId: int.parse(chatId),
+          messageId: message.id,
           message: jsonEncode(message.toJson()),
         ),
       ),

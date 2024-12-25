@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:intl/intl.dart';
@@ -19,49 +20,78 @@ class ChatTextMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isByMe = context.watch<User>().id == message.author.id;
+    final isUser = context.watch<User>().id == message.author.id;
     return Container(
-      width: isByMe ? null : double.infinity,
+      width: isUser ? null : double.infinity,
       padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: isByMe
+        color: isUser
             ? Theme.of(context).colorScheme.primaryContainer
             : Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(12),
           topRight: Radius.circular(12),
-          bottomLeft: Radius.circular(isByMe ? 12 : 0),
-          bottomRight: Radius.circular(isByMe ? 0 : 12),
+          bottomLeft: Radius.circular(isUser ? 12 : 0),
+          bottomRight: Radius.circular(isUser ? 0 : 12),
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          MarkdownBody(
-            data: message.text,
-            selectable: true,
-            styleSheet: MarkdownStyleSheet(
-              textScaler: TextScaler.linear(1.2),
+          if (message.text.isEmpty) ...[
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                color: Theme.of(context).colorScheme.inversePrimary,
+              ),
             ),
-          ),
-          if (!isByMe) ...[
+          ] else ...[
+            MarkdownBody(
+              data: message.text,
+              selectable: true,
+              styleSheet: MarkdownStyleSheet(
+                textScaler: TextScaler.linear(1.2),
+              ),
+            ),
+          ],
+          if (!isUser && message.text.isNotEmpty) ...[
             SizedBox(height: 10),
             Row(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                InkWell(
-                  child: Icon(
-                    Icons.copy_all,
-                    size: 20,
-                  ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Clipboard.setData(ClipboardData(text: message.text));
+                        SmartDialog.showToast('复制成功',
+                            alignment: Alignment.center);
+                      },
+                      child: Icon(
+                        Icons.copy_all,
+                        size: 20,
+                      ),
+                    ),
+                    SizedBox(width: 20),
+                    InkWell(
+                      child: Icon(
+                        Icons.volume_up_outlined,
+                        size: 20,
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(width: 20),
-                InkWell(
-                  child: Icon(
-                    Icons.volume_up,
-                    size: 20,
+                Text(
+                  DateFormat('MM-dd HH:mm').format(message.createdAt),
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Theme.of(context).colorScheme.inversePrimary,
                   ),
-                ),
+                )
               ],
             )
           ],

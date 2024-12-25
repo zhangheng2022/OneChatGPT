@@ -9,29 +9,19 @@ part of 'request_chat.dart';
 RequestChat _$RequestChatFromJson(Map<String, dynamic> json) {
   $checkKeys(
     json,
-    requiredKeys: const ['model'],
+    requiredKeys: const ['preset'],
   );
   return RequestChat(
     messages: (json['messages'] as List<dynamic>)
         .map((e) => RequestChatMessage.fromJson(e as Map<String, dynamic>))
         .toList(),
-    model: json['model'] as String,
-    maxTokens: (json['maxTokens'] as num?)?.toInt(),
-    temperature: (json['temperature'] as num?)?.toDouble(),
-    topP: (json['topP'] as num?)?.toDouble(),
-    historyMessages: (json['historyMessages'] as num?)?.toDouble(),
-    autoTitle: json['autoTitle'] as bool?,
+    preset: json['preset'] as String,
   );
 }
 
 Map<String, dynamic> _$RequestChatToJson(RequestChat instance) =>
     <String, dynamic>{
-      'maxTokens': instance.maxTokens,
-      'temperature': instance.temperature,
-      'topP': instance.topP,
-      'historyMessages': instance.historyMessages,
-      'autoTitle': instance.autoTitle,
-      'model': instance.model,
+      'preset': instance.preset,
       'messages': instance.messages,
     };
 

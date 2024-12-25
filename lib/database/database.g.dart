@@ -325,6 +325,14 @@ class $ChatRecordDetailTable extends ChatRecordDetail
   late final GeneratedColumn<int> chatId = GeneratedColumn<int>(
       'chat_id', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _messageIdMeta =
+      const VerificationMeta('messageId');
+  @override
+  late final GeneratedColumn<String> messageId = GeneratedColumn<String>(
+      'message_id', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
   static const VerificationMeta _messageMeta =
       const VerificationMeta('message');
   @override
@@ -349,7 +357,7 @@ class $ChatRecordDetailTable extends ChatRecordDetail
       defaultValue: currentDateAndTime);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, chatId, message, createdAt, updatedAt];
+      [id, chatId, messageId, message, createdAt, updatedAt];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -369,6 +377,12 @@ class $ChatRecordDetailTable extends ChatRecordDetail
           chatId.isAcceptableOrUnknown(data['chat_id']!, _chatIdMeta));
     } else if (isInserting) {
       context.missing(_chatIdMeta);
+    }
+    if (data.containsKey('message_id')) {
+      context.handle(_messageIdMeta,
+          messageId.isAcceptableOrUnknown(data['message_id']!, _messageIdMeta));
+    } else if (isInserting) {
+      context.missing(_messageIdMeta);
     }
     if (data.containsKey('message')) {
       context.handle(_messageMeta,
@@ -397,6 +411,8 @@ class $ChatRecordDetailTable extends ChatRecordDetail
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       chatId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}chat_id'])!,
+      messageId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}message_id'])!,
       message: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}message'])!,
       createdAt: attachedDatabase.typeMapping
@@ -416,12 +432,14 @@ class ChatRecordDetailData extends DataClass
     implements Insertable<ChatRecordDetailData> {
   final int id;
   final int chatId;
+  final String messageId;
   final String message;
   final DateTime createdAt;
   final DateTime updatedAt;
   const ChatRecordDetailData(
       {required this.id,
       required this.chatId,
+      required this.messageId,
       required this.message,
       required this.createdAt,
       required this.updatedAt});
@@ -430,6 +448,7 @@ class ChatRecordDetailData extends DataClass
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['chat_id'] = Variable<int>(chatId);
+    map['message_id'] = Variable<String>(messageId);
     map['message'] = Variable<String>(message);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -440,6 +459,7 @@ class ChatRecordDetailData extends DataClass
     return ChatRecordDetailCompanion(
       id: Value(id),
       chatId: Value(chatId),
+      messageId: Value(messageId),
       message: Value(message),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
@@ -452,6 +472,7 @@ class ChatRecordDetailData extends DataClass
     return ChatRecordDetailData(
       id: serializer.fromJson<int>(json['id']),
       chatId: serializer.fromJson<int>(json['chatId']),
+      messageId: serializer.fromJson<String>(json['messageId']),
       message: serializer.fromJson<String>(json['message']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
@@ -463,6 +484,7 @@ class ChatRecordDetailData extends DataClass
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'chatId': serializer.toJson<int>(chatId),
+      'messageId': serializer.toJson<String>(messageId),
       'message': serializer.toJson<String>(message),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
@@ -472,12 +494,14 @@ class ChatRecordDetailData extends DataClass
   ChatRecordDetailData copyWith(
           {int? id,
           int? chatId,
+          String? messageId,
           String? message,
           DateTime? createdAt,
           DateTime? updatedAt}) =>
       ChatRecordDetailData(
         id: id ?? this.id,
         chatId: chatId ?? this.chatId,
+        messageId: messageId ?? this.messageId,
         message: message ?? this.message,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
@@ -486,6 +510,7 @@ class ChatRecordDetailData extends DataClass
     return ChatRecordDetailData(
       id: data.id.present ? data.id.value : this.id,
       chatId: data.chatId.present ? data.chatId.value : this.chatId,
+      messageId: data.messageId.present ? data.messageId.value : this.messageId,
       message: data.message.present ? data.message.value : this.message,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -497,6 +522,7 @@ class ChatRecordDetailData extends DataClass
     return (StringBuffer('ChatRecordDetailData(')
           ..write('id: $id, ')
           ..write('chatId: $chatId, ')
+          ..write('messageId: $messageId, ')
           ..write('message: $message, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -505,13 +531,15 @@ class ChatRecordDetailData extends DataClass
   }
 
   @override
-  int get hashCode => Object.hash(id, chatId, message, createdAt, updatedAt);
+  int get hashCode =>
+      Object.hash(id, chatId, messageId, message, createdAt, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is ChatRecordDetailData &&
           other.id == this.id &&
           other.chatId == this.chatId &&
+          other.messageId == this.messageId &&
           other.message == this.message &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
@@ -520,12 +548,14 @@ class ChatRecordDetailData extends DataClass
 class ChatRecordDetailCompanion extends UpdateCompanion<ChatRecordDetailData> {
   final Value<int> id;
   final Value<int> chatId;
+  final Value<String> messageId;
   final Value<String> message;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   const ChatRecordDetailCompanion({
     this.id = const Value.absent(),
     this.chatId = const Value.absent(),
+    this.messageId = const Value.absent(),
     this.message = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -533,14 +563,17 @@ class ChatRecordDetailCompanion extends UpdateCompanion<ChatRecordDetailData> {
   ChatRecordDetailCompanion.insert({
     this.id = const Value.absent(),
     required int chatId,
+    required String messageId,
     required String message,
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   })  : chatId = Value(chatId),
+        messageId = Value(messageId),
         message = Value(message);
   static Insertable<ChatRecordDetailData> custom({
     Expression<int>? id,
     Expression<int>? chatId,
+    Expression<String>? messageId,
     Expression<String>? message,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -548,6 +581,7 @@ class ChatRecordDetailCompanion extends UpdateCompanion<ChatRecordDetailData> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (chatId != null) 'chat_id': chatId,
+      if (messageId != null) 'message_id': messageId,
       if (message != null) 'message': message,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -557,12 +591,14 @@ class ChatRecordDetailCompanion extends UpdateCompanion<ChatRecordDetailData> {
   ChatRecordDetailCompanion copyWith(
       {Value<int>? id,
       Value<int>? chatId,
+      Value<String>? messageId,
       Value<String>? message,
       Value<DateTime>? createdAt,
       Value<DateTime>? updatedAt}) {
     return ChatRecordDetailCompanion(
       id: id ?? this.id,
       chatId: chatId ?? this.chatId,
+      messageId: messageId ?? this.messageId,
       message: message ?? this.message,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -577,6 +613,9 @@ class ChatRecordDetailCompanion extends UpdateCompanion<ChatRecordDetailData> {
     }
     if (chatId.present) {
       map['chat_id'] = Variable<int>(chatId.value);
+    }
+    if (messageId.present) {
+      map['message_id'] = Variable<String>(messageId.value);
     }
     if (message.present) {
       map['message'] = Variable<String>(message.value);
@@ -595,6 +634,7 @@ class ChatRecordDetailCompanion extends UpdateCompanion<ChatRecordDetailData> {
     return (StringBuffer('ChatRecordDetailCompanion(')
           ..write('id: $id, ')
           ..write('chatId: $chatId, ')
+          ..write('messageId: $messageId, ')
           ..write('message: $message, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -788,6 +828,7 @@ typedef $$ChatRecordDetailTableCreateCompanionBuilder
     = ChatRecordDetailCompanion Function({
   Value<int> id,
   required int chatId,
+  required String messageId,
   required String message,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
@@ -796,6 +837,7 @@ typedef $$ChatRecordDetailTableUpdateCompanionBuilder
     = ChatRecordDetailCompanion Function({
   Value<int> id,
   Value<int> chatId,
+  Value<String> messageId,
   Value<String> message,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
@@ -815,6 +857,9 @@ class $$ChatRecordDetailTableFilterComposer
 
   ColumnFilters<int> get chatId => $composableBuilder(
       column: $table.chatId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get messageId => $composableBuilder(
+      column: $table.messageId, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get message => $composableBuilder(
       column: $table.message, builder: (column) => ColumnFilters(column));
@@ -841,6 +886,9 @@ class $$ChatRecordDetailTableOrderingComposer
   ColumnOrderings<int> get chatId => $composableBuilder(
       column: $table.chatId, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get messageId => $composableBuilder(
+      column: $table.messageId, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get message => $composableBuilder(
       column: $table.message, builder: (column) => ColumnOrderings(column));
 
@@ -865,6 +913,9 @@ class $$ChatRecordDetailTableAnnotationComposer
 
   GeneratedColumn<int> get chatId =>
       $composableBuilder(column: $table.chatId, builder: (column) => column);
+
+  GeneratedColumn<String> get messageId =>
+      $composableBuilder(column: $table.messageId, builder: (column) => column);
 
   GeneratedColumn<String> get message =>
       $composableBuilder(column: $table.message, builder: (column) => column);
@@ -906,6 +957,7 @@ class $$ChatRecordDetailTableTableManager extends RootTableManager<
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<int> chatId = const Value.absent(),
+            Value<String> messageId = const Value.absent(),
             Value<String> message = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
@@ -913,6 +965,7 @@ class $$ChatRecordDetailTableTableManager extends RootTableManager<
               ChatRecordDetailCompanion(
             id: id,
             chatId: chatId,
+            messageId: messageId,
             message: message,
             createdAt: createdAt,
             updatedAt: updatedAt,
@@ -920,6 +973,7 @@ class $$ChatRecordDetailTableTableManager extends RootTableManager<
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
             required int chatId,
+            required String messageId,
             required String message,
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
@@ -927,6 +981,7 @@ class $$ChatRecordDetailTableTableManager extends RootTableManager<
               ChatRecordDetailCompanion.insert(
             id: id,
             chatId: chatId,
+            messageId: messageId,
             message: message,
             createdAt: createdAt,
             updatedAt: updatedAt,

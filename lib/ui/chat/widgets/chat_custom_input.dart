@@ -7,7 +7,8 @@ typedef OnMessageSendCallback = void Function(String text);
 typedef OnAttachmentTapCallback = VoidCallback;
 
 class ChatCustomInput extends StatefulWidget {
-  const ChatCustomInput({super.key});
+  final bool disableSend;
+  const ChatCustomInput({super.key, this.disableSend = false});
 
   @override
   State<ChatCustomInput> createState() => _ChatCustomInputState();
@@ -33,6 +34,7 @@ class _ChatCustomInputState extends State<ChatCustomInput> {
     if (text.isNotEmpty) {
       context.read<OnMessageSendCallback?>()?.call(text);
       _textController.clear();
+      FocusScope.of(context).unfocus();
     }
   }
 
@@ -56,11 +58,13 @@ class _ChatCustomInputState extends State<ChatCustomInput> {
       bottom: 0,
       child: Column(
         children: [
-          ElevatedButton.icon(
-            onPressed: () {},
-            label: Text("停止生成"),
-            icon: Icon(Icons.stop_circle),
-          ),
+          if (widget.disableSend) ...[
+            ElevatedButton.icon(
+              onPressed: () {},
+              label: Text("停止生成"),
+              icon: Icon(Icons.stop_circle),
+            ),
+          ],
           SizedBox(height: 10),
           Container(
             width: double.infinity,
@@ -99,13 +103,25 @@ class _ChatCustomInputState extends State<ChatCustomInput> {
                       fillColor: Colors.transparent,
                       border: InputBorder.none,
                     ),
+                    onSubmitted: (text) =>
+                        widget.disableSend ? null : _handleSubmitted(text),
                   ),
                 ),
                 SizedBox(width: 10),
                 IconButton(
-                  icon: Icon(Icons.send),
+                  icon: !widget.disableSend
+                      ? Icon(Icons.send)
+                      : SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Theme.of(context).colorScheme.inversePrimary,
+                          ),
+                        ),
                   color: Theme.of(context).colorScheme.onPrimary,
-                  onPressed: () => _handleSubmitted(_textController.text),
+                  onPressed: () => widget.disableSend
+                      ? null
+                      : _handleSubmitted(_textController.text),
                 ),
               ],
             ),
