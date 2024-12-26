@@ -44,3 +44,6 @@ app.*.map.json
 
 
 pubspec.lock
+
+
+.env

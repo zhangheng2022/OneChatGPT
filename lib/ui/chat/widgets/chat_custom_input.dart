@@ -8,7 +8,9 @@ typedef OnAttachmentTapCallback = VoidCallback;
 
 class ChatCustomInput extends StatefulWidget {
   final bool disableSend;
-  const ChatCustomInput({super.key, this.disableSend = false});
+  final VoidCallback onCancel;
+  const ChatCustomInput(
+      {super.key, this.disableSend = false, required this.onCancel});
 
   @override
   State<ChatCustomInput> createState() => _ChatCustomInputState();
@@ -60,7 +62,9 @@ class _ChatCustomInputState extends State<ChatCustomInput> {
         children: [
           if (widget.disableSend) ...[
             ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: () {
+                widget.onCancel();
+              },
               label: Text("停止生成"),
               icon: Icon(Icons.stop_circle),
             ),

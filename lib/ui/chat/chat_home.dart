@@ -36,6 +36,8 @@ class _ChatHomeState extends State<ChatHome> {
 
   bool _isDisableSend = false;
 
+  final CancelToken _cancelToken = CancelToken();
+
   Stream<String> _getModelMessage() async* {
     final List<RequestChatMessage> historyMessages = _chatController.messages
         .where((message) => message is TextMessage && message.text.isNotEmpty)
@@ -61,37 +63,46 @@ class _ChatHomeState extends State<ChatHome> {
     );
 
     final session = supabaseClient.auth.currentSession;
-    final response = await DioSingleton.instance.post(
-      '${dotenv.env['SUPABASE_URL']}/functions/v1/portkeyai/completions',
-      options: Options(
-        headers: {
-          'Authorization': 'Bearer ${session?.accessToken}',
+    try {
+      final response = await DioSingleton.instance.post(
+        '${dotenv.env['SUPABASE_URL']}/functions/v1/portkeyai/completions',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer ${session?.accessToken}',
+          },
+          responseType: ResponseType.stream,
+        ),
+        data: params.toJson(),
+        cancelToken: _cancelToken,
+      );
+
+      StreamTransformer<Uint8List, List<int>> unit8Transformer =
+          StreamTransformer.fromHandlers(
+        handleData: (data, sink) {
+          sink.add(List<int>.from(data));
         },
-        responseType: ResponseType.stream,
-      ),
-      data: params.toJson(),
-    );
+      );
 
-    StreamTransformer<Uint8List, List<int>> unit8Transformer =
-        StreamTransformer.fromHandlers(
-      handleData: (data, sink) {
-        sink.add(List<int>.from(data));
-      },
-    );
-
-    await for (final chunk in response.data!.stream
-        .transform(unit8Transformer)
-        .transform(const Utf8Decoder())
-        .transform(const LineSplitter())) {
-      if (chunk.startsWith('data: ')) {
-        final jsonString = chunk.substring(6);
-        final messageContent = ResponseChat.fromJson(json.decode(jsonString))
-                .choices[0]
-                .delta
-                .content ??
-            '';
-        yield messageContent;
+      await for (final chunk in response.data!.stream
+          .transform(unit8Transformer)
+          .transform(const Utf8Decoder())
+          .transform(const LineSplitter())) {
+        if (chunk.startsWith('data: ')) {
+          final jsonString = chunk.substring(6);
+          final messageContent = ResponseChat.fromJson(json.decode(jsonString))
+                  .choices[0]
+                  .delta
+                  .content ??
+              '';
+          yield messageContent;
+        }
       }
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.cancel) {
+        debugPrint('completions停止生成: ${e.message}');
+      }
+    } catch (e) {
+      debugPrint('completions错误: $e');
     }
   }
 
@@ -174,6 +185,12 @@ class _ChatHomeState extends State<ChatHome> {
   }
 
   @override
+  void dispose() {
+    _cancelToken.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -206,6 +223,10 @@ class _ChatHomeState extends State<ChatHome> {
               ChatTextMessage(message: message),
           inputBuilder: (context) => ChatCustomInput(
             disableSend: _isDisableSend,
+            onCancel: () {
+              _cancelToken.cancel();
+              print('停止生成');
+            },
           ),
         ),
         onMessageSend: _handleMessageSend,
