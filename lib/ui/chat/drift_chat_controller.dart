@@ -9,8 +9,8 @@ import 'package:uuid/uuid.dart';
 
 class DriftChatController implements ChatController {
   static const Map<PresetEnum, String> _welcomeMessages = {
-    PresetEnum.chat: "你好，有什么可以帮你的吗？",
-    PresetEnum.createImage: "你好，有什么需要生成的吗？",
+    PresetEnum.chat: "你好，你需要和我聊些什么呢？",
+    PresetEnum.createImage: "你好，我能帮你生成图片，需要什么图片呢？",
   };
 
   final AppDatabase database;
@@ -37,10 +37,11 @@ class DriftChatController implements ChatController {
           .filter((row) => row.id.equals(int.parse(chatId)))
           .getSingle();
       Message welcomeMessage = Message.text(
-          id: const Uuid().v4(),
-          author: User(id: 'assistant'),
-          createdAt: DateTime.now(),
-          text: _welcomeMessages[chatRecord.preset]);
+        id: const Uuid().v4(),
+        author: User(id: 'assistant'),
+        createdAt: DateTime.now(),
+        text: _welcomeMessages[chatRecord.preset] ?? '你好，有什么可以帮你的吗？',
+      );
       await insert(welcomeMessage);
     }
   }
