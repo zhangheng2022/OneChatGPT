@@ -77,7 +77,7 @@ class _ChatHomeState extends State<ChatHome> {
 
     final params = RequestChat(
       messages: historyMessages,
-      preset: "comprehensive",
+      preset: "chat",
     );
 
     final session = supabaseClient.auth.currentSession;
@@ -245,7 +245,7 @@ class _ChatHomeState extends State<ChatHome> {
           ),
         ),
         onMessageSend: _handleMessageSend,
-        onAttachmentTap: _handleAttachmentTap,
+        // onAttachmentTap: _handleAttachmentTap,
         chatController: _chatController,
         user: User(id: 'user'),
         scrollController: _scrollController,

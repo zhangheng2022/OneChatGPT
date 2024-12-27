@@ -2,11 +2,17 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
+import 'package:one_chatgpt_flutter/database/chat_record.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
 import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:uuid/uuid.dart';
 
 class DriftChatController implements ChatController {
+  static const Map<PresetEnum, String> _welcomeMessages = {
+    PresetEnum.chat: "你好，有什么可以帮你的吗？",
+    PresetEnum.createImage: "你好，有什么需要生成的吗？",
+  };
+
   final AppDatabase database;
   final String chatId;
   final _operationsController = StreamController<ChatOperation>.broadcast();
@@ -27,12 +33,14 @@ class DriftChatController implements ChatController {
       _operationsController.add(ChatOperation.set());
     }
     if (messages.isEmpty) {
+      final chatRecord = await database.managers.chatRecord
+          .filter((row) => row.id.equals(int.parse(chatId)))
+          .getSingle();
       Message welcomeMessage = Message.text(
-        id: const Uuid().v4(),
-        author: User(id: 'assistant'),
-        createdAt: DateTime.now(),
-        text: "你好，有什么可以帮你的吗？",
-      );
+          id: const Uuid().v4(),
+          author: User(id: 'assistant'),
+          createdAt: DateTime.now(),
+          text: _welcomeMessages[chatRecord.preset]);
       await insert(welcomeMessage);
     }
   }

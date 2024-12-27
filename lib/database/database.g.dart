@@ -29,9 +29,7 @@ class $ChatRecordTable extends ChatRecord
   @override
   late final GeneratedColumnWithTypeConverter<PresetEnum, String> preset =
       GeneratedColumn<String>('preset', aliasedName, false,
-              type: DriftSqlType.string,
-              requiredDuringInsert: false,
-              defaultValue: Constant('comprehensive'))
+              type: DriftSqlType.string, requiredDuringInsert: true)
           .withConverter<PresetEnum>($ChatRecordTable.$converterpreset);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
@@ -235,10 +233,10 @@ class ChatRecordCompanion extends UpdateCompanion<ChatRecordData> {
   ChatRecordCompanion.insert({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
-    this.preset = const Value.absent(),
+    required PresetEnum preset,
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
-  });
+  }) : preset = Value(preset);
   static Insertable<ChatRecordData> custom({
     Expression<int>? id,
     Expression<String>? title,
@@ -660,7 +658,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 typedef $$ChatRecordTableCreateCompanionBuilder = ChatRecordCompanion Function({
   Value<int> id,
   Value<String> title,
-  Value<PresetEnum> preset,
+  required PresetEnum preset,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
 });
@@ -791,7 +789,7 @@ class $$ChatRecordTableTableManager extends RootTableManager<
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String> title = const Value.absent(),
-            Value<PresetEnum> preset = const Value.absent(),
+            required PresetEnum preset,
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
           }) =>

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:one_chatgpt_flutter/database/chat_record.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
 import 'package:one_chatgpt_flutter/ui/index/widgets/home_left_drawer.dart';
 import 'package:one_chatgpt_flutter/utils/log.dart';
@@ -21,10 +22,11 @@ class _HomeState extends State<Home> {
     _database = Provider.of<AppDatabase>(context);
   }
 
-  Future<void> addChat() async {
+  Future<void> addChat(PresetEnum preset) async {
     try {
       debugPrint('addChat');
-      final chatId = await _database.managers.chatRecord.create((row) => row());
+      final chatId = await _database.managers.chatRecord
+          .create((row) => row(preset: preset));
       if (!mounted) return;
       context.goNamed('chat', pathParameters: {'chatId': chatId.toString()});
     } catch (e) {
@@ -83,7 +85,7 @@ class _HomeState extends State<Home> {
                   ),
                   children: [
                     InkWell(
-                      onTap: () {},
+                      onTap: () => addChat(PresetEnum.createImage),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -93,12 +95,12 @@ class _HomeState extends State<Home> {
                               child: Image.asset("assets/icons/image.png"),
                             ),
                           ),
-                          Text('AI图片'),
+                          Text('生成图片'),
                         ],
                       ),
                     ),
                     InkWell(
-                      onTap: () {},
+                      onTap: () => addChat(PresetEnum.createImage),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -108,7 +110,7 @@ class _HomeState extends State<Home> {
                               child: Image.asset("assets/icons/document.png"),
                             ),
                           ),
-                          Text('AI文档'),
+                          Text('解析文档'),
                         ],
                       ),
                     ),
@@ -121,7 +123,7 @@ class _HomeState extends State<Home> {
               width: double.infinity,
               height: 60,
               child: FilledButton.icon(
-                onPressed: addChat,
+                onPressed: () => addChat(PresetEnum.chat),
                 icon: Icon(Icons.question_answer),
                 label: Text(
                   "聊一聊",

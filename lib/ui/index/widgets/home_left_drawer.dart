@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:one_chatgpt_flutter/database/chat_record.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
 import 'package:provider/provider.dart';
 
@@ -28,16 +29,6 @@ class HomeLeftDrawerState extends State<HomeLeftDrawer> {
   @override
   void dispose() {
     super.dispose();
-  }
-
-  Future<void> addChat() async {
-    try {
-      debugPrint('addChat');
-      await _database.managers.chatRecord.create((row) => row());
-      if (!mounted) return;
-    } catch (e) {
-      debugPrint('Error adding chat: $e');
-    }
   }
 
   Future<void> deleteChat(int id) async {
