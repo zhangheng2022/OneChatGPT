@@ -21,6 +21,8 @@ class ChatTextMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUser = context.watch<User>().id == message.author.id;
+    final isInitMessage = message.metadata?.containsKey('init') ?? false;
+
     return Container(
       width: isUser ? null : double.infinity,
       padding: const EdgeInsets.all(10),
@@ -39,7 +41,7 @@ class ChatTextMessage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (message.text.isEmpty) ...[
+          if (isInitMessage) ...[
             SizedBox(
               width: 20,
               height: 20,
@@ -56,7 +58,7 @@ class ChatTextMessage extends StatelessWidget {
               ),
             ),
           ],
-          if (!isUser && message.text.isNotEmpty) ...[
+          if (!isUser && !isInitMessage) ...[
             SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -68,8 +70,10 @@ class ChatTextMessage extends StatelessWidget {
                     InkWell(
                       onTap: () {
                         Clipboard.setData(ClipboardData(text: message.text));
-                        SmartDialog.showToast('复制成功',
-                            alignment: Alignment.center);
+                        SmartDialog.showToast(
+                          '复制成功',
+                          alignment: Alignment.center,
+                        );
                       },
                       child: Icon(
                         Icons.copy_all,

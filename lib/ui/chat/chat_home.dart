@@ -36,7 +36,25 @@ class _ChatHomeState extends State<ChatHome> {
 
   bool _isDisableSend = false;
 
-  final CancelToken _cancelToken = CancelToken();
+  CancelToken _cancelToken = CancelToken();
+
+  void _modelMessageCancel() {
+    _cancelToken.cancel();
+    _cancelToken = CancelToken();
+    final index = _chatController.messages.indexWhere(
+      (message) => message.metadata?.containsKey('init') == true,
+    );
+    if (index != -1) {
+      final message = _chatController.messages[index];
+      if (message is TextMessage) {
+        final newMessage = message.copyWith(
+          text: '已停止生成',
+          metadata: null,
+        );
+        _chatController.update(message, newMessage);
+      }
+    }
+  }
 
   Stream<String> _getModelMessage() async* {
     final List<RequestChatMessage> historyMessages = _chatController.messages
@@ -67,9 +85,7 @@ class _ChatHomeState extends State<ChatHome> {
       final response = await DioSingleton.instance.post(
         '${dotenv.env['SUPABASE_URL']}/functions/v1/portkeyai/completions',
         options: Options(
-          headers: {
-            'Authorization': 'Bearer ${session?.accessToken}',
-          },
+          headers: {'Authorization': 'Bearer ${session?.accessToken}'},
           responseType: ResponseType.stream,
         ),
         data: params.toJson(),
@@ -129,6 +145,7 @@ class _ChatHomeState extends State<ChatHome> {
         author: User(id: 'assistant'),
         createdAt: DateTime.now(),
         text: '',
+        metadata: {'init': true},
       ),
     );
     await for (final content in _getModelMessage()) {
@@ -140,6 +157,7 @@ class _ChatHomeState extends State<ChatHome> {
         if (oldMessage is TextMessage) {
           final newMessage = oldMessage.copyWith(
             text: oldMessage.text + content,
+            metadata: null,
           );
           await _chatController.update(oldMessage, newMessage);
         }
@@ -186,7 +204,7 @@ class _ChatHomeState extends State<ChatHome> {
 
   @override
   void dispose() {
-    _cancelToken.cancel();
+    _modelMessageCancel();
     super.dispose();
   }
 
@@ -223,10 +241,7 @@ class _ChatHomeState extends State<ChatHome> {
               ChatTextMessage(message: message),
           inputBuilder: (context) => ChatCustomInput(
             disableSend: _isDisableSend,
-            onCancel: () {
-              _cancelToken.cancel();
-              print('停止生成');
-            },
+            onCancel: _modelMessageCancel,
           ),
         ),
         onMessageSend: _handleMessageSend,
