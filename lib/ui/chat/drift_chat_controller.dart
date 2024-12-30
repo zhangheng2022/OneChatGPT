@@ -46,6 +46,12 @@ class DriftChatController implements ChatController {
     }
   }
 
+  Future<void> _updateChatRecord(String title) async {
+    await database.managers.chatRecord
+        .filter((row) => row.id.equals(int.parse(chatId)))
+        .update((row) => row(title: Value(title)));
+  }
+
   @override
   Future<void> insert(Message message, {int? index}) async {
     await database.managers.chatRecordDetail.create(
@@ -55,10 +61,8 @@ class DriftChatController implements ChatController {
         message: jsonEncode(message.toJson()),
       ),
     );
-    if (message is TextMessage && message.text.isNotEmpty) {
-      await database.managers.chatRecord
-          .filter((row) => row.id.equals(int.parse(chatId)))
-          .update((row) => row(title: Value(message.text)));
+    if (message is TextMessage && messagesList.length == 1) {
+      _updateChatRecord(message.text);
     }
     messagesList.add(message);
     _operationsController.add(

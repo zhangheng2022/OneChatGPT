@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
+import 'package:flutter_chat_ui/src/utils/chat_input_height_notifier.dart';
 
 typedef OnMessageTapCallback = void Function(Message message);
 typedef OnMessageSendCallback = void Function(String text);
@@ -27,6 +29,12 @@ class _ChatCustomInputState extends State<ChatCustomInput> {
   }
 
   @override
+  void didUpdateWidget(covariant ChatCustomInput oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _updateInputHeight());
+  }
+
+  @override
   void dispose() {
     _textController.dispose();
     super.dispose();
@@ -41,13 +49,13 @@ class _ChatCustomInputState extends State<ChatCustomInput> {
   }
 
   void _updateInputHeight() {
-    // final renderBox =
-    //     _inputKey.currentContext?.findRenderObject() as RenderBox?;
-    // if (renderBox != null) {
-    //   context
-    //       .read<ChatInputHeightNotifier>()
-    //       .updateHeight(renderBox.size.height);
-    // }
+    final renderBox =
+        _inputKey.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox != null) {
+      context
+          .read<ChatInputHeightNotifier>()
+          .updateHeight(renderBox.size.height);
+    }
   }
 
   @override

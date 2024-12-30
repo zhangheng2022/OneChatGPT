@@ -4,15 +4,19 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:one_chatgpt_flutter/database/chat_record.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
 import 'package:one_chatgpt_flutter/models/network_chat/request_chat.dart';
 import 'package:one_chatgpt_flutter/models/network_chat/response_chat.dart';
+import 'package:one_chatgpt_flutter/models/network_chat/response_image.dart';
 import 'package:one_chatgpt_flutter/services/dio_singleton.dart';
 import 'package:one_chatgpt_flutter/ui/chat/drift_chat_controller.dart';
 import 'package:one_chatgpt_flutter/ui/chat/widgets/chat_custom_input.dart';
+import 'package:one_chatgpt_flutter/ui/chat/widgets/chat_image_message.dart';
 import 'package:one_chatgpt_flutter/ui/chat/widgets/chat_text_message.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
+import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import 'package:uuid/uuid.dart';
@@ -38,6 +42,8 @@ class _ChatHomeState extends State<ChatHome> {
 
   CancelToken _cancelToken = CancelToken();
 
+  PresetEnum _preset = PresetEnum.chat;
+
   void _modelMessageCancel() {
     _cancelToken.cancel();
     _cancelToken = CancelToken();
@@ -56,7 +62,51 @@ class _ChatHomeState extends State<ChatHome> {
     }
   }
 
-  Stream<String> _getModelMessage() async* {
+  Future<ResponseImage?> _imageMessage() async {
+    final List<RequestChatMessage> historyMessages = _chatController.messages
+        .where((message) => message is TextMessage && message.text.isNotEmpty)
+        .map(
+      (message) {
+        if (message is TextMessage) {
+          return RequestChatMessage(
+            content: message.text,
+            role: message.author.id,
+          );
+        } else {
+          return RequestChatMessage(
+            content: "不支持的消息类型",
+            role: message.author.id,
+          );
+        }
+      },
+    ).toList();
+    final params = RequestChat(
+      messages: historyMessages,
+      preset: _preset.name,
+    );
+    final session = supabaseClient.auth.currentSession;
+    try {
+      final response = await DioSingleton.instance.post(
+        '${dotenv.env['SUPABASE_URL']}/functions/v1/portkeyai/completions',
+        options: Options(
+          headers: {'Authorization': 'Bearer ${session?.accessToken}'},
+        ),
+        data: params.toJson(),
+        cancelToken: _cancelToken,
+      );
+      debugPrint('===${response.data}===');
+      return ResponseImage.fromJson(response.data);
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.cancel) {
+        debugPrint('图片停止生成: ${e.message}');
+      }
+    } catch (e) {
+      debugPrint('图片生成错误: $e');
+    }
+    return null;
+  }
+
+  Stream<String> _assistantMessage() async* {
     final List<RequestChatMessage> historyMessages = _chatController.messages
         .where((message) => message is TextMessage && message.text.isNotEmpty)
         .map(
@@ -77,7 +127,7 @@ class _ChatHomeState extends State<ChatHome> {
 
     final params = RequestChat(
       messages: historyMessages,
-      preset: "chat",
+      preset: _preset.name,
     );
 
     final session = supabaseClient.auth.currentSession;
@@ -139,20 +189,21 @@ class _ChatHomeState extends State<ChatHome> {
     );
 
     final messageId = const Uuid().v4();
-    await _chatController.insert(
-      TextMessage(
-        id: messageId,
-        author: User(id: 'assistant'),
-        createdAt: DateTime.now(),
-        text: '',
-        metadata: {'init': true},
-      ),
-    );
-    await for (final content in _getModelMessage()) {
-      final index = _chatController.messages.indexWhere(
-        (message) => message.id == messageId,
+
+    if (_preset == PresetEnum.chat) {
+      await _chatController.insert(
+        TextMessage(
+          id: messageId,
+          author: User(id: 'assistant'),
+          createdAt: DateTime.now(),
+          text: '',
+          metadata: {'init': true},
+        ),
       );
-      if (index != -1) {
+      await for (final content in _assistantMessage()) {
+        final index = _chatController.messages.indexWhere(
+          (message) => message.id == messageId,
+        );
         final oldMessage = _chatController.messages[index];
         if (oldMessage is TextMessage) {
           final newMessage = oldMessage.copyWith(
@@ -161,18 +212,24 @@ class _ChatHomeState extends State<ChatHome> {
           );
           await _chatController.update(oldMessage, newMessage);
         }
-      } else {
-        await _chatController.insert(
-          TextMessage(
-            id: messageId,
-            author: User(id: 'assistant'),
-            createdAt: DateTime.now(),
-            text: content,
-          ),
-        );
       }
     }
+    if (_preset == PresetEnum.createImage) {
+      final images = await _imageMessage();
+      if (images == null) return;
+      await _chatController.insert(
+        ImageMessage(
+          id: messageId,
+          author: User(id: 'assistant'),
+          createdAt: DateTime.now(),
+          source: images.data.last.url,
+          width: 100,
+          height: 100,
+        ),
+      );
+    }
 
+    if (!mounted) return;
     setState(() {
       _isDisableSend = false;
     });
@@ -188,6 +245,15 @@ class _ChatHomeState extends State<ChatHome> {
     // await _crossCache.downloadAndSave(image.path);
   }
 
+  void _initPreset() async {
+    final chatRecord = await Provider.of<AppDatabase>(context)
+        .managers
+        .chatRecord
+        .filter((row) => row.id.equals(int.parse(widget.chatId)))
+        .getSingle();
+    _preset = chatRecord.preset;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -195,11 +261,12 @@ class _ChatHomeState extends State<ChatHome> {
 
   @override
   void didChangeDependencies() {
-    super.didChangeDependencies();
     _chatController = DriftChatController(
       database: Provider.of<AppDatabase>(context),
       chatId: widget.chatId,
     );
+    _initPreset();
+    super.didChangeDependencies();
   }
 
   @override
@@ -239,6 +306,8 @@ class _ChatHomeState extends State<ChatHome> {
         builders: Builders(
           textMessageBuilder: (context, message) =>
               ChatTextMessage(message: message),
+          imageMessageBuilder: (context, imageMessage) =>
+              ChatImageMessage(message: imageMessage),
           inputBuilder: (context) => ChatCustomInput(
             disableSend: _isDisableSend,
             onCancel: _modelMessageCancel,

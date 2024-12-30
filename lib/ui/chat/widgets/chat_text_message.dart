@@ -6,7 +6,6 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:intl/intl.dart';
-import 'package:share_plus/share_plus.dart' show Share;
 
 final supabaseUrl = dotenv.get('SUPABASE_URL', fallback: null);
 
@@ -99,45 +98,6 @@ class ChatTextMessage extends StatelessWidget {
               ],
             )
           ],
-        ],
-      ),
-    );
-  }
-
-  String _formatMessageTime(DateTime dateTime) {
-    return DateFormat('HH:mm').format(dateTime);
-  }
-
-  void _showMessageOptions(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            leading: Icon(Icons.copy),
-            title: Text('复制'),
-            onTap: () {
-              Clipboard.setData(ClipboardData(text: message.text));
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.reply),
-            title: Text('回复'),
-            onTap: () {
-              // TODO: 实现回复功能
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.share),
-            title: Text('分享'),
-            onTap: () async {
-              await Share.share(message.text);
-              Navigator.pop(context);
-            },
-          ),
         ],
       ),
     );

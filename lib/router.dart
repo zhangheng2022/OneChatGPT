@@ -56,7 +56,7 @@ class AppRoutes {
                     path: 'chat/:chatId',
                     parentNavigatorKey: _rootNavigatorKey,
                     builder: (BuildContext context, GoRouterState state) {
-                      final String chatId = state.pathParameters['chatId']!;
+                      final chatId = state.pathParameters['chatId']!;
                       return ChatHome(chatId: chatId);
                     },
                   ),

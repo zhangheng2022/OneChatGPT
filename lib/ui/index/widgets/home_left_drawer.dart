@@ -19,6 +19,11 @@ class HomeLeftDrawerState extends State<HomeLeftDrawer> {
 
   bool _editShow = false;
 
+  final Map<PresetEnum, IconData> _presetIcons = {
+    PresetEnum.chat: Icons.notes,
+    PresetEnum.createImage: Icons.image,
+  };
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -99,6 +104,11 @@ class HomeLeftDrawerState extends State<HomeLeftDrawer> {
                         return Card.filled(
                           margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
                           child: ListTile(
+                            leading: Icon(
+                              _presetIcons[snapshot.data![index].preset] ??
+                                  Icons.help_outline,
+                              size: 20,
+                            ),
                             title: Text(
                               snapshot.data![index].title,
                               style: TextStyle(
