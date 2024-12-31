@@ -62,14 +62,19 @@ class _ChatHomeState extends State<ChatHome> {
     }
   }
 
-  Future<ResponseImage?> _imageMessage() async {
+  Future<ResponseChat?> _imageMessage() async {
     final List<RequestChatMessage> historyMessages = _chatController.messages
-        .where((message) => message is TextMessage && message.text.isNotEmpty)
+        .where((message) => message.metadata?.containsKey('init') != true)
         .map(
       (message) {
         if (message is TextMessage) {
           return RequestChatMessage(
             content: message.text,
+            role: message.author.id,
+          );
+        } else if (message is ImageMessage) {
+          return RequestChatMessage(
+            content: message.source,
             role: message.author.id,
           );
         } else {
@@ -87,7 +92,7 @@ class _ChatHomeState extends State<ChatHome> {
     final session = supabaseClient.auth.currentSession;
     try {
       final response = await DioSingleton.instance.post(
-        '${dotenv.env['SUPABASE_URL']}/functions/v1/portkeyai/completions',
+        '${dotenv.env['SUPABASE_URL']}/functions/v1/portkeyai/generateimage',
         options: Options(
           headers: {'Authorization': 'Bearer ${session?.accessToken}'},
         ),
@@ -95,7 +100,7 @@ class _ChatHomeState extends State<ChatHome> {
         cancelToken: _cancelToken,
       );
       debugPrint('===${response.data}===');
-      return ResponseImage.fromJson(response.data);
+      return ResponseChat.fromJson(response.data);
     } on DioException catch (e) {
       if (e.type == DioExceptionType.cancel) {
         debugPrint('图片停止生成: ${e.message}');
@@ -125,7 +130,7 @@ class _ChatHomeState extends State<ChatHome> {
       },
     ).toList();
 
-    final params = RequestChat(
+    final RequestChat params = RequestChat(
       messages: historyMessages,
       preset: _preset.name,
     );
@@ -158,7 +163,7 @@ class _ChatHomeState extends State<ChatHome> {
           final messageContent = ResponseChat.fromJson(json.decode(jsonString))
                   .choices[0]
                   .delta
-                  .content ??
+                  ?.content ??
               '';
           yield messageContent;
         }
@@ -189,17 +194,17 @@ class _ChatHomeState extends State<ChatHome> {
     );
 
     final messageId = const Uuid().v4();
+    await _chatController.insert(
+      TextMessage(
+        id: messageId,
+        author: User(id: 'assistant'),
+        createdAt: DateTime.now(),
+        text: '',
+        metadata: {'init': true},
+      ),
+    );
 
     if (_preset == PresetEnum.chat) {
-      await _chatController.insert(
-        TextMessage(
-          id: messageId,
-          author: User(id: 'assistant'),
-          createdAt: DateTime.now(),
-          text: '',
-          metadata: {'init': true},
-        ),
-      );
       await for (final content in _assistantMessage()) {
         final index = _chatController.messages.indexWhere(
           (message) => message.id == messageId,
@@ -215,18 +220,35 @@ class _ChatHomeState extends State<ChatHome> {
       }
     }
     if (_preset == PresetEnum.createImage) {
-      final images = await _imageMessage();
-      if (images == null) return;
-      await _chatController.insert(
-        ImageMessage(
-          id: messageId,
-          author: User(id: 'assistant'),
-          createdAt: DateTime.now(),
-          source: images.data.last.url,
-          width: 100,
-          height: 100,
-        ),
+      final message = await _imageMessage();
+      if (message == null) return;
+
+      final index = _chatController.messages.indexWhere(
+        (message) => message.id == messageId,
       );
+      final oldMessage = _chatController.messages[index];
+
+      if (message.imageData!.isNotEmpty) {
+        await _chatController.update(
+          oldMessage,
+          ImageMessage(
+            id: messageId,
+            author: User(id: 'assistant'),
+            createdAt: DateTime.now(),
+            source: message.imageData ?? '',
+          ),
+        );
+      } else {
+        await _chatController.update(
+          oldMessage,
+          TextMessage(
+            id: messageId,
+            author: User(id: 'assistant'),
+            createdAt: DateTime.now(),
+            text: message.choices[0].message?.content ?? '',
+          ),
+        );
+      }
     }
 
     if (!mounted) return;

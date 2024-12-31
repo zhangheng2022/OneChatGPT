@@ -25,10 +25,10 @@ Map<String, dynamic> _$ResponseImageToJson(ResponseImage instance) =>
 
 ResponseImageData _$ResponseImageDataFromJson(Map<String, dynamic> json) =>
     ResponseImageData(
-      url: json['url'] as String,
+      b64Json: json['b64_json'] as String,
     );
 
 Map<String, dynamic> _$ResponseImageDataToJson(ResponseImageData instance) =>
     <String, dynamic>{
-      'url': instance.url,
+      'b64_json': instance.b64Json,
     };

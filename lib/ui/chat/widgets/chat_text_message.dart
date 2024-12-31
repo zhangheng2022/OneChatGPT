@@ -6,6 +6,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:intl/intl.dart';
+import 'package:shimmer_animation/shimmer_animation.dart';
 
 final supabaseUrl = dotenv.get('SUPABASE_URL', fallback: null);
 
@@ -41,12 +42,32 @@ class ChatTextMessage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (isInitMessage) ...[
-            SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                color: Theme.of(context).colorScheme.inversePrimary,
-              ),
+            Column(
+              spacing: 6,
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Shimmer(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primaryFixed,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    height: 20,
+                    width: double.infinity,
+                  ),
+                ),
+                Shimmer(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primaryFixed,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    height: 20,
+                    width: 200,
+                  ),
+                ),
+              ],
             ),
           ] else ...[
             MarkdownBody(

@@ -18,10 +18,11 @@ class ResponseImage {
 
 @JsonSerializable()
 class ResponseImageData {
-  String url;
+  @JsonKey(name: 'b64_json')
+  String b64Json;
 
   ResponseImageData({
-    required this.url,
+    required this.b64Json,
   });
 
   factory ResponseImageData.fromJson(Map<String, dynamic> json) =>
