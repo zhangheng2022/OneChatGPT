@@ -1,13 +1,16 @@
-name: Build and Alpha APK
+name: Build and Release Alpha APK
 
 on:
   push:
-    branches:
-      - alpha
+    branches: [alpha]
   pull_request:
-    branches:
-      - alpha
+    branches: [alpha]
     types: [closed]
+
+# Add concurrency to prevent parallel runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-and-release:
@@ -15,59 +18,84 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - uses: actions/setup-java@v4
         with:
-          distribution: "adopt"
+          fetch-depth: 0 # Fetch all history for proper versioning
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin" # Using Eclipse Temurin distribution
           java-version: "17"
+          cache: "gradle" # Enable Gradle caching
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
+          cache: true # Enable Flutter pub cache
+
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ env.FLUTTER_HOME }}/.pub-cache
+            ${{ github.workspace }}/.dart_tool
+            ${{ github.workspace }}/build
+          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-
 
       - name: Decode keystore
         run: |
-          echo ${{ secrets.KEYSTORE }} | base64 --decode > ${{ github.workspace }}/android/app/keystore.jks
+          echo "${{ secrets.KEYSTORE }}" | base64 -d > "${{ github.workspace }}/android/app/keystore.jks"
+        shell: bash
 
-      - name: write .ENV
+      - name: Set up environment
         run: |
-          echo ${{ secrets.ENV }} > ${{ github.workspace }}/.env
+          echo "${{ secrets.ENV }}" > "${{ github.workspace }}/.env"
+          echo "VERSION=$(grep 'version:' pubspec.yaml | awk '{print $2}')" >> $GITHUB_ENV
+        shell: bash
 
-      - name: Extract version
-        run: |
-          echo "VERSION=$(grep 'version:' pubspec.yaml | sed 's/version: //')" >> $GITHUB_ENV
-
-      - name: Build APKs
+      - name: Flutter build preparation
         run: |
           flutter pub get
-          flutter build apk --release
-          flutter build apk --release --split-per-abi
+          flutter clean
+
+      - name: Build APKs
         env:
           KEYALIAS: ${{ secrets.KEYALIAS }}
           KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
           STOREPASSWORD: ${{ secrets.STOREPASSWORD }}
-
-      - name: Rename and Prepare APKs for Upload
         run: |
-          mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/OneChatGPT-${{ env.VERSION }}-fat.apk
-          for apk in build/app/outputs/flutter-apk/*-release.apk; do
-            abi=$(echo "$apk" | sed -n 's/.*app-\(.*\)-release.apk/\1/p')
-            newname="OneChatGPT-${{ env.VERSION }}-${abi}.apk"
-            mv "$apk" "build/app/outputs/flutter-apk/$newname"
+          flutter build apk --release
+          flutter build apk --release --split-per-abi
+
+      - name: Prepare APKs for upload
+        run: |
+          cd build/app/outputs/flutter-apk/
+          mv app-release.apk "OneChatGPT-${{ env.VERSION }}-fat.apk"
+          for apk in *-release.apk; do
+            if [[ $apk != OneChatGPT* ]]; then
+              abi=$(echo "$apk" | sed -n 's/.*app-\(.*\)-release.apk/\1/p')
+              mv "$apk" "OneChatGPT-${{ env.VERSION }}-${abi}.apk"
+            fi
           done
 
-      - name: Upload APKs to Artifacts
+      - name: Upload APKs as artifacts
         uses: actions/upload-artifact@v4
         with:
           name: APKs
           path: build/app/outputs/flutter-apk/*.apk
+          retention-days: 5 # Keep artifacts for 5 days
 
-      - name: Get current time
-        run: echo "CURRENT_TIME=$(TZ=Asia/Shanghai date '+%Y年%m月%d日 %H时%M分%S秒')" >> $GITHUB_ENV
+      - name: Set release time
+        run: |
+          echo "CURRENT_TIME=$(TZ=Asia/Shanghai date '+%Y年%m月%d日 %H时%M分%S秒')" >> $GITHUB_ENV
+        shell: bash
 
       - name: Create Release
         uses: ncipollo/release-action@v1
@@ -76,19 +104,29 @@ jobs:
           removeArtifacts: true
           artifacts: "build/app/outputs/flutter-apk/*.apk"
           tag: Alpha
-          name: OneChatGPT Alpha
+          name: "OneChatGPT Alpha ${{ env.VERSION }}"
           body: |
-            ## 选择合适的版本下载
+            ## OneChatGPT Alpha 版本 ${{ env.VERSION }}
 
-            ### 通用 APK
-            - 如果您不确定您的设备类型，请下载：OneChatGPT-***-fat.apk（这是一个包含所有目标 ABI 的通用包）
+            ### 下载指南
 
-            ### 针对特定架构的 APKs
-            - 对于 ARM 64位设备：OneChatGPT-***-arm64-v8a.apk
-            - 对于 ARM 32位设备：OneChatGPT-***-armeabi-v7a.apk
-            - 对于 x86_64 设备：OneChatGPT-***-x86_64.apk
+            #### 通用版本
+            - **全平台通用版本**: `OneChatGPT-${{ env.VERSION }}-fat.apk`
+              - 适用于所有 Android 设备
+              - 文件较大，包含所有架构支持
 
-            更新时间：${{ env.CURRENT_TIME }}
+            #### 特定架构版本（体积更小）
+            - **ARM 64位**: `OneChatGPT-${{ env.VERSION }}-arm64-v8a.apk`
+              - 适用于大多数现代手机和平板
+            - **ARM 32位**: `OneChatGPT-${{ env.VERSION }}-armeabi-v7a.apk`
+              - 适用于较旧的 Android 设备
+            - **x86_64**: `OneChatGPT-${{ env.VERSION }}-x86_64.apk`
+              - 适用于部分平板和模拟器
+
+            ### 更新说明
+            - 发布时间：${{ env.CURRENT_TIME }}
+            - 分支：${{ github.ref_name }}
+            - 提交：${{ github.sha }}
           draft: false
           prerelease: true
           token: ${{ secrets.GITHUB_TOKEN }}
