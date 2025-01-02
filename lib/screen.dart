@@ -6,6 +6,7 @@ import 'package:app_links/app_links.dart';
 import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter/foundation.dart';
 
 class Screen {
   static Future<void> initialize() async {
