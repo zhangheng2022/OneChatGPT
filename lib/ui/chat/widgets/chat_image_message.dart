@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer_animation/shimmer_animation.dart';
 
 class ChatImageMessage extends StatefulWidget {
   final ImageMessage message;
@@ -39,44 +40,68 @@ class ChatImageMessageState extends State<ChatImageMessage> {
             ? Theme.of(context).colorScheme.primaryContainer
             : Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(12),
-          topRight: Radius.circular(12),
-          bottomLeft: Radius.circular(isUser ? 12 : 0),
-          bottomRight: Radius.circular(isUser ? 0 : 12),
+          topLeft: Radius.circular(10),
+          topRight: Radius.circular(10),
+          bottomLeft: Radius.circular(isUser ? 10 : 0),
+          bottomRight: Radius.circular(isUser ? 0 : 10),
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.memory(
-            imageBytes,
-            width: 200,
-            fit: BoxFit.fitWidth,
-          ),
-          SizedBox(height: 10),
-          SizedBox(
-            width: 200,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                InkWell(
-                  onTap: () {},
-                  child: Icon(
-                    Icons.download_outlined,
-                    size: 20,
+          if (isInitMessage) ...[
+            Shimmer(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryFixed,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                height: 200,
+                width: 200,
+                child: Center(
+                  child: Text(
+                    '正在生成，请稍候',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.inversePrimary,
+                    ),
                   ),
                 ),
-                Text(
-                  DateFormat('MM-dd HH:mm').format(message.createdAt),
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Theme.of(context).colorScheme.inversePrimary,
-                  ),
-                )
-              ],
+              ),
             ),
-          ),
+          ],
+          if (imageBytes.isNotEmpty) ...[
+            Image.memory(
+              imageBytes,
+              width: 200,
+              fit: BoxFit.fitWidth,
+            ),
+          ],
+          if (!isInitMessage) ...[
+            SizedBox(height: 10),
+            SizedBox(
+              width: 200,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  InkWell(
+                    onTap: () {},
+                    child: Icon(
+                      Icons.download_outlined,
+                      size: 20,
+                    ),
+                  ),
+                  Text(
+                    DateFormat('MM-dd HH:mm').format(message.createdAt),
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Theme.of(context).colorScheme.inversePrimary,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );

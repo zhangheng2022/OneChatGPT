@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:one_chatgpt_flutter/database/chat_record.dart';
@@ -100,7 +101,12 @@ class _HomeState extends State<Home> {
                       ),
                     ),
                     InkWell(
-                      onTap: () => addChat(PresetEnum.createImage),
+                      onTap: () {
+                        SmartDialog.showToast(
+                          "暂未开放",
+                          alignment: Alignment.center,
+                        );
+                      },
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [

@@ -38,7 +38,7 @@ class DriftChatController implements ChatController {
           .getSingle();
       Message welcomeMessage = Message.text(
         id: const Uuid().v4(),
-        author: User(id: 'assistant'),
+        author: User(id: 'system'),
         createdAt: DateTime.now(),
         text: _welcomeMessages[chatRecord.preset] ?? '你好，有什么可以帮你的吗？',
       );

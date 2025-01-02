@@ -32,10 +32,10 @@ class ChatTextMessage extends StatelessWidget {
             ? Theme.of(context).colorScheme.primaryContainer
             : Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(12),
-          topRight: Radius.circular(12),
-          bottomLeft: Radius.circular(isUser ? 12 : 0),
-          bottomRight: Radius.circular(isUser ? 0 : 12),
+          topLeft: Radius.circular(10),
+          topRight: Radius.circular(10),
+          bottomLeft: Radius.circular(isUser ? 10 : 0),
+          bottomRight: Radius.circular(isUser ? 0 : 10),
         ),
       ),
       child: Column(
@@ -51,7 +51,7 @@ class ChatTextMessage extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.primaryFixed,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(2),
                     ),
                     height: 20,
                     width: double.infinity,
@@ -61,7 +61,7 @@ class ChatTextMessage extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.primaryFixed,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(2),
                     ),
                     height: 20,
                     width: 200,

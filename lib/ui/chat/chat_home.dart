@@ -51,40 +51,33 @@ class _ChatHomeState extends State<ChatHome> {
       (message) => message.metadata?.containsKey('init') == true,
     );
     if (index != -1) {
-      final message = _chatController.messages[index];
-      if (message is TextMessage) {
-        final newMessage = message.copyWith(
+      final oldMessage = _chatController.messages[index];
+      _chatController.update(
+        oldMessage,
+        TextMessage(
+          id: oldMessage.id,
+          author: User(id: 'assistant'),
+          createdAt: DateTime.now(),
           text: '已停止生成',
           metadata: null,
-        );
-        _chatController.update(message, newMessage);
-      }
+        ),
+      );
     }
   }
 
   Future<ResponseChat?> _imageMessage() async {
-    final List<RequestChatMessage> historyMessages = _chatController.messages
-        .where((message) => message.metadata?.containsKey('init') != true)
-        .map(
-      (message) {
-        if (message is TextMessage) {
-          return RequestChatMessage(
-            content: message.text,
-            role: message.author.id,
-          );
-        } else if (message is ImageMessage) {
-          return RequestChatMessage(
-            content: message.source,
-            role: message.author.id,
-          );
-        } else {
-          return RequestChatMessage(
-            content: "不支持的消息类型",
-            role: message.author.id,
-          );
-        }
-      },
-    ).toList();
+    final TextMessage lastMessage = _chatController.messages.lastWhere(
+        (message) =>
+            message is TextMessage &&
+            message.author.id == 'user' &&
+            message.metadata?.containsKey('init') != true) as TextMessage;
+
+    final List<RequestChatMessage> historyMessages = [
+      RequestChatMessage(
+        content: lastMessage.text,
+        role: lastMessage.author.id,
+      )
+    ];
     final params = RequestChat(
       messages: historyMessages,
       preset: _preset.name,
@@ -194,17 +187,17 @@ class _ChatHomeState extends State<ChatHome> {
     );
 
     final messageId = const Uuid().v4();
-    await _chatController.insert(
-      TextMessage(
-        id: messageId,
-        author: User(id: 'assistant'),
-        createdAt: DateTime.now(),
-        text: '',
-        metadata: {'init': true},
-      ),
-    );
 
     if (_preset == PresetEnum.chat) {
+      await _chatController.insert(
+        TextMessage(
+          id: messageId,
+          author: User(id: 'assistant'),
+          createdAt: DateTime.now(),
+          text: '',
+          metadata: {'init': true},
+        ),
+      );
       await for (final content in _assistantMessage()) {
         final index = _chatController.messages.indexWhere(
           (message) => message.id == messageId,
@@ -220,6 +213,15 @@ class _ChatHomeState extends State<ChatHome> {
       }
     }
     if (_preset == PresetEnum.createImage) {
+      await _chatController.insert(
+        ImageMessage(
+          id: messageId,
+          author: User(id: 'assistant'),
+          createdAt: DateTime.now(),
+          source: '',
+          metadata: {'init': true},
+        ),
+      );
       final message = await _imageMessage();
       if (message == null) return;
 
