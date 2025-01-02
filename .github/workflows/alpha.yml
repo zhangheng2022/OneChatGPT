@@ -21,8 +21,8 @@ jobs:
 
       - uses: actions/setup-java@v4
         with:
-          distribution: 'adopt'
-          java-version: '17'
+          distribution: "adopt"
+          java-version: "17"
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -32,6 +32,10 @@ jobs:
       - name: Decode keystore
         run: |
           echo ${{ secrets.KEYSTORE }} | base64 --decode > ${{ github.workspace }}/android/app/keystore.jks
+
+      - name: write .ENV
+        run: |
+          echo ${{ secrets.ENV }} > ${{ github.workspace }}/.env
 
       - name: Extract version
         run: |
