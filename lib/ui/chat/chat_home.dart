@@ -66,22 +66,37 @@ class _ChatHomeState extends State<ChatHome> {
   }
 
   Future<ResponseChat?> _imageMessage() async {
-    final TextMessage lastMessage = _chatController.messages.lastWhere(
-        (message) =>
-            message is TextMessage &&
-            message.author.id == 'user' &&
-            message.metadata?.containsKey('init') != true) as TextMessage;
-
-    final List<RequestChatMessage> historyMessages = [
-      RequestChatMessage(
-        content: lastMessage.text,
-        role: lastMessage.author.id,
-      )
-    ];
+    final List<RequestChatMessage> historyMessages =
+        _chatController.messages.map(
+      (message) {
+        if (message is TextMessage) {
+          return RequestChatMessage(
+            content: message.text,
+            role: message.author.id,
+          );
+        }
+        if (message is ImageMessage) {
+          return RequestChatMessage(
+            content: [
+              {'type': 'image_url', 'url': message.source}
+            ],
+            role: message.author.id,
+          );
+        }
+        return RequestChatMessage(
+          content: "不支持的消息类型",
+          role: message.author.id,
+        );
+      },
+    ).toList();
+    historyMessages.removeLast();
+    int startIndex =
+        (historyMessages.length - 3).clamp(0, historyMessages.length);
     final params = RequestChat(
-      messages: historyMessages,
+      messages: historyMessages.sublist(startIndex),
       preset: _preset.name,
     );
+    print(params);
     final session = supabaseClient.auth.currentSession;
     try {
       final response = await DioSingleton.instance.post(
@@ -106,7 +121,9 @@ class _ChatHomeState extends State<ChatHome> {
 
   Stream<String> _assistantMessage() async* {
     final List<RequestChatMessage> historyMessages = _chatController.messages
-        .where((message) => message is TextMessage && message.text.isNotEmpty)
+        .where((message) =>
+            message is TextMessage &&
+            message.metadata?.containsKey('init') != true)
         .map(
       (message) {
         if (message is TextMessage) {

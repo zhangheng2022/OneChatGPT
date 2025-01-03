@@ -32,7 +32,7 @@ RequestChatMessage _$RequestChatMessageFromJson(Map<String, dynamic> json) {
   );
   return RequestChatMessage(
     role: json['role'] as String,
-    content: json['content'] as String,
+    content: json['content'],
   );
 }
 

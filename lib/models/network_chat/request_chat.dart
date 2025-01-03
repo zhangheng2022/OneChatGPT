@@ -22,7 +22,7 @@ class RequestChat {
 class RequestChatMessage {
   @JsonKey(required: true)
   String role;
-  String content;
+  dynamic content;
 
   RequestChatMessage({
     required this.role,
