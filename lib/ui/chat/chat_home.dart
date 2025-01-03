@@ -8,7 +8,6 @@ import 'package:one_chatgpt_flutter/database/chat_record.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
 import 'package:one_chatgpt_flutter/models/network_chat/request_chat.dart';
 import 'package:one_chatgpt_flutter/models/network_chat/response_chat.dart';
-import 'package:one_chatgpt_flutter/models/network_chat/response_image.dart';
 import 'package:one_chatgpt_flutter/services/dio_singleton.dart';
 import 'package:one_chatgpt_flutter/ui/chat/drift_chat_controller.dart';
 import 'package:one_chatgpt_flutter/ui/chat/widgets/chat_custom_input.dart';
@@ -16,7 +15,6 @@ import 'package:one_chatgpt_flutter/ui/chat/widgets/chat_image_message.dart';
 import 'package:one_chatgpt_flutter/ui/chat/widgets/chat_text_message.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
-import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import 'package:uuid/uuid.dart';
@@ -47,21 +45,24 @@ class _ChatHomeState extends State<ChatHome> {
   void _modelMessageCancel() {
     _cancelToken.cancel();
     _cancelToken = CancelToken();
-    final index = _chatController.messages.indexWhere(
-      (message) => message.metadata?.containsKey('init') == true,
-    );
+    final index = _chatController.messages
+        .indexWhere((message) => message.metadata?['status'] == 'init');
     if (index != -1) {
       final oldMessage = _chatController.messages[index];
-      _chatController.update(
-        oldMessage,
-        TextMessage(
-          id: oldMessage.id,
-          author: User(id: 'assistant'),
-          createdAt: DateTime.now(),
-          text: '已停止生成',
+      if (oldMessage is TextMessage) {
+        final newMessage = oldMessage.copyWith(
+          text: "已停止生成",
           metadata: null,
-        ),
-      );
+        );
+        _chatController.update(oldMessage, newMessage);
+      }
+      if (oldMessage is ImageMessage) {
+        final newMessage = oldMessage.copyWith(
+          source: "",
+          metadata: {'status': 'stop'},
+        );
+        _chatController.update(oldMessage, newMessage);
+      }
     }
   }
 
@@ -72,14 +73,6 @@ class _ChatHomeState extends State<ChatHome> {
         if (message is TextMessage) {
           return RequestChatMessage(
             content: message.text,
-            role: message.author.id,
-          );
-        }
-        if (message is ImageMessage) {
-          return RequestChatMessage(
-            content: [
-              {'type': 'image_url', 'url': message.source}
-            ],
             role: message.author.id,
           );
         }
@@ -120,11 +113,8 @@ class _ChatHomeState extends State<ChatHome> {
   }
 
   Stream<String> _assistantMessage() async* {
-    final List<RequestChatMessage> historyMessages = _chatController.messages
-        .where((message) =>
-            message is TextMessage &&
-            message.metadata?.containsKey('init') != true)
-        .map(
+    final List<RequestChatMessage> historyMessages =
+        _chatController.messages.map(
       (message) {
         if (message is TextMessage) {
           return RequestChatMessage(
@@ -139,9 +129,12 @@ class _ChatHomeState extends State<ChatHome> {
         }
       },
     ).toList();
+    historyMessages.removeLast();
+    int startIndex =
+        (historyMessages.length - 5).clamp(0, historyMessages.length);
 
     final RequestChat params = RequestChat(
-      messages: historyMessages,
+      messages: historyMessages.sublist(startIndex),
       preset: _preset.name,
     );
 
@@ -212,14 +205,12 @@ class _ChatHomeState extends State<ChatHome> {
           author: User(id: 'assistant'),
           createdAt: DateTime.now(),
           text: '',
-          metadata: {'init': true},
+          metadata: {'status': 'init'},
         ),
       );
       await for (final content in _assistantMessage()) {
-        final index = _chatController.messages.indexWhere(
-          (message) => message.id == messageId,
-        );
-        final oldMessage = _chatController.messages[index];
+        final oldMessage = _chatController.messages
+            .singleWhere((message) => message.id == messageId);
         if (oldMessage is TextMessage) {
           final newMessage = oldMessage.copyWith(
             text: oldMessage.text + content,
@@ -236,17 +227,27 @@ class _ChatHomeState extends State<ChatHome> {
           author: User(id: 'assistant'),
           createdAt: DateTime.now(),
           source: '',
-          metadata: {'init': true},
+          metadata: {'status': 'init'},
         ),
       );
       final message = await _imageMessage();
-      if (message == null) return;
 
-      final index = _chatController.messages.indexWhere(
-        (message) => message.id == messageId,
-      );
-      final oldMessage = _chatController.messages[index];
+      final oldMessage = _chatController.messages
+          .singleWhere((message) => message.id == messageId);
 
+      if (message == null) {
+        await _chatController.update(
+          oldMessage,
+          ImageMessage(
+            id: messageId,
+            author: User(id: 'assistant'),
+            createdAt: DateTime.now(),
+            source: '',
+            metadata: {'status': 'error'},
+          ),
+        );
+        return;
+      }
       if (message.imageData!.isNotEmpty) {
         await _chatController.update(
           oldMessage,
@@ -345,10 +346,10 @@ class _ChatHomeState extends State<ChatHome> {
       ),
       body: Chat(
         builders: Builders(
-          textMessageBuilder: (context, message) =>
-              ChatTextMessage(message: message),
-          imageMessageBuilder: (context, imageMessage) =>
-              ChatImageMessage(message: imageMessage),
+          textMessageBuilder: (context, textMessage, index) =>
+              ChatTextMessage(message: textMessage, index: index),
+          imageMessageBuilder: (context, imageMessage, index) =>
+              ChatImageMessage(message: imageMessage, index: index),
           inputBuilder: (context) => ChatCustomInput(
             disableSend: _isDisableSend,
             onCancel: _modelMessageCancel,

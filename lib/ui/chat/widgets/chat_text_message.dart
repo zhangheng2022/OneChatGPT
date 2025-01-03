@@ -12,16 +12,18 @@ final supabaseUrl = dotenv.get('SUPABASE_URL', fallback: null);
 
 class ChatTextMessage extends StatelessWidget {
   final TextMessage message;
+  final int index;
 
   const ChatTextMessage({
     super.key,
+    required this.index,
     required this.message,
   });
 
   @override
   Widget build(BuildContext context) {
     final isUser = context.watch<User>().id == message.author.id;
-    final isInitMessage = message.metadata?.containsKey('init') ?? false;
+    final messageStatus = message.metadata?['status'];
 
     return Container(
       width: isUser ? null : double.infinity,
@@ -41,7 +43,7 @@ class ChatTextMessage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (isInitMessage) ...[
+          if (messageStatus == 'init') ...[
             Column(
               spacing: 6,
               mainAxisSize: MainAxisSize.min,
@@ -78,7 +80,7 @@ class ChatTextMessage extends StatelessWidget {
               ),
             ),
           ],
-          if (!isUser && !isInitMessage) ...[
+          if (!isUser && messageStatus == null) ...[
             SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
