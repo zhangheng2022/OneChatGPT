@@ -23,13 +23,16 @@ class _HomeState extends State<Home> {
     _database = Provider.of<AppDatabase>(context);
   }
 
-  Future<void> addChat(PresetEnum preset) async {
+  Future<void> addChat(PresetEnum preset, String title) async {
     try {
       debugPrint('addChat');
       final chatId = await _database.managers.chatRecord
           .create((row) => row(preset: preset));
       if (!mounted) return;
-      context.goNamed('chat', pathParameters: {'chatId': chatId.toString()});
+      context.goNamed(
+        'chat',
+        queryParameters: {'chatId': chatId.toString()},
+      );
     } catch (e) {
       debugPrint('Error adding chat: $e');
     }
@@ -86,7 +89,7 @@ class _HomeState extends State<Home> {
                   ),
                   children: [
                     InkWell(
-                      onTap: () => addChat(PresetEnum.createImage),
+                      onTap: () => addChat(PresetEnum.createImage, '生成图片'),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -129,7 +132,7 @@ class _HomeState extends State<Home> {
               width: double.infinity,
               height: 60,
               child: FilledButton.icon(
-                onPressed: () => addChat(PresetEnum.chat),
+                onPressed: () => addChat(PresetEnum.chat, '聊一聊'),
                 icon: Icon(Icons.question_answer),
                 label: Text(
                   "聊一聊",

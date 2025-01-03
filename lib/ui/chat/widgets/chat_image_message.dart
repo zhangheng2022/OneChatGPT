@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:intl/intl.dart';
+import 'package:one_chatgpt_flutter/widgets/photo_view_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 
@@ -77,11 +78,22 @@ class ChatImageMessageState extends State<ChatImageMessage> {
             ),
           ],
           if (messageStatus == null) ...[
-            Image.memory(
-              imageBytes,
-              filterQuality: FilterQuality.high,
-              width: 200,
-              fit: BoxFit.fitWidth,
+            InkWell(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => PhotoViewScreen(
+                      imageProvider: MemoryImage(imageBytes),
+                    ),
+                  ),
+                );
+              },
+              child: Image.memory(
+                imageBytes,
+                filterQuality: FilterQuality.high,
+                width: 200,
+                fit: BoxFit.fitWidth,
+              ),
             ),
             SizedBox(height: 10),
             SizedBox(

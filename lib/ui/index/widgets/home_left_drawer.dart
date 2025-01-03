@@ -127,7 +127,7 @@ class HomeLeftDrawerState extends State<HomeLeftDrawer> {
                             onTap: () {
                               context.goNamed(
                                 'chat',
-                                pathParameters: {
+                                queryParameters: {
                                   'chatId': snapshot.data![index].id.toString()
                                 },
                               );

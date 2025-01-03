@@ -53,10 +53,13 @@ class AppRoutes {
                 routes: <RouteBase>[
                   GoRoute(
                     name: 'chat',
-                    path: 'chat/:chatId',
+                    path: 'chat',
                     parentNavigatorKey: _rootNavigatorKey,
                     builder: (BuildContext context, GoRouterState state) {
-                      final chatId = state.pathParameters['chatId']!;
+                      final chatId = state.uri.queryParameters['chatId'];
+                      if (chatId == null) {
+                        return ErrorWidget('缺少chatId，请检查路由参数');
+                      }
                       return ChatHome(chatId: chatId);
                     },
                   ),

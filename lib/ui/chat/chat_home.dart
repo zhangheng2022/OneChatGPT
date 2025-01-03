@@ -25,7 +25,10 @@ final supabaseUrl = dotenv.get('SUPABASE_URL', fallback: null);
 
 class ChatHome extends StatefulWidget {
   final String chatId;
-  const ChatHome({super.key, required this.chatId});
+  const ChatHome({
+    super.key,
+    required this.chatId,
+  });
 
   @override
   State<ChatHome> createState() => _ChatHomeState();
@@ -277,15 +280,10 @@ class _ChatHomeState extends State<ChatHome> {
     });
   }
 
-  void _handleAttachmentTap() async {
-    // final picker = ImagePicker();
-
-    // final image = await picker.pickImage(source: ImageSource.gallery);
-
-    // if (image == null) return;
-
-    // await _crossCache.downloadAndSave(image.path);
-  }
+  static const Map<PresetEnum, String> _presetTitle = {
+    PresetEnum.chat: "聊一聊",
+    PresetEnum.createImage: "生成图片",
+  };
 
   void _initPreset() async {
     final chatRecord = await Provider.of<AppDatabase>(context)
@@ -293,7 +291,9 @@ class _ChatHomeState extends State<ChatHome> {
         .chatRecord
         .filter((row) => row.id.equals(int.parse(widget.chatId)))
         .getSingle();
-    _preset = chatRecord.preset;
+    setState(() {
+      _preset = chatRecord.preset;
+    });
   }
 
   @override
@@ -303,12 +303,12 @@ class _ChatHomeState extends State<ChatHome> {
 
   @override
   void didChangeDependencies() {
+    super.didChangeDependencies();
     _chatController = DriftChatController(
       database: Provider.of<AppDatabase>(context),
       chatId: widget.chatId,
     );
     _initPreset();
-    super.didChangeDependencies();
   }
 
   @override
@@ -330,7 +330,7 @@ class _ChatHomeState extends State<ChatHome> {
               height: 30,
             ),
             SizedBox(width: 10),
-            Text("聊一聊"),
+            Text(_presetTitle[_preset] ?? ''),
           ],
         ),
         actions: [
