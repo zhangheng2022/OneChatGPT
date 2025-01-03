@@ -200,7 +200,7 @@ class _LoginPageState extends State<LoginPage> {
                                     _googleLoginLoading ? null : _googleLogin,
                               ),
                             ),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 10),
                             SizedBox(
                               width: double.infinity,
                               height: 50,
