@@ -1,6 +1,7 @@
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
+import 'package:one_chatgpt_flutter/ui/auth/forget_password.dart';
 import 'package:one_chatgpt_flutter/ui/faq/faq.dart';
 import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:one_chatgpt_flutter/ui/auth/login.dart';
@@ -26,7 +27,11 @@ class AppRoutes {
       final supabase = Supabase.instance.client;
       final session = supabase.auth.currentSession;
       final isSessionExpired = session?.isExpired ?? true;
-      final noSessionPaths = ['/login', '/login/register'];
+      final noSessionPaths = [
+        '/login',
+        '/login/register',
+        '/login/forget_password',
+      ];
 
       if (noSessionPaths.contains(state.fullPath)) {
         return null;
@@ -138,8 +143,11 @@ class AppRoutes {
             name: 'register',
             path: 'register',
             builder: (context, state) => const RegisterPage(),
-            // onExit: (BuildContext context, GoRouterState state) =>
-            //     _showDialog(context, state),
+          ),
+          GoRoute(
+            name: 'forget_password',
+            path: 'forget_password',
+            builder: (context, state) => const ForgetPassword(),
           ),
         ],
       ),

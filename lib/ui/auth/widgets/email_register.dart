@@ -60,7 +60,6 @@ class _RegisterEmailState extends State<RegisterEmail> {
                 prefixIcon: const Icon(Icons.mail_outlined),
                 labelText: '邮箱',
                 hintText: "请输入邮箱",
-                helperText: "请输入邮箱",
               ),
               validator: (value) {
                 if (value!.isEmpty) return "请输入邮箱";
@@ -80,8 +79,7 @@ class _RegisterEmailState extends State<RegisterEmail> {
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.lock_outlined),
                 labelText: '密码',
-                hintText: "请输入密码",
-                helperText: "最少6位，包括至少1个字母，1个数字",
+                hintText: "最少6位，包括至少1个字母，1个数字",
                 suffixIcon: _userPassword.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.remove_red_eye),
@@ -110,9 +108,8 @@ class _RegisterEmailState extends State<RegisterEmail> {
               keyboardType: TextInputType.visiblePassword,
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.lock_outlined),
-                labelText: '密码',
+                labelText: '二次密码',
                 hintText: "请再次输入密码",
-                helperText: "请再次输入密码",
                 suffixIcon: _userPassword.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.remove_red_eye),

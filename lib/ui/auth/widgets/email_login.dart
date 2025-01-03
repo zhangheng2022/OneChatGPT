@@ -1,5 +1,6 @@
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:one_chatgpt_flutter/utils/validator.dart';
 import 'package:one_chatgpt_flutter/widgets/circular_progress.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -62,7 +63,7 @@ class _LoginEmailState extends State<LoginEmail> {
               },
               onChanged: (val) => setState(() => _userEmail = val),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             TextFormField(
               obscureText: _hideObscureText,
               keyboardType: TextInputType.visiblePassword,
@@ -75,7 +76,8 @@ class _LoginEmailState extends State<LoginEmail> {
                             ? Icons.visibility_off
                             : Icons.visibility),
                         onPressed: () => setState(
-                            () => _hideObscureText = !_hideObscureText),
+                          () => _hideObscureText = !_hideObscureText,
+                        ),
                       )
                     : null,
               ),
@@ -86,7 +88,7 @@ class _LoginEmailState extends State<LoginEmail> {
               },
               onChanged: (val) => setState(() => _userPassword = val),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             SizedBox(
               width: double.infinity,
               height: 50,
@@ -102,9 +104,9 @@ class _LoginEmailState extends State<LoginEmail> {
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: () {
-                  SmartDialog.showToast('正在开发中');
+                  context.goNamed('forget_password');
                 },
-                child: const Text('忘记密码?'),
+                child: const Text('重置密码'),
               ),
             )
           ],
