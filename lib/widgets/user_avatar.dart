@@ -4,7 +4,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
-import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:one_chatgpt_flutter/state/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -79,7 +78,7 @@ class UserAvatarState extends State<UserAvatar> {
       SmartDialog.showToast("修改成功");
     } catch (err) {
       // 处理错误
-      Log.e(err);
+      debugPrint(err.toString());
     }
   }
 

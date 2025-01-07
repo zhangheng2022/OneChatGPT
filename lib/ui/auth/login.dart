@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:one_chatgpt_flutter/widgets/circular_progress.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:one_chatgpt_flutter/ui/auth/widgets/email_login.dart';
 import 'package:go_router/go_router.dart';
 import 'package:one_chatgpt_flutter/utils/connectivity_checker.dart';
@@ -32,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
         redirectTo: 'onechatgpt://login-callback',
       );
     } catch (err) {
-      Log.e("github授权登录错误：$err");
+      debugPrint("github授权登录错误：$err");
     }
   }
 
@@ -76,7 +75,6 @@ class _LoginPageState extends State<LoginPage> {
         accessToken: accessToken,
       );
     } catch (err) {
-      Log.e("Google授权失败===>$err");
       SmartDialog.showToast('授权失败，请稍候再试');
     } finally {
       setState(() => _googleLoginLoading = false);
@@ -84,12 +82,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   bool _isCanPop = false;
-  Timer _timer = Timer(const Duration(), () {});
 
   @override
   void dispose() {
-    // 组件销毁时取消 Timer，避免内存泄漏
-    _timer.cancel();
     super.dispose();
   }
 
@@ -99,14 +94,12 @@ class _LoginPageState extends State<LoginPage> {
     return PopScope(
       canPop: _isCanPop,
       onPopInvokedWithResult: (bool didPop, Object? result) async {
-        Log.i(didPop);
         if (!didPop) {
           SmartDialog.showToast('再按一次退出');
           setState(() {
             _isCanPop = true;
           });
-          _timer.cancel();
-          _timer = Timer(const Duration(seconds: 2), () {
+          Timer(const Duration(seconds: 2), () {
             setState(() {
               _isCanPop = false;
             });

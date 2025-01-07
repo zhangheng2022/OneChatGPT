@@ -47,7 +47,6 @@ dependencies:
   go_router: ^14.6.3
   drift: ^2.23.1
   path: ^1.9.0
-  logger: ^2.5.0
   app_links: ^6.3.3
   google_fonts: ^6.2.1
   flutter_dotenv: ^5.2.1

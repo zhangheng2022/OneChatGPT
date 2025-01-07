@@ -3,7 +3,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:app_links/app_links.dart';
-import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
@@ -23,7 +22,6 @@ class Screen {
 
       FlutterNativeSplash.remove();
     } catch (e) {
-      Log.e('Initialization failed: $e');
       FlutterNativeSplash.remove();
       rethrow;
     }
@@ -31,7 +29,9 @@ class Screen {
 
   static Future<void> _initializeAppLinks() async {
     final appLinks = AppLinks();
-    appLinks.uriLinkStream.listen((uri) => Log.i('Deep link received: $uri'));
+    appLinks.uriLinkStream.listen(
+      (uri) => debugPrint('深度链接触发: $uri'),
+    );
   }
 
   static Future<void> _initializeLocalization() async {
@@ -52,7 +52,7 @@ class Screen {
         await supabase.auth.refreshSession();
       }
     } catch (e) {
-      Log.e('Supabase initialization failed: $e');
+      debugPrint('初始化 Supabase 失败: $e');
       rethrow;
     }
   }

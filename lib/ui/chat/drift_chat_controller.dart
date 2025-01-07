@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:drift/drift.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:one_chatgpt_flutter/database/chat_record.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
-import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:uuid/uuid.dart';
 
 class DriftChatController implements ChatController {
@@ -97,7 +97,7 @@ class DriftChatController implements ChatController {
       messagesList[index] = newMessage;
       _operationsController.add(ChatOperation.update(oldMessage, newMessage));
     } else {
-      Log.e('更新失败,缺少需要更新的消息');
+      debugPrint('更新失败,缺少需要更新的消息');
     }
   }
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:one_chatgpt_flutter/state/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -29,7 +28,6 @@ class _UpdateName extends State<UpdateName> {
       );
       SmartDialog.showToast("修改成功");
     } catch (err) {
-      Log.e("更新用户名错误：$err");
       SmartDialog.showToast("系统错误，请稍候再试");
     } finally {
       SmartDialog.dismiss(status: SmartStatus.loading);

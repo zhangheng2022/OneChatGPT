@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:one_chatgpt_flutter/utils/validator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -32,7 +31,6 @@ class _UpdatePassword extends State<UpdatePassword> {
       );
       SmartDialog.showToast("密码修改成功，下次登录请使用新密码");
     } catch (err) {
-      Log.e("UpdatePassword错误===>$err");
       if (err is AuthException) {
         if (err.statusCode == '422') {
           SmartDialog.showToast("新密码和旧密码相同，请检查");

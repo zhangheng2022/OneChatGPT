@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:one_chatgpt_flutter/database/chat_record.dart';
 import 'package:one_chatgpt_flutter/database/database.dart';
 import 'package:one_chatgpt_flutter/ui/index/widgets/home_left_drawer.dart';
-import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:provider/provider.dart';
 
 class Home extends StatefulWidget {

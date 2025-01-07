@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:one_chatgpt_flutter/models/model_setting/model_setting.dart';
 import 'package:one_chatgpt_flutter/models/network_channel/network_channel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -42,7 +41,7 @@ class ModelSettingProvider extends ChangeNotifier {
   /// ModelSettingProvider 类的构造函数。
   /// 通过调用 _init() 方法初始化类。
   ModelSettingProvider() {
-    Log.t("ModelConfigProvider初始化");
+    debugPrint("ModelConfigProvider初始化");
     _init();
   }
 
@@ -51,8 +50,6 @@ class ModelSettingProvider extends ChangeNotifier {
     /// 从 Supabase 获取可用模型列表。
     List<dynamic> data =
         await _supabase.rpc('get_model_config').catchError((onError) {
-      Log.e(onError);
-
       return [];
     });
 

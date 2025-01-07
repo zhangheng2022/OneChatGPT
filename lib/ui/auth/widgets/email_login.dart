@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:one_chatgpt_flutter/utils/validator.dart';
 import 'package:one_chatgpt_flutter/widgets/circular_progress.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:one_chatgpt_flutter/utils/log.dart';
 
 class LoginEmail extends StatefulWidget {
   const LoginEmail({super.key});
@@ -33,7 +32,6 @@ class _LoginEmailState extends State<LoginEmail> {
         password: _userPassword,
       );
     } catch (err) {
-      Log.e("登录错误===>$err");
       SmartDialog.showToast('邮箱或密码不正确，请检查');
     } finally {
       setState(() => _isLoading = false);

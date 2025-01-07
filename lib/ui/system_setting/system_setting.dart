@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:one_chatgpt_flutter/state/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -16,11 +14,7 @@ class _SystemSettingState extends State<SystemSetting> {
   late PackageInfo packageInfo;
 
   Future<void> init() async {
-    try {
-      packageInfo = await PackageInfo.fromPlatform();
-    } catch (e) {
-      Log.e("packageInfo错误：$e");
-    }
+    packageInfo = await PackageInfo.fromPlatform();
   }
 
   @override

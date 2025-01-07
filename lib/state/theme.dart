@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ThemeProvider extends ChangeNotifier {
@@ -27,7 +26,7 @@ class ThemeProvider extends ChangeNotifier {
   }
 
   ThemeProvider() {
-    Log.t("AppTheme初始化");
+    debugPrint("AppTheme初始化");
     _init();
   }
 

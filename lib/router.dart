@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:one_chatgpt_flutter/ui/auth/forget_password.dart';
 import 'package:one_chatgpt_flutter/ui/faq/faq.dart';
-import 'package:one_chatgpt_flutter/utils/log.dart';
 import 'package:one_chatgpt_flutter/ui/auth/login.dart';
 import 'package:one_chatgpt_flutter/ui/auth/register.dart';
 import 'package:one_chatgpt_flutter/ui/chat/chat_home.dart';
@@ -156,7 +155,6 @@ class AppRoutes {
 }
 
 Future<bool> _showDialog(BuildContext context, GoRouterState state) async {
-  Log.d(state);
   final response = await showDialog<bool>(
     context: context,
     builder: (BuildContext context) {
