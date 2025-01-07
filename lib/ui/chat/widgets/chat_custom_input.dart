@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
-import 'package:flutter_chat_ui/src/utils/chat_input_height_notifier.dart';
 
 typedef OnMessageTapCallback = void Function(Message message);
 typedef OnMessageSendCallback = void Function(String text);

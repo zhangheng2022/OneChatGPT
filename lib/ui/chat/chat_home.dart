@@ -93,7 +93,7 @@ class _ChatHomeState extends State<ChatHome> {
       messages: historyMessages.sublist(startIndex),
       preset: _preset.name,
     );
-    print(params);
+    debugPrint(params.toString());
     final session = supabaseClient.auth.currentSession;
     try {
       final response = await DioSingleton.instance.post(

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 
 class DioSingleton {
   static final Dio _dio = Dio();
@@ -15,13 +16,13 @@ class DioSingleton {
 class DioInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    print('Request: ${options.uri}');
+    debugPrint('Request: ${options.uri}');
     super.onRequest(options, handler);
   }
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    print('Response: ${response.statusCode}');
+    debugPrint('Response: ${response.statusCode}');
     super.onResponse(response, handler);
   }
 }

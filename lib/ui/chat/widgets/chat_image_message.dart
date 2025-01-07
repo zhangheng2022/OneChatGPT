@@ -34,7 +34,7 @@ class ChatImageMessageState extends State<ChatImageMessage> {
       await Gal.putImageBytes(imageBytes);
       SmartDialog.showToast("保存成功，请前往相册查看", alignment: Alignment.center);
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       SmartDialog.showToast("保存失败", alignment: Alignment.center);
     }
   }

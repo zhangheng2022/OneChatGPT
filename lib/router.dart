@@ -154,29 +154,29 @@ class AppRoutes {
   );
 }
 
-Future<bool> _showDialog(BuildContext context, GoRouterState state) async {
-  final response = await showDialog<bool>(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('提示'),
-        content: const Text("确定退出？"),
-        actions: <Widget>[
-          TextButton(
-            child: const Text('取消'),
-            onPressed: () {
-              Navigator.of(context).pop(false);
-            },
-          ),
-          TextButton(
-            child: const Text('退出'),
-            onPressed: () {
-              Navigator.of(context).pop(true);
-            },
-          ),
-        ],
-      );
-    },
-  );
-  return response ?? false;
-}
+// Future<bool> _showDialog(BuildContext context, GoRouterState state) async {
+//   final response = await showDialog<bool>(
+//     context: context,
+//     builder: (BuildContext context) {
+//       return AlertDialog(
+//         title: const Text('提示'),
+//         content: const Text("确定退出？"),
+//         actions: <Widget>[
+//           TextButton(
+//             child: const Text('取消'),
+//             onPressed: () {
+//               Navigator.of(context).pop(false);
+//             },
+//           ),
+//           TextButton(
+//             child: const Text('退出'),
+//             onPressed: () {
+//               Navigator.of(context).pop(true);
+//             },
+//           ),
+//         ],
+//       );
+//     },
+//   );
+//   return response ?? false;
+// }

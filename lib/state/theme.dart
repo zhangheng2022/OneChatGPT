@@ -18,9 +18,6 @@ class ThemeProvider extends ChangeNotifier {
       case ThemeMode.dark:
         key = "dark";
         break;
-      default:
-        key = "system";
-        break;
     }
     return key;
   }
