@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -18,6 +19,7 @@ class Screen {
         _initializeAppLinks(),
         _initializeLocalization(),
         _initializeSupabase(),
+        _initializeSentry(),
       ]);
 
       FlutterNativeSplash.remove();
@@ -55,5 +57,20 @@ class Screen {
       debugPrint('初始化 Supabase 失败: $e');
       rethrow;
     }
+  }
+
+  static Future<void> _initializeSentry() async {
+    final sentryDsn = dotenv.env['SENTRY_DSN'];
+    if (sentryDsn == null) {
+      debugPrint('sentryDsn未配置: $sentryDsn');
+      return;
+    }
+    await SentryFlutter.init(
+      (SentryFlutterOptions options) {
+        options.dsn = sentryDsn;
+        options.experimental.replay.sessionSampleRate = 1.0;
+        options.experimental.replay.onErrorSampleRate = 1.0;
+      },
+    );
   }
 }
