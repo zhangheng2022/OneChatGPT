@@ -9,6 +9,7 @@ import 'package:one_chatgpt_flutter/database/database.dart';
 import 'package:one_chatgpt_flutter/models/network_chat/request_chat.dart';
 import 'package:one_chatgpt_flutter/models/network_chat/response_chat.dart';
 import 'package:one_chatgpt_flutter/services/dio_singleton.dart';
+import 'package:one_chatgpt_flutter/state/theme.dart';
 import 'package:one_chatgpt_flutter/ui/chat/drift_chat_controller.dart';
 import 'package:one_chatgpt_flutter/ui/chat/widgets/chat_custom_input.dart';
 import 'package:one_chatgpt_flutter/ui/chat/widgets/chat_image_message.dart';
@@ -286,7 +287,7 @@ class _ChatHomeState extends State<ChatHome> {
   };
 
   void _initPreset() async {
-    final chatRecord = await Provider.of<AppDatabase>(context)
+    final chatRecord = await Provider.of<AppDatabase>(context, listen: false)
         .managers
         .chatRecord
         .filter((row) => row.id.equals(int.parse(widget.chatId)))
@@ -299,6 +300,7 @@ class _ChatHomeState extends State<ChatHome> {
   @override
   void initState() {
     super.initState();
+    _initPreset();
   }
 
   @override
@@ -308,7 +310,6 @@ class _ChatHomeState extends State<ChatHome> {
       database: Provider.of<AppDatabase>(context),
       chatId: widget.chatId,
     );
-    _initPreset();
   }
 
   @override
@@ -319,6 +320,7 @@ class _ChatHomeState extends State<ChatHome> {
 
   @override
   Widget build(BuildContext context) {
+    String currentThemeKey = context.watch<ThemeProvider>().currentThemeKey;
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -360,7 +362,8 @@ class _ChatHomeState extends State<ChatHome> {
         chatController: _chatController,
         user: User(id: 'user'),
         scrollController: _scrollController,
-        themeMode: ThemeMode.light,
+        themeMode: currentThemeKey == 'dark' ? ThemeMode.dark : ThemeMode.light,
+        darkTheme: ChatTheme.dark().copyWith(backgroundColor: Colors.white),
       ),
     );
   }

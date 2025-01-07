@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:intl/intl.dart';
 import 'package:one_chatgpt_flutter/widgets/photo_view_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
+import 'package:gal/gal.dart';
 
 class ChatImageMessage extends StatefulWidget {
   final ImageMessage message;
@@ -27,6 +29,16 @@ class ChatImageMessageState extends State<ChatImageMessage> {
     'error': "图片生成失败",
   };
 
+  Future<void> _saveImage(Uint8List imageBytes) async {
+    try {
+      await Gal.putImageBytes(imageBytes);
+      SmartDialog.showToast("保存成功，请前往相册查看", alignment: Alignment.center);
+    } catch (e) {
+      print(e);
+      SmartDialog.showToast("保存失败", alignment: Alignment.center);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -44,9 +56,7 @@ class ChatImageMessageState extends State<ChatImageMessage> {
       padding: const EdgeInsets.all(10),
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: isUser
-            ? Theme.of(context).colorScheme.primaryContainer
-            : Theme.of(context).colorScheme.surfaceContainer,
+        color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(10),
           topRight: Radius.circular(10),
@@ -103,7 +113,9 @@ class ChatImageMessageState extends State<ChatImageMessage> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      _saveImage(imageBytes);
+                    },
                     child: Icon(
                       Icons.download_outlined,
                       size: 20,
