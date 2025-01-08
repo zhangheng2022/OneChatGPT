@@ -77,11 +77,11 @@ jobs:
       - name: Prepare APKs for upload
         run: |
           cd build/app/outputs/flutter-apk/
-          mv app-release.apk "OneChatGPT-${{ env.VERSION }}-fat.apk"
+          mv app-release.apk "OneChatGPT-fat.apk"
           for apk in *-release.apk; do
             if [[ $apk != OneChatGPT* ]]; then
               abi=$(echo "$apk" | sed -n 's/.*app-\(.*\)-release.apk/\1/p')
-              mv "$apk" "OneChatGPT-${{ env.VERSION }}-${abi}.apk"
+              mv "$apk" "OneChatGPT-${abi}.apk"
             fi
           done
 
