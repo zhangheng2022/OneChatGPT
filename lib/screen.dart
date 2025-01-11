@@ -24,16 +24,13 @@ class Screen {
 
       FlutterNativeSplash.remove();
     } catch (e) {
-      FlutterNativeSplash.remove();
       rethrow;
     }
   }
 
   static Future<void> _initializeAppLinks() async {
     final appLinks = AppLinks();
-    appLinks.uriLinkStream.listen(
-      (uri) => debugPrint('深度链接触发: $uri'),
-    );
+    appLinks.uriLinkStream.listen((uri) => debugPrint('深度链接触发: $uri'));
   }
 
   static Future<void> _initializeLocalization() async {
