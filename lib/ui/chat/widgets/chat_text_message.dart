@@ -22,7 +22,7 @@ class ChatTextMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isUser = context.watch<User>().id == message.author.id;
+    final isUser = context.watch<String>() == message.authorId;
     final messageStatus = message.metadata?['status'];
 
     return Container(

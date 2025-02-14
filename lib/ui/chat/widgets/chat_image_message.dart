@@ -49,7 +49,7 @@ class ChatImageMessageState extends State<ChatImageMessage> {
   Widget build(BuildContext context) {
     final message = widget.message;
     Uint8List imageBytes = base64Decode(message.source);
-    final isUser = context.watch<User>().id == message.author.id;
+    final isUser = context.watch<String>() == message.authorId;
     final messageStatus = message.metadata?['status'];
 
     return Container(

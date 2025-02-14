@@ -77,12 +77,12 @@ class _ChatHomeState extends State<ChatHome> {
         if (message is TextMessage) {
           return RequestChatMessage(
             content: message.text,
-            role: message.author.id,
+            role: message.authorId,
           );
         }
         return RequestChatMessage(
           content: "不支持的消息类型",
-          role: message.author.id,
+          role: message.authorId,
         );
       },
     ).toList();
@@ -123,12 +123,12 @@ class _ChatHomeState extends State<ChatHome> {
         if (message is TextMessage) {
           return RequestChatMessage(
             content: message.text,
-            role: message.author.id,
+            role: message.authorId,
           );
         } else {
           return RequestChatMessage(
             content: "不支持的消息类型",
-            role: message.author.id,
+            role: message.authorId,
           );
         }
       },
@@ -194,7 +194,7 @@ class _ChatHomeState extends State<ChatHome> {
     await _chatController.insert(
       TextMessage(
         id: const Uuid().v4(),
-        author: User(id: 'user'),
+        authorId: 'user',
         createdAt: DateTime.now(),
         text: text,
       ),
@@ -206,7 +206,7 @@ class _ChatHomeState extends State<ChatHome> {
       await _chatController.insert(
         TextMessage(
           id: messageId,
-          author: User(id: 'assistant'),
+          authorId: 'assistant',
           createdAt: DateTime.now(),
           text: '',
           metadata: {'status': 'init'},
@@ -228,7 +228,7 @@ class _ChatHomeState extends State<ChatHome> {
       await _chatController.insert(
         ImageMessage(
           id: messageId,
-          author: User(id: 'assistant'),
+          authorId: 'assistant',
           createdAt: DateTime.now(),
           source: '',
           metadata: {'status': 'init'},
@@ -244,7 +244,7 @@ class _ChatHomeState extends State<ChatHome> {
           oldMessage,
           ImageMessage(
             id: messageId,
-            author: User(id: 'assistant'),
+            authorId: 'assistant',
             createdAt: DateTime.now(),
             source: '',
             metadata: {'status': 'error'},
@@ -257,7 +257,7 @@ class _ChatHomeState extends State<ChatHome> {
           oldMessage,
           ImageMessage(
             id: messageId,
-            author: User(id: 'assistant'),
+            authorId: 'assistant',
             createdAt: DateTime.now(),
             source: message.imageData ?? '',
           ),
@@ -267,7 +267,7 @@ class _ChatHomeState extends State<ChatHome> {
           oldMessage,
           TextMessage(
             id: messageId,
-            author: User(id: 'assistant'),
+            authorId: 'assistant',
             createdAt: DateTime.now(),
             text: message.choices[0].message?.content ?? '',
           ),
@@ -320,7 +320,6 @@ class _ChatHomeState extends State<ChatHome> {
 
   @override
   Widget build(BuildContext context) {
-    String currentThemeKey = context.watch<ThemeProvider>().currentThemeKey;
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -360,10 +359,8 @@ class _ChatHomeState extends State<ChatHome> {
         onMessageSend: _handleMessageSend,
         // onAttachmentTap: _handleAttachmentTap,
         chatController: _chatController,
-        user: User(id: 'user'),
-        scrollController: _scrollController,
-        themeMode: currentThemeKey == 'dark' ? ThemeMode.dark : ThemeMode.light,
-        darkTheme: ChatTheme.dark().copyWith(backgroundColor: Colors.white),
+        currentUserId: 'user',
+        resolveUser: (id) async => User(id: "user"),
       ),
     );
   }

@@ -51,9 +51,7 @@ class _ChatCustomInputState extends State<ChatCustomInput> {
     final renderBox =
         _inputKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox != null) {
-      context
-          .read<ChatInputHeightNotifier>()
-          .updateHeight(renderBox.size.height);
+      context.read<ChatInputHeightNotifier>().setHeight(renderBox.size.height);
     }
   }
 
