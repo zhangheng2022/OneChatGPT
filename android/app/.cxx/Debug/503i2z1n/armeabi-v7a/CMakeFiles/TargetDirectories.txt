@@ -1,0 +1,2 @@
+C:/Users/96227/Desktop/Works/other/flutter-project/OneChatGPT/android/app/.cxx/Debug/503i2z1n/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/96227/Desktop/Works/other/flutter-project/OneChatGPT/android/app/.cxx/Debug/503i2z1n/armeabi-v7a/CMakeFiles/rebuild_cache.dir
